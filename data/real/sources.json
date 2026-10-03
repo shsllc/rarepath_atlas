@@ -147,6 +147,54 @@
     "meta": {}
   },
   {
+    "id": "pubmed:31147226",
+    "kind": "pubmed_abstract",
+    "title": "Severity Assessment in CDKL5 Deficiency Disorder.",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+    "retrieval_date": "2026-10-03",
+    "retrieved_via": "NCBI E-utilities esummary + efetch (db=pubmed)",
+    "text": "BACKGROUND: Pathologic mutations in cyclin-dependent kinase-like 5 cause CDKL5 deficiency disorder, a genetic syndrome associated with severe epilepsy and cognitive, motor, visual, and autonomic disturbances. This disorder is a relatively common genetic cause of early-life epilepsy. A specific severity assessment is lacking, required to monitor the clinical course and needed to define the natural history and for clinical trial readiness.\nMETHODS: A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium. An initial draft severity assessment was presented and reviewed at the annual CDKL5 Forum meeting (Boston, 2017). Subsequently it was iterated through four cycles of a modified Delphi process by a group of clinicians, researchers, industry, patient advisory groups, and parents familiar with this disorder until consensus was achieved. The revised version of the severity assessment was presented for review, comment, and piloting to families at the International Foundation for CDKL5 Research-sponsored family meeting (Colorado, 2018). Final revisions were based on this additional input.\nRESULTS: The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions. Parental ratings of therapy effectiveness and child and family functioning are also included.\nCONCLUSIONS: A severity assessment was rapidly developed with input from multiple stakeholders. Refinement through ongoing validation is required for future clinical trials. The consensus methods employed for the development of severity assessment may be applicable to similar rare disorders.",
+    "citation": {
+      "pmid": "31147226",
+      "pmcid": "PMC6659999",
+      "doi": "10.1016/j.pediatrneurol.2019.03.017"
+    },
+    "authors": [
+      "Demarest S",
+      "Pestana-Knight EM",
+      "Olson HE",
+      "Downs J",
+      "Marsh ED",
+      "Kaufmann WE",
+      "Partridge CA",
+      "Leonard H",
+      "Gwadry-Sridhar F",
+      "Frame KE",
+      "Cross JH",
+      "Chin RFM",
+      "Parikh S",
+      "Panzer A",
+      "Weisenberg J",
+      "Utley K",
+      "Jaksha A",
+      "Amin S",
+      "Khwaja O",
+      "Devinsky O",
+      "Neul JL",
+      "Percy AK",
+      "Benke TA"
+    ],
+    "pub_date": "2019 Aug",
+    "journal": "Pediatr Neurol",
+    "publication_types": [
+      "Journal Article",
+      "Research Support, N.I.H., Extramural",
+      "Research Support, Non-U.S. Gov't",
+      "Review"
+    ],
+    "meta": {}
+  },
+  {
     "id": "pmc:PMC8882337",
     "kind": "pmc_excerpt",
     "title": "Comparison of core features in four Developmental Encephalopathies in the Rett Natural History Study (selected full-text sentences)",

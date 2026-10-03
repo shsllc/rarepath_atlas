@@ -1,26 +1,26 @@
-# Demo path: CDKL5 deficiency disorder (verified, Gate 2)
+# Demo path: CDKL5 deficiency disorder (verified, Gate 3)
 
-## The journey a judge sees
+## The 60-second judge path
 
-Search **CDKL5** (or "CDD", "CDKL5 deficiency disorder"). Every statement below opens to its verbatim source quote in the evidence drawer.
+Open `/results?q=CDKL5&demo=1`. The numbered *Suggested demo path* panel links each step:
 
-1. **Your disease:** CDKL5 deficiency disorder. Identifiers MONDO:0100039 and GARD:0026021 (both verified via EBI OLS); gene CDKL5 (HGNC:11411). Four sourced features: seizure, epileptic spasm, cerebral visual impairment, developmental regression. Mechanism is shown as *not described in the retrieved sources*, deliberately.
-2. **Connected communities**
-   - Rett syndrome, *shared research infrastructure* (**Known**): both enrolled in NCT02738281; the 2020 paper compared 793 participants head to head.
-   - Rett syndrome, *historical classification* (**Contradictory**): CDD was "initially considered a variant of Rett syndrome", but that classification is superseded.
-   - Rett syndrome, *important clinical differences* (**Known**): seizure onset (2 months, youngest), regression (all Rett vs. 23–34% of the others), seizures before baseline (96.2% vs. 47.5%).
-   - FOXG1 disorder and MECP2 duplication syndrome: co-enrolled in the same study, with their documented differences.
-3. **Reusable research** (never "Known"; each card has a conservative reuse class)
-   - **Shared research-infrastructure precedent:** the Rett and Rett-Related Disorders Natural History Study (NCT02738281, RDCRN 5211, NIH U54HD061222).
-   - **Potentially adaptable:** the RTT Clinical Severity Scale was administered to CDD participants (median score 29). The card also shows the authors' own caveats and the CDD-specific CDKL5 Developmental Score.
-   - **Discovery lead:** the biobank of Rett and related disorders (NCT02705677), which lists CDKL5 among its conditions.
-4. **Next action** (sourced): review the NCT02738281 record and the 2020 paper's methods with a CDD clinical researcher, to identify which recruitment, longitudinal-data or outcome-measure components are transferable. The 2020 authors themselves suggest comparing the CSS with a CDD-specific scale using the Natural History Study database.
-5. **People & communities:** IFCR, Loulou Foundation, IRSF and the FOXG1 Research Foundation (official sites). The registry-listed PI and study director appear with no contact data. Key publications show a preprint badge where applicable.
-6. **What we don't know:** seven gaps, covering mechanism, the superseded classification, data access, CSS validity in CDD, no treatment transfer, the preprint status, and count discrepancies.
+1. **Search CDKL5.** The gene resolves to CDKL5 deficiency disorder (MONDO:0100039).
+2. **"Shared research infrastructure found":** CDD and Rett participants were enrolled in the same NIH-funded natural-history study (NCT02738281).
+3. **Open the study:** the node view shows the NCT link, conditions (Rett, MECP2 duplication, **CDKL5 Disorder**, FOXG1), and 9 sourced relationships.
+4. **Contradiction spotlight:** the historical "Atypical Rett Syndrome" label (preserved in the MONDO definition) vs. current evidence (*Lancet Neurol* 2022, *Ann Neurol* 2020).
+5. **Featured reusable research:** a shared research-infrastructure precedent, in five evidence-cited lines:
+   - **What happened:** CDD participants were enrolled alongside Rett, FOXG1 and MECP2 duplication.
+   - **Why it matters:** sharing has already happened; the NHS consortium's experience helped build a CDD-specific severity assessment (PMID 31147226).
+   - **Potentially adaptable asset:** the RTT Clinical Severity Scale was given to every participant, including CDD (median 29).
+   - **Important limitation:** the scale is not established as valid for CDD; seizure frequency may raise scores; the CDD assessment still needs validation.
+   - **Next research question:** how do the RTT CSS and the CDD-specific severity assessment compare in people with CDD, and could the NHS database support that comparison?
+6. **Explain this connection:** the OpenAI Path Explainer returns four short parts, under 180 words.
+7. **Evidence graph:** 11 entities and 15 reviewed relationships by default, with the contradicted classification drawn as a double line.
+8. **End at the next research question.**
 
-Honest negatives: "Seizure" explains that it is a symptom and lists the diseases it is annotated on. Any off-scope term, for example "ketogenic diet", returns *No supported connection found*.
+Honest negatives: "Seizure" explains that it is a symptom; off-scope terms return *No supported connection found*.
 
-## Sources retrieved (data/real/sources.json, 21 records)
+## Sources retrieved (data/real/sources.json, 22 records)
 
 | Source | Retrieved via | Key content |
 |---|---|---|
@@ -28,6 +28,7 @@ Honest negatives: "Seizure" explains that it is a symptom and lists the diseases
 | PMC8882337 full-text excerpts (12 sentences) | E-utilities `db=pmc`; license: *available for text mining* | Recruitment through **NCT02738281**; CSS and CGI-S given to all participants; "variant RTT" nomenclature "should not be used"; CSS caveats |
 | PMID 35483386: Leonard et al., *Lancet Neurol* 2022 (PMC9788833) | E-utilities | "initially considered a variant of Rett syndrome … now recognised as an independent disorder" |
 | PMID 39867409: Aledo-Serrano et al., **medRxiv preprint** 2025 (PMC11759598) | E-utilities | 67 adults with CDD; CDKL5 Developmental Score; **not peer reviewed** |
+| PMID 31147226: Demarest et al., *Pediatr Neurol* 2019, "Severity Assessment in CDKL5 Deficiency Disorder" (added in Gate 3; it is ref 22 of PMID 32472944) | E-utilities | 51-item CDD severity assessment "developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium"; "Refinement through ongoing validation is required" |
 | NCT02738281: Natural History of Rett Syndrome & Related Disorders | ClinicalTrials.gov API v2 | Conditions: Rett, MECP2 Duplication, **CDKL5 Disorder**, FOXG1; eligibility names CDKL5; 1,044 enrolled; completed 2021-07 |
 | NCT02705677: Biobanking of Rett Syndrome and Related Disorders | ClinicalTrials.gov API v2 | Conditions include CDKL5; DNA/RNA/plasma/cell lines; grant U54HD061222 |
 | U54HD061222: RDCRC natural-history project (FY2019 record) | NIH RePORTER API v2 | "will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1" |
@@ -49,11 +50,11 @@ The build fails if any quote is not found verbatim in its stored source, any ide
 
 ## Where OpenAI is used
 
-| Role | When | What it did in Gate 2 |
+| Role | When | What it did (latest run) |
 |---|---|---|
-| **Evidence Extractor** | Ingestion (`extract-claims.ts`) | 7 text sources → 85 claims, all with verbatim-verified quotes (0 dropped). 27 corroborate analyst edges; 12 became extractor-only edges, labelled *"Found by the OpenAI Evidence Extractor … not reviewed by an analyst"*. |
-| **Entity Reconciler** | Ingestion | 57 calls mapping mentions such as "CDKL5 deficiency disorder (CDD)" to curated nodes. Only alias matches or **high-confidence** matches are used; 16 claims were rejected for lower-confidence matches. |
-| **Path Explainer** | Runtime (Explain button) | Family-readable explanation of any edge set; it must flag disputed and inferred steps and may cite only the edges it was given. |
+| **Evidence Extractor** | Ingestion (`extract-claims.ts`) | 8 text sources → 114 claims, all with verbatim-verified quotes. 26 corroborate analyst edges; 13 became extractor-only edges, labelled *"Found by the OpenAI Evidence Extractor … not reviewed by an analyst"* and hidden from the default graph. |
+| **Entity Reconciler** | Ingestion | 79 calls mapping mentions such as "CDKL5 deficiency disorder (CDD)" to curated nodes. Only alias matches or **high-confidence** matches are used; 10 claims were rejected for lower-confidence matches. Type-aware matching stops "CDKL5" the disorder resolving to CDKL5 the gene. |
+| **Path Explainer** | Runtime (*Explain this connection*) | Four parts: why it matters / what the evidence shows / what it does not show / next question. 180 words maximum, checked by `checkExplanation()` with one corrective retry; jargon and treatment-transfer phrasing are rejected. |
 
 Run metadata (model, run id, counts) is stored in `build_info.openai_runs` and shown on the results page.
 
@@ -61,6 +62,7 @@ Run metadata (model, run id, counts) is stored in `build_info.openai_runs` and s
 
 - **Sourced (Known):** every relationship edge. Analyst-selected verbatim quotes or registry/ontology fields, re-verified on every build.
 - **Extractor-only edges:** also quote-verified, but the entity mapping and predicate were chosen by the model. They are badged, and they never feed connection cards, reuse cards or actions (enforced by a test).
+- **Graph default view:** only analyst-reviewed edges. AI extractions appear only when the "Include analyst-unreviewed AI extractions" filter is on, drawn faded and labelled "AI-extracted".
 - **Inferred:** every reuse card. A reuse opportunity is a hypothesis, so it is never shown as Known.
 - **Contradictory:** the claim "CDD is a variant of Rett syndrome", which current literature contradicts.
 
@@ -86,9 +88,15 @@ Run metadata (model, run id, counts) is stored in `build_info.openai_runs` and s
 - **Preprint:** the PMID 39867409 figures are from a non-peer-reviewed preprint.
 - **MONDO naming:** MECP2 duplication syndrome is filed under "syndromic X-linked intellectual disability Lubs type" (MONDO:0010283), with MECP2 duplication syndrome as a synonym.
 
-## 10x milestone (to quantify in Gate 3)
+## 10× milestone
 
-Milestone: *identifying and evaluating an existing reusable natural-history study or research asset.* The traditional path is a literature review, then registry searching, then networking to learn whether CDD was ever included. RarePath Atlas gives one search, the registry and grant evidence that CDD was enrolled, the documented differences, and a named next step.
+See [10x-impact.md](10x-impact.md). The claim is limited to compressing the discovery and evidence-assembly part of one milestone, and it lists the measurements needed to prove it. There are no invented time savings.
+
+## Claims changed in Gate 3
+
+- **Weakened:** the 2020 paper's sentence "…no direct comparison has been performed" is now quoted only as "Although they are historically linked". In context it described the situation before that paper; the Path Explainer was reading it as current fact.
+- **Resolved:** the earlier gap "the CDD-specific scale referenced by the 2020 paper has not been identified" is now answered by PMID 31147226.
+- **Re-checked:** the preprint (PMID 39867409) still has no peer-reviewed version in PubMed as of 2026-10-03.
 
 ## Gate 1 fixture
 

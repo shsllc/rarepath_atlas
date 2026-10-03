@@ -5,8 +5,9 @@ import { getServices } from "@/lib/services/registry";
 
 export const dynamic = "force-dynamic";
 
-export default async function ResultsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const q = ((await searchParams).q ?? "").trim();
+export default async function ResultsPage({ searchParams }: { searchParams: Promise<{ q?: string; demo?: string }> }) {
+  const sp = await searchParams;
+  const q = (sp.q ?? "").trim();
   const result = q ? await getServices().search.search(q) : null;
 
   return (
@@ -30,7 +31,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
             )}
           </div>
         )}
-        {result && result.found && <ResultsView result={result} />}
+        {result && result.found && <ResultsView result={result} demo={sp.demo === "1"} />}
       </div>
     </div>
   );

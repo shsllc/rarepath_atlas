@@ -13,8 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen font-sans antialiased">
         <header className="border-b border-line bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <Link href="/" className="font-semibold tracking-tight">
-              RarePath Atlas
+            <Link href="/" className="flex items-baseline gap-2">
+              <span className="font-semibold tracking-tight">RarePath Atlas</span>
+              <span className="hidden text-xs text-muted sm:inline">Rare shouldn&apos;t mean researching alone.</span>
             </Link>
             <span className="text-xs text-muted">Research navigation, not medical advice</span>
           </div>

@@ -342,6 +342,20 @@
       "owner_disease_id": "disease:cdd"
     },
     {
+      "id": "asset:cdd-severity",
+      "label": "CDKL5 Deficiency Disorder severity assessment (Demarest et al., 2019)",
+      "aliases": [
+        "CDD severity assessment",
+        "severity assessment"
+      ],
+      "external_ids": [],
+      "verification": "verified",
+      "type": "ResearchAsset",
+      "asset_kind": "outcome_measure",
+      "owner_disease_id": "disease:cdd",
+      "access_notes": "Published in Pediatric Neurology 2019 (PMID 31147226). The authors state ongoing validation is required."
+    },
+    {
       "id": "asset:biobank",
       "label": "Rett and related disorders biospecimen collection (DNA, RNA, plasma, cell lines)",
       "aliases": [],
@@ -414,6 +428,53 @@
       "pmid": "35483386",
       "pmcid": "PMC9788833",
       "doi": "10.1016/S1474-4422(22)00035-7",
+      "publication_status": "peer_reviewed"
+    },
+    {
+      "id": "paper:31147226",
+      "label": "Severity Assessment in CDKL5 Deficiency Disorder",
+      "aliases": [],
+      "external_ids": [
+        {
+          "system": "PMID",
+          "id": "31147226",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "verification": "verified"
+        }
+      ],
+      "verification": "verified",
+      "type": "Paper",
+      "year": 2019,
+      "journal": "Pediatr Neurol",
+      "authors": [
+        "Demarest S",
+        "Pestana-Knight EM",
+        "Olson HE",
+        "Downs J",
+        "Marsh ED",
+        "Kaufmann WE",
+        "Partridge CA",
+        "Leonard H",
+        "Gwadry-Sridhar F",
+        "Frame KE",
+        "Cross JH",
+        "Chin RFM",
+        "Parikh S",
+        "Panzer A",
+        "Weisenberg J",
+        "Utley K",
+        "Jaksha A",
+        "Amin S",
+        "Khwaja O",
+        "Devinsky O",
+        "Neul JL",
+        "Percy AK",
+        "Benke TA"
+      ],
+      "pub_date": "2019 Aug",
+      "pmid": "31147226",
+      "pmcid": "PMC6659999",
+      "doi": "10.1016/j.pediatrneurol.2019.03.017",
       "publication_status": "peer_reviewed"
     },
     {
@@ -590,6 +651,28 @@
           "method": "structured_api",
           "source_record_id": "mondo:MONDO:0100039",
           "stance": "supports"
+        },
+        {
+          "id": "ev:ai:33",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Pathologic mutations in cyclin-dependent kinase-like 5 cause CDKL5 deficiency disorder, a genetic syndrome associated with severe epilepsy and cognitive, motor, visual, and autonomic disturbances.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
         }
       ],
       "confidence": "high",
@@ -621,26 +704,6 @@
           "method": "structured_api",
           "source_record_id": "mondo:MONDO:0100040",
           "stance": "supports"
-        },
-        {
-          "id": "ev:ai:36",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Eligibility criteria: Inclusion Criteria: * Individuals of both genders and of all ages, with RTT, MECP2 Dup, and, RTT-related disorders including those with mutations or deletions in CDKL5 and FOXG1 genes, or those with RTT (atypical or typical) who are mutation negative.",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
         }
       ],
       "confidence": "high",
@@ -700,7 +763,7 @@
           "retrieval_date": "2026-10-03",
           "source_type": "literature",
           "evidence_type": "direct_statement",
-          "quoted_or_structured_evidence": "Although they are historically linked, no direct comparison has been performed.",
+          "quoted_or_structured_evidence": "Although they are historically linked",
           "citation": {
             "pmid": "32472944",
             "pmcid": "PMC8882337",
@@ -711,7 +774,7 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:12",
+          "id": "ev:ai:21",
           "source": "PubMed abstract (PMID 35483386)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/35483386/",
           "retrieval_date": "2026-10-03",
@@ -728,8 +791,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -1011,6 +1074,28 @@
           "method": "structured_api",
           "source_record_id": "ctgov:NCT02738281",
           "stance": "supports"
+        },
+        {
+          "id": "ev:ai:8",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
         }
       ],
       "confidence": "high",
@@ -1046,41 +1131,43 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:25",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "id": "ev:ai:7",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
+          "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Clinical longitudinal assessments in Rett syndrome (RTT) as measured by mean growth over 5 years.",
+          "quoted_or_structured_evidence": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
           "citation": {
-            "nct": "NCT02738281"
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
           },
           "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
+          "source_record_id": "pubmed:32472944",
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:37",
+          "id": "ev:ai:42",
           "source": "NIH RePORTER",
           "source_url": "https://reporter.nih.gov/project-details/9781383",
           "retrieval_date": "2026-10-03",
           "source_type": "funding_database",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
+          "quoted_or_structured_evidence": "The on-going RTT NHS has provided critical data for organizing and advancing longitudinal studies.",
           "citation": {},
           "method": "openai_extractor",
           "source_record_id": "reporter:U54HD061222",
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -1117,41 +1204,25 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:27",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "id": "ev:ai:9",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
+          "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
+          "quoted_or_structured_evidence": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
           "citation": {
-            "nct": "NCT02738281"
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
           },
           "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
+          "source_record_id": "pubmed:32472944",
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:39",
-          "source": "NIH RePORTER",
-          "source_url": "https://reporter.nih.gov/project-details/9781383",
-          "retrieval_date": "2026-10-03",
-          "source_type": "funding_database",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
-          "citation": {},
-          "method": "openai_extractor",
-          "source_record_id": "reporter:U54HD061222",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -1188,41 +1259,25 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:26",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "id": "ev:ai:10",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
+          "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: mean growth rate over 5 years with subjects having MECP2 duplication syndrome",
+          "quoted_or_structured_evidence": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
           "citation": {
-            "nct": "NCT02738281"
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
           },
           "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
+          "source_record_id": "pubmed:32472944",
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:38",
-          "source": "NIH RePORTER",
-          "source_url": "https://reporter.nih.gov/project-details/9781383",
-          "retrieval_date": "2026-10-03",
-          "source_type": "funding_database",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
-          "citation": {},
-          "method": "openai_extractor",
-          "source_record_id": "reporter:U54HD061222",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -1550,46 +1605,6 @@
           "method": "structured_api",
           "source_record_id": "ctgov:NCT02705677",
           "stance": "supports"
-        },
-        {
-          "id": "ev:ai:28",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "To address these issues, biological materials (DNA, RNA, plasma, cell lines) will be collected from affected individuals and in some cases from unaffected family members, initial evaluation performed to identify additional biological factors contributing to disease severity, and these materials will be stored for future characterization.",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:29",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
         }
       ],
       "confidence": "high",
@@ -1644,13 +1659,13 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:7",
+          "id": "ev:ai:1",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
           "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "citation": {
             "pmid": "32472944",
             "pmcid": "PMC8882337",
@@ -1661,8 +1676,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -1801,28 +1816,6 @@
           "method": "analyst_quote",
           "source_record_id": "pubmed:32472944",
           "stance": "supports"
-        },
-        {
-          "id": "ev:ai:6",
-          "source": "PubMed abstract (PMID 32472944)",
-          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-          "retrieval_date": "2026-10-03",
-          "source_type": "literature",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
-          "citation": {
-            "pmid": "32472944",
-            "pmcid": "PMC8882337",
-            "doi": "10.1002/ana.25797"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "pubmed:32472944",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
         }
       ],
       "confidence": "high",
@@ -1929,29 +1922,7 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:2",
-          "source": "PubMed abstract (PMID 32472944)",
-          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-          "retrieval_date": "2026-10-03",
-          "source_type": "literature",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
-          "citation": {
-            "pmid": "32472944",
-            "pmcid": "PMC8882337",
-            "doi": "10.1002/ana.25797"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "pubmed:32472944",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:4",
+          "id": "ev:ai:11",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
@@ -1968,12 +1939,34 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:13",
+          "id": "ev:ai:19",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        },
+        {
+          "id": "ev:ai:22",
           "source": "PubMed abstract (PMID 35483386)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/35483386/",
           "retrieval_date": "2026-10-03",
@@ -1990,12 +1983,12 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:14",
+          "id": "ev:ai:25",
           "source": "PubMed abstract (PMID 39867409)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
           "retrieval_date": "2026-10-03",
@@ -2012,34 +2005,12 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:16",
-          "source": "PubMed abstract (PMID 39867409)",
-          "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
-          "retrieval_date": "2026-10-03",
-          "source_type": "literature",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Focal-onset and non-motor seizures emerged later.",
-          "citation": {
-            "pmid": "39867409",
-            "pmcid": "PMC11759598",
-            "doi": "10.1101/2025.01.12.24318239"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "pubmed:39867409",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:18",
+          "id": "ev:ai:28",
           "source": "PubMed abstract (PMID 39867409)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
           "retrieval_date": "2026-10-03",
@@ -2056,12 +2027,12 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:20",
+          "id": "ev:ai:31",
           "source": "PubMed abstract (PMID 39867409)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
           "retrieval_date": "2026-10-03",
@@ -2078,12 +2049,12 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:21",
+          "id": "ev:ai:34",
           "source": "PubMed Central full text (PMC8882337)",
           "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8882337/",
           "retrieval_date": "2026-10-03",
@@ -2099,8 +2070,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2139,7 +2110,7 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:15",
+          "id": "ev:ai:26",
           "source": "PubMed abstract (PMID 39867409)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
           "retrieval_date": "2026-10-03",
@@ -2156,8 +2127,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2194,6 +2165,28 @@
           "method": "analyst_quote",
           "source_record_id": "pubmed:35483386",
           "stance": "supports"
+        },
+        {
+          "id": "ev:ai:24",
+          "source": "PubMed abstract (PMID 35483386)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/35483386/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Gastrointestinal, sleep, and musculoskeletal problems are common in CDD, as in other developmental epileptic encephalopathies, but the prevalence of cerebral visual impairment appears higher in CDD.",
+          "citation": {
+            "pmid": "35483386",
+            "pmcid": "PMC9788833",
+            "doi": "10.1016/S1474-4422(22)00035-7"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:35483386",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
         }
       ],
       "confidence": "moderate",
@@ -2248,7 +2241,29 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:19",
+          "id": "ev:ai:16",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        },
+        {
+          "id": "ev:ai:29",
           "source": "PubMed abstract (PMID 39867409)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
           "retrieval_date": "2026-10-03",
@@ -2265,8 +2280,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2305,7 +2320,7 @@
           "stance": "supports"
         },
         {
-          "id": "ev:ai:1",
+          "id": "ev:ai:15",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
@@ -2322,8 +2337,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2470,6 +2485,26 @@
           "method": "analyst_quote",
           "source_record_id": "pmc:PMC8882337",
           "stance": "supports"
+        },
+        {
+          "id": "ev:ai:36",
+          "source": "ClinicalTrials.gov (NCT02738281)",
+          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "retrieval_date": "2026-10-03",
+          "source_type": "trial_registry",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as reported by the mean Clinical Severity Scale (CSS) at 5 years",
+          "citation": {
+            "nct": "NCT02738281"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "ctgov:NCT02738281",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
         }
       ],
       "confidence": "high",
@@ -2522,9 +2557,238 @@
           "method": "analyst_quote",
           "source_record_id": "pubmed:39867409",
           "stance": "supports"
+        },
+        {
+          "id": "ev:ai:30",
+          "source": "PubMed abstract (PMID 39867409)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/39867409/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "We analyzed demographic, phenotypic, CDKL5 Developmental Score (CDS), and treatment data, and tested associations with genetic factors, sex, and a positive or negative history of neonatal seizures, as an early predictor of prognosis.",
+          "citation": {
+            "pmid": "39867409",
+            "pmcid": "PMC11759598",
+            "doi": "10.1101/2025.01.12.24318239"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:39867409",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
         }
       ],
       "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:sa-cdd",
+      "subject_id": "asset:cdd-severity",
+      "predicate": "applied_to",
+      "object_id": "disease:cdd",
+      "source": "PubMed abstract (PMID 31147226)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "direct_statement",
+      "quoted_or_structured_evidence": "A specific severity assessment is lacking, required to monitor the clinical course and needed to define the natural history and for clinical trial readiness.",
+      "evidence": [
+        {
+          "id": "ev:sa-cdd:1",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "A specific severity assessment is lacking, required to monitor the clinical course and needed to define the natural history and for clinical trial readiness.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        },
+        {
+          "id": "ev:sa-cdd:2",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        },
+        {
+          "id": "ev:sa-cdd:3",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "Refinement through ongoing validation is required for future clinical trials.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "qualifies"
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:nhs-informed-sa",
+      "subject_id": "study:nhs",
+      "predicate": "informed_development_of",
+      "object_id": "asset:cdd-severity",
+      "source": "PubMed abstract (PMID 31147226)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "direct_statement",
+      "quoted_or_structured_evidence": "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium.",
+      "evidence": [
+        {
+          "id": "ev:nhs-informed-sa:1",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        },
+        {
+          "id": "ev:nhs-informed-sa:2",
+          "source": "PubMed Central full text (PMC8882337)",
+          "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8882337/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "disease-specific severity scales are needed to be developed (and one has been developed for CDD)",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pmc:PMC8882337",
+          "stance": "supports"
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ifcr-informed-sa",
+      "subject_id": "org:ifcr",
+      "predicate": "informed_development_of",
+      "object_id": "asset:cdd-severity",
+      "source": "PubMed abstract (PMID 31147226)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "direct_statement",
+      "quoted_or_structured_evidence": "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium",
+      "evidence": [
+        {
+          "id": "ev:ifcr-informed-sa:1",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        },
+        {
+          "id": "ev:ifcr-informed-sa:2",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "The revised version of the severity assessment was presented for review, comment, and piloting to families at the International Foundation for CDKL5 Research-sponsored family meeting (Colorado, 2018).",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:sa-paper",
+      "subject_id": "asset:cdd-severity",
+      "predicate": "described_in",
+      "object_id": "paper:31147226",
+      "source": "PubMed abstract (PMID 31147226)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "direct_statement",
+      "quoted_or_structured_evidence": "A severity assessment was rapidly developed with input from multiple stakeholders.",
+      "evidence": [
+        {
+          "id": "ev:sa-paper:1",
+          "source": "PubMed abstract (PMID 31147226)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "direct_statement",
+          "quoted_or_structured_evidence": "A severity assessment was rapidly developed with input from multiple stakeholders.",
+          "citation": {
+            "pmid": "31147226",
+            "pmcid": "PMC6659999",
+            "doi": "10.1016/j.pediatrneurol.2019.03.017"
+          },
+          "method": "analyst_quote",
+          "source_record_id": "pubmed:31147226",
+          "stance": "supports"
+        }
+      ],
+      "confidence": "high",
       "inferred": false,
       "contradiction_status": "none",
       "created_at": "2026-10-03"
@@ -2824,25 +3088,25 @@
       "created_at": "2026-10-03"
     },
     {
-      "id": "edge:ai:disease:rett|has_phenotype|pheno:seizure",
+      "id": "edge:ai:disease:rett|phenotypically_overlaps|disease:foxg1",
       "subject_id": "disease:rett",
-      "predicate": "has_phenotype",
-      "object_id": "pheno:seizure",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:foxg1",
       "source": "PubMed abstract (PMID 32472944)",
       "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
       "retrieval_date": "2026-10-03",
       "source_type": "literature",
       "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+      "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
       "evidence": [
         {
-          "id": "ev:ai:3",
+          "id": "ev:ai:2",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
           "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "citation": {
             "pmid": "32472944",
             "pmcid": "PMC8882337",
@@ -2853,8 +3117,190 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        },
+        {
+          "id": "ev:ai:13",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Rett syndrome and FOGX1 were intermediate in both features.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:rett|phenotypically_overlaps|disease:mdd",
+      "subject_id": "disease:rett",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:mdd",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+      "evidence": [
+        {
+          "id": "ev:ai:3",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:cdd|phenotypically_overlaps|disease:foxg1",
+      "subject_id": "disease:cdd",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:foxg1",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+      "evidence": [
+        {
+          "id": "ev:ai:4",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:cdd|phenotypically_overlaps|disease:mdd",
+      "subject_id": "disease:cdd",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:mdd",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+      "evidence": [
+        {
+          "id": "ev:ai:5",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:foxg1|phenotypically_overlaps|disease:mdd",
+      "subject_id": "disease:foxg1",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:mdd",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+      "evidence": [
+        {
+          "id": "ev:ai:6",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2876,7 +3322,7 @@
       "quoted_or_structured_evidence": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
       "evidence": [
         {
-          "id": "ev:ai:5",
+          "id": "ev:ai:12",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
@@ -2893,36 +3339,18 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:disease:rett|phenotypically_overlaps|disease:foxg1",
-      "subject_id": "disease:rett",
-      "predicate": "phenotypically_overlaps",
-      "object_id": "disease:foxg1",
-      "source": "PubMed abstract (PMID 32472944)",
-      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-      "retrieval_date": "2026-10-03",
-      "source_type": "literature",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
-      "evidence": [
+        },
         {
-          "id": "ev:ai:8",
+          "id": "ev:ai:14",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
           "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "quoted_or_structured_evidence": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
           "citation": {
             "pmid": "32472944",
             "pmcid": "PMC8882337",
@@ -2933,8 +3361,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -2944,105 +3372,25 @@
       "created_at": "2026-10-03"
     },
     {
-      "id": "edge:ai:disease:rett|phenotypically_overlaps|disease:mdd",
-      "subject_id": "disease:rett",
-      "predicate": "phenotypically_overlaps",
-      "object_id": "disease:mdd",
-      "source": "PubMed abstract (PMID 32472944)",
-      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-      "retrieval_date": "2026-10-03",
-      "source_type": "literature",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
-      "evidence": [
-        {
-          "id": "ev:ai:9",
-          "source": "PubMed abstract (PMID 32472944)",
-          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-          "retrieval_date": "2026-10-03",
-          "source_type": "literature",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
-          "citation": {
-            "pmid": "32472944",
-            "pmcid": "PMC8882337",
-            "doi": "10.1002/ana.25797"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "pubmed:32472944",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:disease:cdd|phenotypically_overlaps|disease:foxg1",
-      "subject_id": "disease:cdd",
-      "predicate": "phenotypically_overlaps",
-      "object_id": "disease:foxg1",
-      "source": "PubMed abstract (PMID 32472944)",
-      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-      "retrieval_date": "2026-10-03",
-      "source_type": "literature",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
-      "evidence": [
-        {
-          "id": "ev:ai:10",
-          "source": "PubMed abstract (PMID 32472944)",
-          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
-          "retrieval_date": "2026-10-03",
-          "source_type": "literature",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
-          "citation": {
-            "pmid": "32472944",
-            "pmcid": "PMC8882337",
-            "doi": "10.1002/ana.25797"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "pubmed:32472944",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:disease:foxg1|phenotypically_overlaps|disease:mdd",
+      "id": "edge:ai:disease:foxg1|has_phenotype|pheno:regression",
       "subject_id": "disease:foxg1",
-      "predicate": "phenotypically_overlaps",
-      "object_id": "disease:mdd",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:regression",
       "source": "PubMed abstract (PMID 32472944)",
       "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
       "retrieval_date": "2026-10-03",
       "source_type": "literature",
       "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+      "quoted_or_structured_evidence": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
       "evidence": [
         {
-          "id": "ev:ai:11",
+          "id": "ev:ai:17",
           "source": "PubMed abstract (PMID 32472944)",
           "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
           "retrieval_date": "2026-10-03",
           "source_type": "literature",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "quoted_or_structured_evidence": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
           "citation": {
             "pmid": "32472944",
             "pmcid": "PMC8882337",
@@ -3053,8 +3401,146 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:mdd|has_phenotype|pheno:regression",
+      "subject_id": "disease:mdd",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:regression",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+      "evidence": [
+        {
+          "id": "ev:ai:18",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:disease:rett|has_phenotype|pheno:seizure",
+      "subject_id": "disease:rett",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:seizure",
+      "source": "PubMed abstract (PMID 32472944)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "literature",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+      "evidence": [
+        {
+          "id": "ev:ai:20",
+          "source": "PubMed abstract (PMID 32472944)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/32472944/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "literature",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+          "citation": {
+            "pmid": "32472944",
+            "pmcid": "PMC8882337",
+            "doi": "10.1002/ana.25797"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "pubmed:32472944",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        },
+        {
+          "id": "ev:ai:35",
+          "source": "ClinicalTrials.gov (NCT02738281)",
+          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "retrieval_date": "2026-10-03",
+          "source_type": "trial_registry",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as the percent of subjects with reported epilepsy at 5 years",
+          "citation": {
+            "nct": "NCT02738281"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "ctgov:NCT02738281",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
+          }
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:ai:asset:rtt-css|applied_to|disease:mdd",
+      "subject_id": "asset:rtt-css",
+      "predicate": "applied_to",
+      "object_id": "disease:mdd",
+      "source": "ClinicalTrials.gov (NCT02738281)",
+      "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+      "retrieval_date": "2026-10-03",
+      "source_type": "trial_registry",
+      "evidence_type": "llm_extraction",
+      "quoted_or_structured_evidence": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: the mean CSS score at 5 years with subjects having MECP2 duplication syndrome",
+      "evidence": [
+        {
+          "id": "ev:ai:37",
+          "source": "ClinicalTrials.gov (NCT02738281)",
+          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "retrieval_date": "2026-10-03",
+          "source_type": "trial_registry",
+          "evidence_type": "llm_extraction",
+          "quoted_or_structured_evidence": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: the mean CSS score at 5 years with subjects having MECP2 duplication syndrome",
+          "citation": {
+            "nct": "NCT02738281"
+          },
+          "method": "openai_extractor",
+          "source_record_id": "ctgov:NCT02738281",
+          "stance": "supports",
+          "extraction": {
+            "model": "gpt-5-mini",
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -3068,41 +3554,21 @@
       "subject_id": "disease:rett",
       "predicate": "co_studied_with",
       "object_id": "disease:mdd",
-      "source": "ClinicalTrials.gov (NCT02738281)",
-      "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+      "source": "ClinicalTrials.gov (NCT02705677)",
+      "source_url": "https://clinicaltrials.gov/study/NCT02705677",
       "retrieval_date": "2026-10-03",
       "source_type": "trial_registry",
       "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
+      "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
       "evidence": [
         {
-          "id": "ev:ai:22",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "citation": {
-            "nct": "NCT02738281"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:33",
+          "id": "ev:ai:38",
           "source": "ClinicalTrials.gov (NCT02705677)",
           "source_url": "https://clinicaltrials.gov/study/NCT02705677",
           "retrieval_date": "2026-10-03",
           "source_type": "trial_registry",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
+          "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "citation": {
             "nct": "NCT02705677"
           },
@@ -3111,12 +3577,12 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         },
         {
-          "id": "ev:ai:40",
+          "id": "ev:ai:41",
           "source": "NIH RePORTER",
           "source_url": "https://reporter.nih.gov/project-details/9781383",
           "retrieval_date": "2026-10-03",
@@ -3129,8 +3595,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -3144,41 +3610,21 @@
       "subject_id": "disease:rett",
       "predicate": "co_studied_with",
       "object_id": "disease:foxg1",
-      "source": "ClinicalTrials.gov (NCT02738281)",
-      "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+      "source": "ClinicalTrials.gov (NCT02705677)",
+      "source_url": "https://clinicaltrials.gov/study/NCT02705677",
       "retrieval_date": "2026-10-03",
       "source_type": "trial_registry",
       "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
+      "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
       "evidence": [
         {
-          "id": "ev:ai:23",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "citation": {
-            "nct": "NCT02738281"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:34",
+          "id": "ev:ai:39",
           "source": "ClinicalTrials.gov (NCT02705677)",
           "source_url": "https://clinicaltrials.gov/study/NCT02705677",
           "retrieval_date": "2026-10-03",
           "source_type": "trial_registry",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
+          "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "citation": {
             "nct": "NCT02705677"
           },
@@ -3187,8 +3633,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -3202,79 +3648,21 @@
       "subject_id": "disease:mdd",
       "predicate": "co_studied_with",
       "object_id": "disease:foxg1",
-      "source": "ClinicalTrials.gov (NCT02738281)",
-      "source_url": "https://clinicaltrials.gov/study/NCT02738281",
-      "retrieval_date": "2026-10-03",
-      "source_type": "trial_registry",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-      "evidence": [
-        {
-          "id": "ev:ai:24",
-          "source": "ClinicalTrials.gov (NCT02738281)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "citation": {
-            "nct": "NCT02738281"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02738281",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        },
-        {
-          "id": "ev:ai:35",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:asset:biobank|applied_to|disease:rett",
-      "subject_id": "asset:biobank",
-      "predicate": "applied_to",
-      "object_id": "disease:rett",
       "source": "ClinicalTrials.gov (NCT02705677)",
       "source_url": "https://clinicaltrials.gov/study/NCT02705677",
       "retrieval_date": "2026-10-03",
       "source_type": "trial_registry",
       "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+      "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
       "evidence": [
         {
-          "id": "ev:ai:30",
+          "id": "ev:ai:40",
           "source": "ClinicalTrials.gov (NCT02705677)",
           "source_url": "https://clinicaltrials.gov/study/NCT02705677",
           "retrieval_date": "2026-10-03",
           "source_type": "trial_registry",
           "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+          "quoted_or_structured_evidence": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "citation": {
             "nct": "NCT02705677"
           },
@@ -3283,84 +3671,8 @@
           "stance": "supports",
           "extraction": {
             "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:asset:biobank|applied_to|disease:mdd",
-      "subject_id": "asset:biobank",
-      "predicate": "applied_to",
-      "object_id": "disease:mdd",
-      "source": "ClinicalTrials.gov (NCT02705677)",
-      "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-      "retrieval_date": "2026-10-03",
-      "source_type": "trial_registry",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-      "evidence": [
-        {
-          "id": "ev:ai:31",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
-          }
-        }
-      ],
-      "confidence": "moderate",
-      "inferred": false,
-      "contradiction_status": "none",
-      "created_at": "2026-10-03"
-    },
-    {
-      "id": "edge:ai:asset:biobank|applied_to|disease:foxg1",
-      "subject_id": "asset:biobank",
-      "predicate": "applied_to",
-      "object_id": "disease:foxg1",
-      "source": "ClinicalTrials.gov (NCT02705677)",
-      "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-      "retrieval_date": "2026-10-03",
-      "source_type": "trial_registry",
-      "evidence_type": "llm_extraction",
-      "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-      "evidence": [
-        {
-          "id": "ev:ai:32",
-          "source": "ClinicalTrials.gov (NCT02705677)",
-          "source_url": "https://clinicaltrials.gov/study/NCT02705677",
-          "retrieval_date": "2026-10-03",
-          "source_type": "trial_registry",
-          "evidence_type": "llm_extraction",
-          "quoted_or_structured_evidence": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-          "citation": {
-            "nct": "NCT02705677"
-          },
-          "method": "openai_extractor",
-          "source_record_id": "ctgov:NCT02705677",
-          "stance": "supports",
-          "extraction": {
-            "model": "gpt-5-mini",
-            "run_id": "extract-2026-10-03T21-13-41-468Z",
-            "created_at": "2026-10-03T21:21:19.504Z"
+            "run_id": "extract-2026-10-03T21-31-07-916Z",
+            "created_at": "2026-10-03T21:41:46.274Z"
           }
         }
       ],
@@ -3452,6 +3764,49 @@
       "source_disease_id": "disease:rett",
       "headline": "Rett and Rett-Related Disorders Natural History Study (NCT02738281)",
       "reuse_classification": "shared_infrastructure_precedent",
+      "story": [
+        {
+          "label": "What happened",
+          "text": "CDD participants were enrolled in the same NIH-funded natural-history study as Rett syndrome, FOXG1 disorder and MECP2 duplication syndrome.",
+          "evidence_edge_ids": [
+            "edge:cdd-in-nhs",
+            "edge:costudy-rett",
+            "edge:nhs-paper"
+          ]
+        },
+        {
+          "label": "Why it matters",
+          "text": "Cross-disorder infrastructure sharing has already happened. Experience from this study's consortium also helped build a CDD-specific severity assessment.",
+          "evidence_edge_ids": [
+            "edge:nhs-informed-sa",
+            "edge:nhs-infra"
+          ]
+        },
+        {
+          "label": "Potentially adaptable asset",
+          "text": "Outcome-measure experience: the RTT Clinical Severity Scale was given to every participant, including people with CDD (median score 29).",
+          "evidence_edge_ids": [
+            "edge:css-cdd"
+          ]
+        },
+        {
+          "label": "Important limitation",
+          "text": "The Rett scale is not established as valid for CDD; its authors note CDD's more frequent seizures may raise scores. The CDD-specific assessment also still needs validation.",
+          "evidence_edge_ids": [
+            "edge:css-cdd",
+            "edge:sa-cdd"
+          ]
+        },
+        {
+          "label": "Next research question",
+          "text": "How do the RTT Clinical Severity Scale and the CDD-specific severity assessment compare in people with CDD, and could the Natural History Study database support that comparison?",
+          "evidence_edge_ids": [
+            "edge:css-cdd",
+            "edge:sa-cdd",
+            "edge:nhs-infra"
+          ]
+        }
+      ],
       "why_it_may_transfer": [
         "CDD was explicitly included: the registry lists 'CDKL5 Disorder' as a condition and its eligibility criteria name CDKL5.",
         "The study ran across multiple clinical sites and supported a head-to-head comparison of 793 participants.",
@@ -3476,7 +3831,8 @@
         "edge:nhs-paper",
         "edge:nhs-infra",
         "edge:costudy-rett",
-        "edge:differs-rett"
+        "edge:differs-rett",
+        "edge:nhs-informed-sa"
       ],
       "confidence": "moderate",
       "status": "inferred",
@@ -3521,24 +3877,26 @@
       "source_disease_id": "disease:rett",
       "headline": "Outcome-measure experience: the RTT Clinical Severity Scale used in CDD participants",
       "reuse_classification": "potentially_adaptable",
+      "story": [],
       "why_it_may_transfer": [
         "The RTT Clinical Severity Scale and the RTT Clinical Global Impression–Severity were given to every study participant, including CDD (median CSS score 29), so the disorders could be compared directly.",
         "Investigators at each site were trained on the scale."
       ],
       "what_differs": [
         "The scale was built for Rett syndrome. The authors note that CDD's more frequent seizures may partly drive its higher scores.",
-        "CDD-specific measures exist. The 2025 adult-cohort preprint used the CDKL5 Developmental Score (CDS)."
+        "A CDD-specific severity assessment exists (51 items covering epilepsy, motor, cognition/behaviour/vision/speech and autonomic function), and the 2025 adult-cohort preprint used the CDKL5 Developmental Score (CDS)."
       ],
       "what_is_uncertain": [
         "Whether the Rett scale is valid or sensitive to change in CDD. No retrieved source establishes this.",
         "The NIH-funded research centre's abstract says outcome measures 'require special consideration for these disorders'.",
-        "The CDD-specific scale that the 2020 paper refers to has not been retrieved or identified."
+        "The CDD-specific severity assessment still needs validation, according to its own authors."
       ],
       "requires_expert_validation": [
-        "Should a CDD study use the Rett scale, a CDD-specific instrument such as the CDS, or both for comparability?"
+        "Should a CDD study use the Rett scale, the CDD-specific severity assessment, or both for comparability across disorders?"
       ],
       "evidence_edge_ids": [
         "edge:css-cdd",
+        "edge:sa-cdd",
         "edge:cds-cdd",
         "edge:differs-rett"
       ],
@@ -3548,11 +3906,11 @@
         {
           "id": "act:compare-scales",
           "kind": "compare_outcome_measures",
-          "label": "With a CDD clinical researcher, compare the RTT Clinical Severity Scale against CDD-specific measures such as the CDKL5 Developmental Score. The 2020 authors note this comparison could be run on the Natural History Study database.",
+          "label": "With a CDD clinical researcher, compare the RTT Clinical Severity Scale against the CDD-specific severity assessment. The 2020 authors note this comparison could be run on the Natural History Study database.",
           "target_node_id": "asset:rtt-css",
           "evidence_edge_ids": [
             "edge:css-cdd",
-            "edge:cds-cdd",
+            "edge:sa-cdd",
             "edge:nhs-infra"
           ]
         }
@@ -3564,6 +3922,7 @@
       "source_disease_id": "disease:rett",
       "headline": "Biobanking of Rett Syndrome and Related Disorders (NCT02705677)",
       "reuse_classification": "discovery_lead",
+      "story": [],
       "why_it_may_transfer": [
         "The biobank protocol lists CDKL5 among its conditions and planned to collect DNA, RNA, plasma and cell lines.",
         "Its stated motivation was the lack of biomarkers of disease status, severity or treatment response."
@@ -3628,10 +3987,11 @@
     {
       "id": "gap:css-validity",
       "kind": "open_question",
-      "statement": "Whether the RTT Clinical Severity Scale is valid or responsive in CDD has not been established in the retrieved sources.",
-      "suggested_question_or_experiment": "Compare it against a CDD-specific measure in CDD participants, as the 2020 authors suggest.",
+      "statement": "Whether the RTT Clinical Severity Scale is valid or responsive in CDD has not been established, and the CDD-specific severity assessment itself still requires validation.",
+      "suggested_question_or_experiment": "Compare the two instruments in CDD participants, as the 2020 authors suggest.",
       "related_edge_ids": [
-        "edge:css-cdd"
+        "edge:css-cdd",
+        "edge:sa-cdd"
       ]
     },
     {
@@ -3646,8 +4006,8 @@
     {
       "id": "gap:preprint",
       "kind": "missing_evidence",
-      "statement": "The adult natural-history study (PMID 39867409) is a medRxiv preprint and had not been peer reviewed when it was retrieved.",
-      "suggested_question_or_experiment": "Check for a peer-reviewed version before relying on its figures.",
+      "statement": "The adult natural-history study (PMID 39867409) is a medRxiv preprint. No peer-reviewed version was found in PubMed on 2026-10-03.",
+      "suggested_question_or_experiment": "Re-check for a peer-reviewed version before relying on its figures.",
       "related_edge_ids": [
         "edge:cds-cdd",
         "edge:cdd-spasm"
@@ -3809,6 +4169,54 @@
       "publication_types": [
         "Journal Article",
         "Preprint"
+      ],
+      "meta": {}
+    },
+    {
+      "id": "pubmed:31147226",
+      "kind": "pubmed_abstract",
+      "title": "Severity Assessment in CDKL5 Deficiency Disorder.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31147226/",
+      "retrieval_date": "2026-10-03",
+      "retrieved_via": "NCBI E-utilities esummary + efetch (db=pubmed)",
+      "text": "BACKGROUND: Pathologic mutations in cyclin-dependent kinase-like 5 cause CDKL5 deficiency disorder, a genetic syndrome associated with severe epilepsy and cognitive, motor, visual, and autonomic disturbances. This disorder is a relatively common genetic cause of early-life epilepsy. A specific severity assessment is lacking, required to monitor the clinical course and needed to define the natural history and for clinical trial readiness.\nMETHODS: A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium. An initial draft severity assessment was presented and reviewed at the annual CDKL5 Forum meeting (Boston, 2017). Subsequently it was iterated through four cycles of a modified Delphi process by a group of clinicians, researchers, industry, patient advisory groups, and parents familiar with this disorder until consensus was achieved. The revised version of the severity assessment was presented for review, comment, and piloting to families at the International Foundation for CDKL5 Research-sponsored family meeting (Colorado, 2018). Final revisions were based on this additional input.\nRESULTS: The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions. Parental ratings of therapy effectiveness and child and family functioning are also included.\nCONCLUSIONS: A severity assessment was rapidly developed with input from multiple stakeholders. Refinement through ongoing validation is required for future clinical trials. The consensus methods employed for the development of severity assessment may be applicable to similar rare disorders.",
+      "citation": {
+        "pmid": "31147226",
+        "pmcid": "PMC6659999",
+        "doi": "10.1016/j.pediatrneurol.2019.03.017"
+      },
+      "authors": [
+        "Demarest S",
+        "Pestana-Knight EM",
+        "Olson HE",
+        "Downs J",
+        "Marsh ED",
+        "Kaufmann WE",
+        "Partridge CA",
+        "Leonard H",
+        "Gwadry-Sridhar F",
+        "Frame KE",
+        "Cross JH",
+        "Chin RFM",
+        "Parikh S",
+        "Panzer A",
+        "Weisenberg J",
+        "Utley K",
+        "Jaksha A",
+        "Amin S",
+        "Khwaja O",
+        "Devinsky O",
+        "Neul JL",
+        "Percy AK",
+        "Benke TA"
+      ],
+      "pub_date": "2019 Aug",
+      "journal": "Pediatr Neurol",
+      "publication_types": [
+        "Journal Article",
+        "Research Support, N.I.H., Extramural",
+        "Research Support, Non-U.S. Gov't",
+        "Review"
       ],
       "meta": {}
     },
@@ -4273,14 +4681,14 @@
     }
   ],
   "build_info": {
-    "built_at": "2026-10-03T21:21:42.685Z",
+    "built_at": "2026-10-03T21:44:17.450Z",
     "openai_runs": [
       {
         "role": "Evidence Extractor + Entity Reconciler",
         "model": "gpt-5-mini",
-        "run_id": "extract-2026-10-03T21-13-41-468Z",
-        "created_at": "2026-10-03T21:21:19.504Z",
-        "summary": "7 sources processed; 85 quote-verified claims kept; 57 reconciler calls; 27 corroborations of analyst edges; 12 extractor-only edges added; 0 rejected for type-signature violations; 16 rejected for low-confidence entity matches."
+        "run_id": "extract-2026-10-03T21-31-07-916Z",
+        "created_at": "2026-10-03T21:41:46.274Z",
+        "summary": "8 sources processed; 114 quote-verified claims kept; 79 reconciler calls; 26 corroborations of analyst edges; 13 extractor-only edges added; 0 rejected for type-signature violations; 10 rejected for low-confidence entity matches."
       }
     ]
   }

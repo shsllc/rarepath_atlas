@@ -1,126 +1,18 @@
 {
-  "run_id": "extract-2026-10-03T21-13-41-468Z",
+  "run_id": "extract-2026-10-03T21-31-07-916Z",
   "role": "OpenAI Evidence Extractor + Entity Reconciler",
   "model": "gpt-5-mini",
   "key_source": ".env.local",
-  "created_at": "2026-10-03T21:21:19.504Z",
-  "reconciler_calls": 57,
+  "created_at": "2026-10-03T21:41:46.274Z",
+  "reconciler_calls": 79,
   "sources": [
     {
       "source_id": "pubmed:32472944",
-      "response_id": "resp_0245bdb20b90c583006ac1700c526887d08ea739176ea56133",
-      "returned": 11,
-      "kept": 11,
+      "response_id": "resp_0aa049575076bdbb006ac17422e79c87d0bb23a05df83abd32",
+      "returned": 26,
+      "kept": 26,
       "dropped_unverified_quote": 0,
       "claims": [
-        {
-          "subject": {
-            "text": "Rett syndrome",
-            "type": "Disease"
-          },
-          "predicate": "has_phenotype",
-          "object": {
-            "text": "Developmental regression (median = 18 months)",
-            "type": "Phenotype"
-          },
-          "supporting_quote": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "alias",
-          "object_id": "pheno:regression",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "CDKL5-deficiency disorder",
-            "type": "Disease"
-          },
-          "predicate": "has_phenotype",
-          "object": {
-            "text": "Seizures (incidence prior to baseline visit 96.2%)",
-            "type": "Phenotype"
-          },
-          "supporting_quote": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "alias",
-          "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:alias:high"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome",
-            "type": "Disease"
-          },
-          "predicate": "has_phenotype",
-          "object": {
-            "text": "Seizures (incidence prior to baseline visit 47.5%)",
-            "type": "Phenotype"
-          },
-          "supporting_quote": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "alias",
-          "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "CDKL5-deficiency disorder",
-            "type": "Disease"
-          },
-          "predicate": "has_phenotype",
-          "object": {
-            "text": "Youngest age at seizure onset (2 months); highest overall severity",
-            "type": "Phenotype"
-          },
-          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "alias",
-          "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "MECP2 duplication disorder",
-            "type": "Disease"
-          },
-          "predicate": "has_phenotype",
-          "object": {
-            "text": "Oldest median age at seizure onset (64 months) and lowest severity scores",
-            "type": "Phenotype"
-          },
-          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "alias",
-          "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "CDKL5-deficiency disorder",
-            "type": "Disease"
-          },
-          "predicate": "clinically_differs_from",
-          "object": {
-            "text": "MECP2 duplication disorder",
-            "type": "Disease"
-          },
-          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "alias",
-          "object_id": "disease:mdd",
-          "object_match": "alias"
-        },
         {
           "subject": {
             "text": "Rett syndrome",
@@ -131,7 +23,7 @@
             "text": "CDKL5-deficiency disorder",
             "type": "Disease"
           },
-          "supporting_quote": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:rett",
@@ -149,7 +41,7 @@
             "text": "FOXG1 disorder",
             "type": "Disease"
           },
-          "supporting_quote": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:rett",
@@ -167,7 +59,7 @@
             "text": "MECP2 duplication disorder",
             "type": "Disease"
           },
-          "supporting_quote": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:rett",
@@ -185,12 +77,30 @@
             "text": "FOXG1 disorder",
             "type": "Disease"
           },
-          "supporting_quote": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "disease:foxg1",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "phenotypically_overlaps",
+          "object": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "disease:mdd",
           "object_match": "alias"
         },
         {
@@ -203,21 +113,381 @@
             "text": "MECP2 duplication disorder",
             "type": "Disease"
           },
-          "supporting_quote": "Although these developmental encephalopathies share many clinical features, clear differences in severity, regression, and seizures warrant considering them as unique disorders.",
+          "supporting_quote": "Rett syndrome, CDKL5-deficiency disorder, FOXG1 disorder, and MECP2 duplication disorder are developmental encephalopathies with shared and distinct features.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:foxg1",
           "subject_match": "alias",
           "object_id": "disease:mdd",
           "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
+            "text": "Rett and Rett-Related Disorders Natural History Study",
+            "type": "Study"
+          },
+          "supporting_quote": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "study:nhs",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
+            "text": "Rett and Rett-Related Disorders Natural History Study",
+            "type": "Study"
+          },
+          "supporting_quote": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "study:nhs",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "FOXG1 disorder",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
+            "text": "Rett and Rett-Related Disorders Natural History Study",
+            "type": "Study"
+          },
+          "supporting_quote": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:foxg1",
+          "subject_match": "alias",
+          "object_id": "study:nhs",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
+            "text": "Rett and Rett-Related Disorders Natural History Study",
+            "type": "Study"
+          },
+          "supporting_quote": "Comprehensive clinical information was collected from 793 individuals enrolled in the Rett and Rett-Related Disorders Natural History Study.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": "study:nhs",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "most severely affected",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "youngest age at seizure onset (2 months)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "oldest median age at seizure onset (64 months)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "lowest severity scores",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals with CDKL5-deficency disorder were the most severely affected and had the youngest age at seizure onset (2 months), whereas children with MECP2 duplication syndrome had the oldest median age at seizure onset (64 months) and lowest severity scores.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome",
+            "type": "Disease"
+          },
+          "predicate": "phenotypically_overlaps",
+          "object": {
+            "text": "FOGX1",
+            "type": "Disease"
+          },
+          "supporting_quote": "Rett syndrome and FOGX1 were intermediate in both features.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "disease:foxg1",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "smaller head circumference correlates with increased severity",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "smaller head circumference correlates with increased severity",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "FOXG1 disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "smaller head circumference correlates with increased severity",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:foxg1",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "smaller head circumference correlates with increased severity",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "earlier age at seizure onset in MECP2 duplication syndrome",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Smaller head circumference correlates with increased severity in all disorders and earlier age at seizure onset in MECP2 duplication syndrome.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "developmental regression (median = 18 months)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "pheno:regression",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "CDKL5-deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "developmental regression (23 to 34%)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "pheno:regression",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "FOXG1 disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "developmental regression (23 to 34%)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:foxg1",
+          "subject_match": "alias",
+          "object_id": "pheno:regression",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "developmental regression (23 to 34%)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Developmental regression occurred in all Rett syndrome participants (median = 18 months) but only 23 to 34% of the other disorders.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": "pheno:regression",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "seizure incidence prior to the baseline visit (96.2%)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "seizure incidence prior to the baseline visit (47.5%)",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Seizure incidence prior to the baseline visit was highest for CDKL5 deficiency disorder (96.2%) and lowest for Rett syndrome (47.5%).",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
         }
       ]
     },
     {
       "source_id": "pubmed:35483386",
-      "response_id": "resp_0b9ddfc8aaa4d41b006ac170404cf887d08c222ce9fd0a5a06",
-      "returned": 10,
-      "kept": 10,
+      "response_id": "resp_09210052e2840665006ac1747f4edc87d0940d61050dc6c978",
+      "returned": 11,
+      "kept": 11,
       "dropped_unverified_quote": 0,
       "claims": [
         {
@@ -245,16 +515,16 @@
           },
           "predicate": "has_phenotype",
           "object": {
-            "text": "early-onset (generally within the first 2 months of life) seizures that are usually refractory to polypharmacy",
+            "text": "early-onset (generally within the first 2 months of life) seizures",
             "type": "Phenotype"
           },
           "supporting_quote": "It is characterised by early-onset (generally within the first 2 months of life) seizures that are usually refractory to polypharmacy.",
-          "hedged": true,
+          "hedged": false,
           "negated": false,
           "subject_id": "disease:cdd",
           "subject_match": "openai_reconciler:exact:high",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:exact:high"
+          "object_match": "openai_reconciler:alias:high"
         },
         {
           "subject": {
@@ -263,7 +533,25 @@
           },
           "predicate": "has_phenotype",
           "object": {
-            "text": "severely impaired development",
+            "text": "seizures that are usually refractory to polypharmacy",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "It is characterised by early-onset (generally within the first 2 months of life) seizures that are usually refractory to polypharmacy.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:alias:high"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder (CDD)",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "Development is severely impaired in patients with CDD",
             "type": "Phenotype"
           },
           "supporting_quote": "Development is severely impaired in patients with CDD, with only a quarter of girls and a smaller proportion of boys achieving independent walking; however, there is clinical variability, which is probably genetically determined.",
@@ -369,6 +657,24 @@
             "text": "CDKL5 deficiency disorder (CDD)",
             "type": "Disease"
           },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "cerebral visual impairment",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Gastrointestinal, sleep, and musculoskeletal problems are common in CDD, as in other developmental epileptic encephalopathies, but the prevalence of cerebral visual impairment appears higher in CDD.",
+          "hedged": true,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": "pheno:cvi",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder (CDD)",
+            "type": "Disease"
+          },
           "predicate": "phenotypically_overlaps",
           "object": {
             "text": "other developmental epileptic encephalopathies",
@@ -381,32 +687,14 @@
           "subject_match": "openai_reconciler:exact:high",
           "object_id": null,
           "object_match": "openai_reconciler:none:low"
-        },
-        {
-          "subject": {
-            "text": "CDKL5 deficiency disorder (CDD)",
-            "type": "Disease"
-          },
-          "predicate": "clinically_differs_from",
-          "object": {
-            "text": "other developmental epileptic encephalopathies",
-            "type": "Disease"
-          },
-          "supporting_quote": "but the prevalence of cerebral visual impairment appears higher in CDD.",
-          "hedged": true,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": null,
-          "object_match": "openai_reconciler:none:low"
         }
       ]
     },
     {
       "source_id": "pubmed:39867409",
-      "response_id": "resp_0e267ff46f0274b0006ac1707b07bc87d084a23b1f6c2784e2",
-      "returned": 22,
-      "kept": 22,
+      "response_id": "resp_01d191013016a64f006ac174c6d4b887d099a39af8bdd687f2",
+      "returned": 31,
+      "kept": 31,
       "dropped_unverified_quote": 0,
       "claims": [
         {
@@ -461,7 +749,7 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:synonym:moderate"
+          "object_match": "openai_reconciler:alias:high"
         },
         {
           "subject": {
@@ -479,7 +767,7 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:alias:high"
+          "object_match": "openai_reconciler:synonym:moderate"
         },
         {
           "subject": {
@@ -497,7 +785,7 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:alias:high"
+          "object_match": "openai_reconciler:synonym:moderate"
         },
         {
           "subject": {
@@ -515,7 +803,7 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:alias:high"
+          "object_match": "openai_reconciler:synonym:high"
         },
         {
           "subject": {
@@ -677,25 +965,25 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:regression",
-          "object_match": "openai_reconciler:exact:high"
+          "object_match": "openai_reconciler:synonym:high"
         },
         {
           "subject": {
+            "text": "CDKL5 Developmental Score (CDS)",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
             "text": "CDKL5 deficiency disorder",
             "type": "Disease"
           },
-          "predicate": "studied_in",
-          "object": {
-            "text": "The natural history of CDKL5 deficiency disorder into adulthood",
-            "type": "Study"
-          },
-          "supporting_quote": "We analyzed clinical data about an international cohort of 67 adults with CDD.",
+          "supporting_quote": "We analyzed demographic, phenotypic, CDKL5 Developmental Score (CDS), and treatment data, and tested associations with genetic factors, sex, and a positive or negative history of neonatal seizures, as an early predictor of prognosis.",
           "hedged": false,
           "negated": false,
-          "subject_id": "disease:cdd",
+          "subject_id": "asset:cds",
           "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:synonym:moderate"
+          "object_id": "disease:cdd",
+          "object_match": "alias"
         },
         {
           "subject": {
@@ -730,8 +1018,26 @@
           "negated": false,
           "subject_id": "disease:cdd",
           "subject_match": "alias",
-          "object_id": "pheno:regression",
-          "object_match": "openai_reconciler:synonym:moderate"
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
+            "text": "an international cohort of 67 adults with CDD",
+            "type": "Study"
+          },
+          "supporting_quote": "We analyzed clinical data about an international cohort of 67 adults with CDD.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         },
         {
           "subject": {
@@ -776,14 +1082,104 @@
           },
           "predicate": "has_phenotype",
           "object": {
-            "text": "anxiety",
+            "text": "potential complications of their illness and treatment",
             "type": "Phenotype"
           },
-          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "supporting_quote": "Those with a history of neonatal seizures tended to attain fewer CDS skills and were more likely to have abnormal muscle tone in adulthood, atrioventricular conduction delay, and potential complications of their illness and treatment.",
           "hedged": true,
           "negated": false,
           "subject_id": "disease:cdd",
           "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_variant",
+          "object": {
+            "text": "missense variants",
+            "type": "Variant"
+          },
+          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
+          "object_id": null,
+          "object_match": "no_candidates"
+        },
+        {
+          "subject": {
+            "text": "missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "attained more CDS skills than those with other variants",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "loss of skills in adulthood",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
+          "object_id": "pheno:regression",
+          "object_match": "openai_reconciler:synonym:moderate"
+        },
+        {
+          "subject": {
+            "text": "missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "anxiety",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "non-missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "manifested a more multisystemic disorder",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Individuals carrying missense variants attained more CDS skills than those with other variants and were more likely to lose skills in adulthood and develop anxiety, possibly reflecting the limited neurodevelopment of those with non-missense variants, who manifested a more multisystemic disorder.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
           "object_id": null,
           "object_match": "openai_reconciler:none:low"
         },
@@ -794,7 +1190,7 @@
           },
           "predicate": "has_phenotype",
           "object": {
-            "text": "seizures that often improved with age",
+            "text": "seizures often improved with age",
             "type": "Phenotype"
           },
           "supporting_quote": "Seizures often improved with age, but 73% had never experienced more than 6 months of seizure-freedom.",
@@ -804,14 +1200,221 @@
           "subject_match": "alias",
           "object_id": "pheno:seizure",
           "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "73% had never experienced more than 6 months of seizure-freedom",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Seizures often improved with age, but 73% had never experienced more than 6 months of seizure-freedom.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "non-missense variants",
+            "type": "Variant"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "a more complex disorder and lower developmental trajectory",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Presence a non-missense variants or a history of neonatal seizures indicates a more complex disorder and lower developmental trajectory.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "no_candidates",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "history of neonatal seizures",
+            "type": "Phenotype"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "a more complex disorder and lower developmental trajectory",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Presence a non-missense variants or a history of neonatal seizures indicates a more complex disorder and lower developmental trajectory.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "pheno:seizure",
+          "subject_match": "openai_reconciler:alias:high",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        }
+      ]
+    },
+    {
+      "source_id": "pubmed:31147226",
+      "response_id": "resp_0662d9f10ea68fdc006ac175697b4087d0a3036ce1b037ddd4",
+      "returned": 8,
+      "kept": 8,
+      "dropped_unverified_quote": 0,
+      "claims": [
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "caused_by_variant_in",
+          "object": {
+            "text": "cyclin-dependent kinase-like 5",
+            "type": "Gene"
+          },
+          "supporting_quote": "Pathologic mutations in cyclin-dependent kinase-like 5 cause CDKL5 deficiency disorder, a genetic syndrome associated with severe epilepsy and cognitive, motor, visual, and autonomic disturbances.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "gene:cdkl5",
+          "object_match": "openai_reconciler:synonym:high"
+        },
+        {
+          "subject": {
+            "text": "CDKL5 deficiency disorder",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "early-life epilepsy",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "This disorder is a relatively common genetic cause of early-life epilepsy.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:cdd",
+          "subject_match": "alias",
+          "object_id": "pheno:seizure",
+          "object_match": "openai_reconciler:alias:moderate"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "epilepsy",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": "pheno:seizure",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "motor",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "cognition, behavior, vision, and speech",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "autonomic functions",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "Parental ratings of therapy effectiveness",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Parental ratings of therapy effectiveness and child and family functioning are also included.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "The final severity assessment",
+            "type": "ResearchAsset"
+          },
+          "predicate": "asset_measures",
+          "object": {
+            "text": "child and family functioning",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Parental ratings of therapy effectiveness and child and family functioning are also included.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:cdd-severity",
+          "subject_match": "openai_reconciler:alias:moderate",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         }
       ]
     },
     {
       "source_id": "pmc:PMC8882337",
-      "response_id": "resp_05f23991d03d8423006ac170fb8d0887d0a0910d669d085887",
-      "returned": 7,
-      "kept": 7,
+      "response_id": "resp_03a9dfb8a5587d91006ac175ae57b887d082999eb726fceb56",
+      "returned": 8,
+      "kept": 8,
       "dropped_unverified_quote": 0,
       "claims": [
         {
@@ -831,6 +1434,24 @@
           "subject_match": "openai_reconciler:none:low",
           "object_id": "study:nhs",
           "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "RTT Clinical Severity Scale",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
+            "text": "Rett Syndrome and Related Disorders",
+            "type": "Disease"
+          },
+          "supporting_quote": "These two scales were performed on all of the participants in the natural history study, allowing a direct comparison between groups.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:rtt-css",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         },
         {
           "subject": {
@@ -902,7 +1523,7 @@
           "subject_id": "disease:cdd",
           "subject_match": "alias",
           "object_id": "pheno:seizure",
-          "object_match": "openai_reconciler:exact:high"
+          "object_match": "openai_reconciler:alias:high"
         },
         {
           "subject": {
@@ -911,7 +1532,7 @@
           },
           "predicate": "historically_classified_with",
           "object": {
-            "text": "atypical or variant RTT or RTT-like",
+            "text": "atypical or variant RTT",
             "type": "Disease"
           },
           "supporting_quote": "Due to the overlapping nature of these conditions, they were often imprecisely named “atypical or variant RTT” or “RTT-like”.",
@@ -924,155 +1545,155 @@
         },
         {
           "subject": {
-            "text": "RTT Clinical Severity Scale",
+            "text": "disease-specific severity scale",
             "type": "ResearchAsset"
           },
           "predicate": "applied_to",
           "object": {
-            "text": "Rett Syndrome and Related Disorders",
+            "text": "CDD",
             "type": "Disease"
           },
-          "supporting_quote": "These two scales were performed on all of the participants in the natural history study, allowing a direct comparison between groups.",
+          "supporting_quote": "However, disease-specific severity scales are needed to be developed (and one has been developed for CDD) and comparison of the utility of the Clinical Severity Scale to a disease-specific scale could be informative and potentially performed using the Natural History Study database.",
           "hedged": false,
           "negated": false,
-          "subject_id": "asset:rtt-css",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": null,
-          "object_match": "openai_reconciler:none:low"
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": "disease:cdd",
+          "object_match": "alias"
         }
       ]
     },
     {
       "source_id": "ctgov:NCT02738281",
-      "response_id": "resp_0b20d9c5068d01b0006ac17136f0d487d096daaf2f519099db",
-      "returned": 10,
-      "kept": 10,
-      "dropped_unverified_quote": 0,
+      "response_id": "resp_068b295aacb45388006ac175f8985c87d0bd1298a8c3f58566",
+      "returned": 21,
+      "kept": 17,
+      "dropped_unverified_quote": 4,
       "claims": [
         {
           "subject": {
             "text": "Rett syndrome (RTT)",
             "type": "Disease"
           },
-          "predicate": "co_studied_with",
+          "predicate": "has_phenotype",
           "object": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:mdd",
-          "object_match": "openai_reconciler:alias:high"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome (RTT)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:cdd",
-          "object_match": "openai_reconciler:alias:moderate"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome (RTT)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:foxg1",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "openai_reconciler:alias:high",
-          "object_id": "disease:cdd",
-          "object_match": "openai_reconciler:alias:moderate"
-        },
-        {
-          "subject": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "openai_reconciler:alias:high",
-          "object_id": "disease:foxg1",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "openai_reconciler:alias:moderate",
-          "object_id": "disease:foxg1",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome (RTT)",
-            "type": "Disease"
-          },
-          "predicate": "studied_in",
-          "object": {
-            "text": "NCT02738281: Natural History of Rett Syndrome & Related Disorders",
-            "type": "Study"
+            "text": "growth",
+            "type": "Phenotype"
           },
           "supporting_quote": "Primary outcome: Clinical longitudinal assessments in Rett syndrome (RTT) as measured by mean growth over 5 years.",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:rett",
           "subject_match": "openai_reconciler:exact:high",
-          "object_id": "study:nhs",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "head circumference",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as measured by mean change in head circumference over 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "stereotypic movements",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as measured by mean number of stereotypic movements at 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "epilepsy",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as the percent of subjects with reported epilepsy at 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": "pheno:seizure",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "scoliosis",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as the percent of subjects with reported scoliosis at 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "openai_reconciler:exact:high",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "Clinical Severity Scale (CSS)",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as reported by the mean Clinical Severity Scale (CSS) at 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "asset:rtt-css",
+          "subject_match": "openai_reconciler:alias:high",
+          "object_id": "disease:rett",
+          "object_match": "openai_reconciler:exact:high"
+        },
+        {
+          "subject": {
+            "text": "Motor Behavioral Assessment (MBA)",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
+            "text": "Rett syndrome (RTT)",
+            "type": "Disease"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in Rett syndrome (RTT) as measured by the mean Motor Behavioral Assessment (MBA) at 5 years",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": "disease:rett",
           "object_match": "openai_reconciler:exact:high"
         },
         {
@@ -1080,121 +1701,94 @@
             "text": "MECP2 duplication syndrome",
             "type": "Disease"
           },
-          "predicate": "studied_in",
+          "predicate": "has_phenotype",
           "object": {
-            "text": "NCT02738281: Natural History of Rett Syndrome & Related Disorders",
-            "type": "Study"
+            "text": "growth rate",
+            "type": "Phenotype"
           },
           "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: mean growth rate over 5 years with subjects having MECP2 duplication syndrome",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:mdd",
           "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         },
         {
           "subject": {
-            "text": "CDKL5",
+            "text": "MECP2 duplication syndrome",
             "type": "Disease"
           },
-          "predicate": "studied_in",
+          "predicate": "has_phenotype",
           "object": {
-            "text": "NCT02738281: Natural History of Rett Syndrome & Related Disorders",
-            "type": "Study"
+            "text": "head circumference",
+            "type": "Phenotype"
           },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: mean change in head circumference 5 years with subjects having MECP2 duplication syndrome",
           "hedged": false,
           "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "openai_reconciler:alias:moderate",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "predicate": "studied_in",
-          "object": {
-            "text": "NCT02738281: Natural History of Rett Syndrome & Related Disorders",
-            "type": "Study"
-          },
-          "supporting_quote": "The purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT including the range of clinical involvement and to correlate genotype-phenotype over a broad spectrum of phenotypes.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:foxg1",
+          "subject_id": "disease:mdd",
           "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        }
-      ]
-    },
-    {
-      "source_id": "ctgov:NCT02705677",
-      "response_id": "resp_04d67ed221ead853006ac171665d8887d0a83b20dca6d5832c",
-      "returned": 16,
-      "kept": 16,
-      "dropped_unverified_quote": 0,
-      "claims": [
-        {
-          "subject": {
-            "text": "NCT02705677: Biobanking of Rett Syndrome and Related Disorders",
-            "type": "Study"
-          },
-          "predicate": "produced_asset",
-          "object": {
-            "text": "biological materials (DNA, RNA, plasma, cell lines)",
-            "type": "ResearchAsset"
-          },
-          "supporting_quote": "To address these issues, biological materials (DNA, RNA, plasma, cell lines) will be collected from affected individuals and in some cases from unaffected family members, initial evaluation performed to identify additional biological factors contributing to disease severity, and these materials will be stored for future characterization.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "study:biobank",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "asset:biobank",
-          "object_match": "openai_reconciler:exact:high"
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         },
         {
           "subject": {
-            "text": "NCT02705677: Biobanking of Rett Syndrome and Related Disorders",
-            "type": "Study"
-          },
-          "predicate": "produced_asset",
-          "object": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-            "type": "ResearchAsset"
-          },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "study:biobank",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "asset:biobank",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-            "type": "ResearchAsset"
-          },
-          "predicate": "applied_to",
-          "object": {
-            "text": "Rett syndrome (RTT)",
+            "text": "MECP2 duplication syndrome",
             "type": "Disease"
           },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "stereotypic movements",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: mean number of stereotypic movements in a 24 hour period at 5 years with subjects having MECP2 duplication syndrome",
           "hedged": false,
           "negated": false,
-          "subject_id": "asset:biobank",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:rett",
-          "object_match": "openai_reconciler:exact:high"
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
         },
         {
           "subject": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+            "text": "MECP2 duplication syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "scoliosis",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: percent of subjects reporting scoliosis 5 years with subjects having MECP2 duplication syndrome",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "MECP2 duplication syndrome",
+            "type": "Disease"
+          },
+          "predicate": "has_phenotype",
+          "object": {
+            "text": "survival",
+            "type": "Phenotype"
+          },
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: percent of subjects surviving at 5 years with subjects having MECP2 duplication syndrome",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "CSS",
             "type": "ResearchAsset"
           },
           "predicate": "applied_to",
@@ -1202,192 +1796,147 @@
             "text": "MECP2 duplication syndrome",
             "type": "Disease"
           },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: the mean CSS score at 5 years with subjects having MECP2 duplication syndrome",
           "hedged": false,
           "negated": false,
-          "subject_id": "asset:biobank",
-          "subject_match": "openai_reconciler:exact:high",
+          "subject_id": "asset:rtt-css",
+          "subject_match": "alias",
           "object_id": "disease:mdd",
           "object_match": "alias"
         },
         {
           "subject": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+            "text": "MAB",
             "type": "ResearchAsset"
           },
           "predicate": "applied_to",
           "object": {
-            "text": "FOXG1",
+            "text": "MECP2 duplication syndrome",
             "type": "Disease"
           },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+          "supporting_quote": "Primary outcome: Clinical and neurobehavioral longitudinal assessments in MECP2 duplication syndrome: the mean MAB score at 5 years with subjects having MECP2 duplication syndrome",
           "hedged": false,
           "negated": false,
-          "subject_id": "asset:biobank",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:foxg1",
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": "disease:mdd",
           "object_match": "alias"
         },
         {
           "subject": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+            "text": "Quality of Life Measures",
             "type": "ResearchAsset"
           },
           "predicate": "applied_to",
+          "object": {
+            "text": "RTT",
+            "type": "Disease"
+          },
+          "supporting_quote": "Secondary outcome: Quality of Life Measures in RTT",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": "disease:rett",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Quality of Life Measures",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
+            "text": "MECP2 duplication syndrome",
+            "type": "Disease"
+          },
+          "supporting_quote": "Secondary outcome: Quality of Life Measures in MECP2 duplication syndrome",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": "disease:mdd",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Quality of Life Measures",
+            "type": "ResearchAsset"
+          },
+          "predicate": "applied_to",
+          "object": {
+            "text": "RTT-related disorders",
+            "type": "Disease"
+          },
+          "supporting_quote": "Secondary outcome: Quality of Life Measures in RTT-related disorders.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        }
+      ]
+    },
+    {
+      "source_id": "ctgov:NCT02705677",
+      "response_id": "resp_04411e965ba30c16006ac17654eecc87d08052de8b3524e0d0",
+      "returned": 10,
+      "kept": 6,
+      "dropped_unverified_quote": 4,
+      "claims": [
+        {
+          "subject": {
+            "text": "Rett Syndrome",
+            "type": "Disease"
+          },
+          "predicate": "co_studied_with",
+          "object": {
+            "text": "MECP2 Duplication",
+            "type": "Disease"
+          },
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "disease:mdd",
+          "object_match": "alias"
+        },
+        {
+          "subject": {
+            "text": "Rett Syndrome",
+            "type": "Disease"
+          },
+          "predicate": "co_studied_with",
           "object": {
             "text": "CDKL5",
             "type": "Disease"
           },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "hedged": false,
           "negated": false,
-          "subject_id": "asset:biobank",
-          "subject_match": "openai_reconciler:exact:high",
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
           "object_id": "disease:cdd",
-          "object_match": "openai_reconciler:alias:moderate"
-        },
-        {
-          "subject": {
-            "text": "Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-            "type": "ResearchAsset"
-          },
-          "predicate": "applied_to",
-          "object": {
-            "text": "MECP2 mutations not producing RTT",
-            "type": "Disease"
-          },
-          "supporting_quote": "Primary outcome: Biobanking of blood for Rett syndrome (RTT), MECP2 duplication syndrome, FOXG1, CDKL5, and MECP2 mutations not producing RTT",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "asset:biobank",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:mdd",
           "object_match": "openai_reconciler:synonym:moderate"
         },
         {
           "subject": {
-            "text": "Rett syndrome (RTT)",
+            "text": "Rett Syndrome",
             "type": "Disease"
           },
           "predicate": "co_studied_with",
           "object": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
+            "text": "FOXG1 Disorders",
             "type": "Disease"
           },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:mdd",
-          "object_match": "openai_reconciler:alias:high"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome (RTT)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:cdd",
-          "object_match": "openai_reconciler:alias:moderate"
-        },
-        {
-          "subject": {
-            "text": "Rett syndrome (RTT)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "openai_reconciler:exact:high",
-          "object_id": "disease:foxg1",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "openai_reconciler:alias:high",
-          "object_id": "disease:cdd",
-          "object_match": "openai_reconciler:alias:moderate"
-        },
-        {
-          "subject": {
-            "text": "MECP2-duplication disorder (MECP2 Dup)",
-            "type": "Disease"
-          },
-          "predicate": "co_studied_with",
-          "object": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "openai_reconciler:alias:high",
-          "object_id": "disease:foxg1",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "CDKL5",
-            "type": "Disease"
-          },
-          "predicate": "caused_by_variant_in",
-          "object": {
-            "text": "CDKL5",
-            "type": "Gene"
-          },
-          "supporting_quote": "Eligibility criteria: Inclusion Criteria: * Individuals of both genders and of all ages, with RTT, MECP2 Dup, and, RTT-related disorders including those with mutations or deletions in CDKL5 and FOXG1 genes, or those with RTT (atypical or typical) who are mutation negative.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:cdd",
-          "subject_match": "openai_reconciler:alias:moderate",
-          "object_id": "gene:cdkl5",
-          "object_match": "alias"
-        },
-        {
-          "subject": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "predicate": "caused_by_variant_in",
-          "object": {
-            "text": "FOXG1",
-            "type": "Gene"
-          },
-          "supporting_quote": "Eligibility criteria: Inclusion Criteria: * Individuals of both genders and of all ages, with RTT, MECP2 Dup, and, RTT-related disorders including those with mutations or deletions in CDKL5 and FOXG1 genes, or those with RTT (atypical or typical) who are mutation negative.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:foxg1",
           "subject_match": "alias",
-          "object_id": "gene:foxg1",
+          "object_id": "disease:foxg1",
           "object_match": "alias"
         },
         {
@@ -1395,136 +1944,64 @@
             "text": "MECP2 Duplication",
             "type": "Disease"
           },
-          "predicate": "caused_by_variant_in",
+          "predicate": "co_studied_with",
           "object": {
-            "text": "MECP2",
-            "type": "Gene"
+            "text": "CDKL5",
+            "type": "Disease"
           },
-          "supporting_quote": "Secondary outcome: Breakpoints and gene content of MECP2 and FOXG1 duplications",
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:mdd",
           "subject_match": "alias",
-          "object_id": null,
-          "object_match": "openai_reconciler:none:low"
+          "object_id": "disease:cdd",
+          "object_match": "openai_reconciler:synonym:moderate"
         },
         {
           "subject": {
-            "text": "MECP2 mutations not producing RTT",
+            "text": "MECP2 Duplication",
             "type": "Disease"
           },
-          "predicate": "caused_by_variant_in",
+          "predicate": "co_studied_with",
           "object": {
-            "text": "MECP2",
-            "type": "Gene"
-          },
-          "supporting_quote": "The overarching purpose of this study is to advance understanding of the natural history of Rett syndrome (RTT), MECP2-duplication disorder (MECP2 Dup), RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations who do not have RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:mdd",
-          "subject_match": "openai_reconciler:synonym:moderate",
-          "object_id": null,
-          "object_match": "openai_reconciler:none:low"
-        }
-      ]
-    },
-    {
-      "source_id": "reporter:U54HD061222",
-      "response_id": "resp_077a3c9b8b9c0bdd006ac171a650b487d0819c4ecb2b263c93",
-      "returned": 9,
-      "kept": 9,
-      "dropped_unverified_quote": 0,
-      "claims": [
-        {
-          "subject": {
-            "text": "RTT",
+            "text": "FOXG1 Disorders",
             "type": "Disease"
           },
-          "predicate": "studied_in",
-          "object": {
-            "text": "U54HD061222: Rett syndrome, MECP2 Duplications, and Rett-related Disorders Natural History",
-            "type": "Study"
-          },
-          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:rett",
-          "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "MECP2 duplication disorder",
-            "type": "Disease"
-          },
-          "predicate": "studied_in",
-          "object": {
-            "text": "U54HD061222: Rett syndrome, MECP2 Duplications, and Rett-related Disorders Natural History",
-            "type": "Study"
-          },
-          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:mdd",
           "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
+          "object_id": "disease:foxg1",
+          "object_match": "alias"
         },
         {
           "subject": {
             "text": "CDKL5",
             "type": "Disease"
           },
-          "predicate": "studied_in",
+          "predicate": "co_studied_with",
           "object": {
-            "text": "U54HD061222: Rett syndrome, MECP2 Duplications, and Rett-related Disorders Natural History",
-            "type": "Study"
+            "text": "FOXG1 Disorders",
+            "type": "Disease"
           },
-          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
+          "supporting_quote": "Conditions: Rett Syndrome; MECP2 Duplication; CDKL5; FOXG1 Disorders",
           "hedged": false,
           "negated": false,
           "subject_id": "disease:cdd",
-          "subject_match": "openai_reconciler:alias:moderate",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "FOXG1",
-            "type": "Disease"
-          },
-          "predicate": "studied_in",
-          "object": {
-            "text": "U54HD061222: Rett syndrome, MECP2 Duplications, and Rett-related Disorders Natural History",
-            "type": "Study"
-          },
-          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": "disease:foxg1",
-          "subject_match": "alias",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        },
-        {
-          "subject": {
-            "text": "individuals with MECP2 mutations but lacking clinical criteria for RTT",
-            "type": "Disease"
-          },
-          "predicate": "studied_in",
-          "object": {
-            "text": "U54HD061222: Rett syndrome, MECP2 Duplications, and Rett-related Disorders Natural History",
-            "type": "Study"
-          },
-          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
-          "hedged": false,
-          "negated": false,
-          "subject_id": null,
-          "subject_match": "openai_reconciler:none:low",
-          "object_id": "study:nhs",
-          "object_match": "openai_reconciler:exact:high"
-        },
+          "subject_match": "openai_reconciler:synonym:moderate",
+          "object_id": "disease:foxg1",
+          "object_match": "alias"
+        }
+      ]
+    },
+    {
+      "source_id": "reporter:U54HD061222",
+      "response_id": "resp_01d2fc7053628078006ac1767529e087d084262dbeef3ebad0",
+      "returned": 7,
+      "kept": 7,
+      "dropped_unverified_quote": 0,
+      "claims": [
         {
           "subject": {
             "text": "RTT",
@@ -1563,21 +2040,39 @@
         },
         {
           "subject": {
+            "text": "MECP2 duplication disorder",
+            "type": "Disease"
+          },
+          "predicate": "co_studied_with",
+          "object": {
+            "text": "the RTT-related disorders",
+            "type": "Disease"
+          },
+          "supporting_quote": "This RDCRC will focus on three distinct disorders: RTT, MECP2 duplication disorder, and the RTT-related disorders including CDKL5, FOXG1, and individuals with MECP2 mutations but lacking clinical criteria for RTT.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:mdd",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "RTT",
+            "type": "Disease"
+          },
+          "predicate": "studied_in",
+          "object": {
             "text": "RTT NHS",
             "type": "Study"
-          },
-          "predicate": "produced_asset",
-          "object": {
-            "text": "critical data",
-            "type": "ResearchAsset"
           },
           "supporting_quote": "The on-going RTT NHS has provided critical data for organizing and advancing longitudinal studies.",
           "hedged": false,
           "negated": false,
-          "subject_id": "study:nhs",
-          "subject_match": "openai_reconciler:alias:high",
-          "object_id": null,
-          "object_match": "openai_reconciler:none:low"
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": "study:nhs",
+          "object_match": "openai_reconciler:alias:high"
         },
         {
           "subject": {
@@ -1590,12 +2085,48 @@
             "type": "Phenotype"
           },
           "supporting_quote": "Substantial questions remain for RTT in terms of clinical variability not explainable solely by the specific mutations.",
-          "hedged": false,
+          "hedged": true,
           "negated": false,
           "subject_id": "disease:rett",
           "subject_match": "alias",
           "object_id": null,
           "object_match": "openai_reconciler:none:low"
+        },
+        {
+          "subject": {
+            "text": "RTT",
+            "type": "Disease"
+          },
+          "predicate": "involves_mechanism",
+          "object": {
+            "text": "neurophysiological and neuroimaging correlates of disease severity (alterations in specific volumetric measures, chemical composition, and neurophysiological measures such as EEG and Evoked Potentials)",
+            "type": "Mechanism"
+          },
+          "supporting_quote": "3) Identify and characterize neurophysiological and neuroimaging correlates of disease severity in RTT and RTT-related disorders: Understanding alterations in specific volumetric measures, chemical composition, and neurophysiological measures such as EEG and Evoked Potentials are critical to advancing clinical knowledge.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": "disease:rett",
+          "subject_match": "alias",
+          "object_id": null,
+          "object_match": "no_candidates"
+        },
+        {
+          "subject": {
+            "text": "the RTT-related disorders",
+            "type": "Disease"
+          },
+          "predicate": "involves_mechanism",
+          "object": {
+            "text": "neurophysiological and neuroimaging correlates of disease severity (alterations in specific volumetric measures, chemical composition, and neurophysiological measures such as EEG and Evoked Potentials)",
+            "type": "Mechanism"
+          },
+          "supporting_quote": "3) Identify and characterize neurophysiological and neuroimaging correlates of disease severity in RTT and RTT-related disorders: Understanding alterations in specific volumetric measures, chemical composition, and neurophysiological measures such as EEG and Evoked Potentials are critical to advancing clinical knowledge.",
+          "hedged": false,
+          "negated": false,
+          "subject_id": null,
+          "subject_match": "openai_reconciler:none:low",
+          "object_id": null,
+          "object_match": "no_candidates"
         }
       ]
     }

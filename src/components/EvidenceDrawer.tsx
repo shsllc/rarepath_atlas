@@ -1,25 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceItem, type GraphNode } from "@/lib/schemas";
+import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceItem, type GraphNode, type SourceRecord } from "@/lib/schemas";
 import { METHOD_LABEL, PREDICATE_LABEL } from "@/lib/format";
+import type { DrawerTarget } from "@/lib/graph-view";
 import { FixtureChip, StatusBadge } from "./StatusBadge";
 
-export interface DrawerRequest {
-  title: string;
-  edgeIds: string[];
-}
-
 interface Props {
-  request: DrawerRequest | null;
+  request: DrawerTarget | null;
   onClose: () => void;
+  onNavigate: (t: DrawerTarget) => void;
   nodes: Map<string, GraphNode>;
   edges: Map<string, EvidenceEdge>;
+  sources: Map<string, SourceRecord>;
 }
 
-type Explain = { state: "idle" } | { state: "loading" } | { state: "error"; message: string } | { state: "done"; text: string; caveats: string[] };
+interface Explanation {
+  why_it_matters: string;
+  evidence_shows: string;
+  does_not_show: string;
+  next_question: string;
+  word_count: number;
+  quality_issues: string[];
+}
+type Explain = { state: "idle" } | { state: "loading" } | { state: "error"; message: string } | { state: "done"; e: Explanation };
 
-export function EvidenceDrawer({ request, onClose, nodes, edges }: Props) {
+export function EvidenceDrawer({ request, onClose, onNavigate, nodes, edges, sources }: Props) {
   const [explain, setExplain] = useState<Explain>({ state: "idle" });
 
   useEffect(() => {
@@ -30,58 +36,68 @@ export function EvidenceDrawer({ request, onClose, nodes, edges }: Props) {
   }, [request, onClose]);
 
   if (!request) return null;
-  const list = request.edgeIds.map((id) => edges.get(id)).filter((e): e is EvidenceEdge => !!e);
   const label = (id: string) => nodes.get(id)?.label ?? id;
+  const node = request.kind === "node" ? nodes.get(request.nodeId) : undefined;
+  const edgeIds =
+    request.kind === "edges"
+      ? request.edgeIds
+      : [...edges.values()].filter((e) => e.subject_id === request.nodeId || e.object_id === request.nodeId).map((e) => e.id);
+  const list = edgeIds.map((id) => edges.get(id)).filter((e): e is EvidenceEdge => !!e);
+  const title = request.kind === "edges" ? request.title : (node?.label ?? request.nodeId);
 
   async function runExplain() {
     setExplain({ state: "loading" });
     const res = await fetch("/api/explain", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ edge_ids: request!.edgeIds, audience: "family" }),
+      body: JSON.stringify({ edge_ids: edgeIds.slice(0, 20), audience: "family" }),
     });
     const json = await res.json();
     if (!res.ok) setExplain({ state: "error", message: json.error ?? `HTTP ${res.status}` });
-    else setExplain({ state: "done", text: json.plain_language, caveats: json.caveats ?? [] });
+    else setExplain({ state: "done", e: json });
   }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Evidence details">
       <button className="absolute inset-0 bg-black/30" aria-label="Close evidence" onClick={onClose} />
-      <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white p-6 shadow-xl">
+      <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white p-5 shadow-xl sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Evidence trail</p>
-            <h2 className="mt-1 text-lg font-semibold">{request.title}</h2>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted">{request.kind === "node" ? `Entity · ${node?.type ?? ""}` : "Evidence trail"}</p>
+            <h2 className="mt-1 text-lg font-semibold">{title}</h2>
           </div>
           <button onClick={onClose} className="rounded px-2 py-1 text-muted hover:bg-canvas" aria-label="Close">
             ✕
           </button>
         </div>
 
-        <div className="mt-4 rounded-lg border border-line bg-canvas p-3 text-sm">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-medium">Explain in plain language</span>
-            <button onClick={runExplain} disabled={explain.state === "loading"} className="rounded bg-ink px-3 py-1 text-xs font-medium text-white disabled:opacity-50">
-              {explain.state === "loading" ? "Explaining…" : "Explain (OpenAI)"}
-            </button>
-          </div>
-          {explain.state === "error" && <p className="mt-2 text-contradictory">{explain.message}</p>}
-          {explain.state === "done" && (
-            <div className="mt-2 space-y-2">
-              <p>{explain.text}</p>
-              {explain.caveats.length > 0 && (
-                <ul className="list-disc pl-5 text-muted">
-                  {explain.caveats.map((c, i) => (
-                    <li key={i}>{c}</li>
-                  ))}
-                </ul>
-              )}
-              <p className="text-xs text-muted">AI-generated summary of the evidence below. Not medical advice.</p>
-            </div>
-          )}
-        </div>
+        {node && <NodeDetails node={node} sources={sources} />}
 
+        {list.length > 0 && (
+          <div className="mt-4 rounded-lg border border-line bg-canvas p-3 text-sm" data-testid="explain-panel">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium">Explain this connection</span>
+              <button onClick={runExplain} disabled={explain.state === "loading"} className="rounded bg-ink px-3 py-1 text-xs font-medium text-white disabled:opacity-50">
+                {explain.state === "loading" ? "Explaining…" : "Explain (OpenAI)"}
+              </button>
+            </div>
+            {explain.state === "error" && <p className="mt-2 text-contradictory">{explain.message}</p>}
+            {explain.state === "done" && (
+              <div className="mt-3 space-y-3">
+                <ExplainPart title="Why this connection matters" text={explain.e.why_it_matters} />
+                <ExplainPart title="What the evidence shows" text={explain.e.evidence_shows} />
+                <ExplainPart title="What it does not show" text={explain.e.does_not_show} />
+                <ExplainPart title="Next question to ask" text={explain.e.next_question} strong />
+                <p className="text-xs text-muted">
+                  AI-generated from the quotes below by the OpenAI Path Explainer ({explain.e.word_count} words). Not medical advice.
+                  {explain.e.quality_issues?.length > 0 && ` Quality check flagged: ${explain.e.quality_issues.join("; ")}.`}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {request.kind === "node" && <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-muted">Evidence-backed relationships ({list.length})</h3>}
         <ol className="mt-6 space-y-4">
           {list.map((e) => {
             const status = deriveEvidenceStatus(e);
@@ -91,10 +107,24 @@ export function EvidenceDrawer({ request, onClose, nodes, edges }: Props) {
                   <StatusBadge status={status} />
                   <span className="text-xs text-muted">confidence: {e.confidence}</span>
                   {e.inferred && <span className="text-xs font-medium text-inferred">inferred = true</span>}
+                  <span className="text-xs text-muted">
+                    AI involvement:{" "}
+                    {e.evidence.some((x) => x.method === "openai_extractor")
+                      ? e.evidence.every((x) => x.method === "openai_extractor")
+                        ? "OpenAI extracted (unreviewed)"
+                        : "OpenAI corroborated"
+                      : "none"}
+                  </span>
                   {e.source_type === "demo_fixture" && <FixtureChip />}
                 </div>
                 <p className="mt-2 font-medium">
-                  {label(e.subject_id)} <span className="font-normal text-muted">{PREDICATE_LABEL[e.predicate]}</span> {label(e.object_id)}
+                  <button className="text-left hover:underline" onClick={() => onNavigate({ kind: "node", nodeId: e.subject_id })}>
+                    {label(e.subject_id)}
+                  </button>{" "}
+                  <span className="font-normal text-muted">{PREDICATE_LABEL[e.predicate]}</span>{" "}
+                  <button className="text-left hover:underline" onClick={() => onNavigate({ kind: "node", nodeId: e.object_id })}>
+                    {label(e.object_id)}
+                  </button>
                 </p>
                 {e.evidence_type === "llm_extraction" && (
                   <p className="mt-2 rounded bg-canvas p-2 text-xs text-muted">
@@ -196,5 +226,52 @@ function EvidenceItemView({ ev }: { ev: EvidenceItem }) {
         <dd>{ev.retrieval_date}</dd>
       </dl>
     </li>
+  );
+}
+
+function ExplainPart({ title, text, strong }: { title: string; text: string; strong?: boolean }) {
+  return (
+    <div>
+      <h4 className="text-[11px] font-semibold uppercase tracking-wide text-muted">{title}</h4>
+      <p className={strong ? "font-medium" : ""}>{text}</p>
+    </div>
+  );
+}
+
+function NodeDetails({ node, sources }: { node: GraphNode; sources: Map<string, SourceRecord> }) {
+  const provenance = node.external_ids.length
+    ? "Identifiers verified against retrieved records."
+    : "Curated entity; every relationship below cites its own source.";
+  const paperSrc = node.type === "Paper" && node.pmid ? sources.get(`pubmed:${node.pmid}`) : undefined;
+  return (
+    <div className="mt-4 space-y-2 rounded-lg border border-line p-3 text-sm">
+      {node.lay_summary && <p>{node.lay_summary}</p>}
+      {node.description && <p className="text-muted">{node.description}</p>}
+      {node.type === "Paper" && (
+        <p className="text-xs text-muted">
+          {node.journal} · {node.pub_date} · {node.authors.slice(0, 3).join(", ")}
+          {node.authors.length > 3 ? " et al." : ""}
+          {node.publication_status === "preprint" && <span className="ml-1 rounded bg-yellow-100 px-1 font-semibold text-yellow-900">Preprint — not peer reviewed</span>}
+        </p>
+      )}
+      {node.type === "Study" && (
+        <p className="text-xs text-muted">
+          {node.conditions.join("; ")} · {node.status?.toLowerCase()} · enrollment {node.enrollment} · sponsor {node.sponsor}
+        </p>
+      )}
+      {node.external_ids.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {node.external_ids.map((x) => (
+            <a key={x.system + x.id} href={x.url} target="_blank" rel="noreferrer" className="rounded border border-line px-1.5 py-0.5 font-mono text-xs underline">
+              {x.id.includes(":") || x.id.startsWith(x.system) ? x.id : `${x.system}:${x.id}`}
+            </a>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-muted">
+        {provenance}
+        {paperSrc && ` Retrieved ${paperSrc.retrieval_date} via ${paperSrc.retrieved_via}.`}
+      </p>
+    </div>
   );
 }

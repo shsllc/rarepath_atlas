@@ -13,6 +13,7 @@ export const Predicate = z.enum([
   "co_studied_with", // Disease -> Disease (enrolled in the same study/infrastructure)
   "clinically_differs_from", // Disease -> Disease (evidence of distinct features)
   "applied_to", // ResearchAsset -> Disease (instrument/infrastructure used in that population)
+  "informed_development_of", // Study|PatientOrganization|ResearchAsset -> ResearchAsset (experience fed into building it)
   "studied_in", // Disease -> Study
   "produced_asset", // Study -> ResearchAsset
   "asset_measures", // ResearchAsset -> Phenotype

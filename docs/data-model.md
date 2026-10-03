@@ -48,7 +48,7 @@ Relationships are objects that carry their own evidence, not bare graph edges.
 }
 ```
 
-Predicates: caused_by_variant_in, has_variant, has_phenotype, involves_mechanism, phenotypically_overlaps, shares_mechanism_with, historically_classified_with, **classified_as_variant_of**, **co_studied_with**, **clinically_differs_from**, **applied_to**, studied_in, produced_asset, asset_measures, supports_community, investigates, described_in. Each predicate has a type signature, which the build enforces.
+Predicates: caused_by_variant_in, has_variant, has_phenotype, involves_mechanism, phenotypically_overlaps, shares_mechanism_with, historically_classified_with, **classified_as_variant_of**, **co_studied_with**, **clinically_differs_from**, **applied_to**, **informed_development_of**, studied_in, produced_asset, asset_measures, supports_community, investigates, described_in. Each predicate has a type signature, which the build enforces.
 
 Each evidence item also records:
 - `method`: structured_api, analyst_quote, openai_extractor or fixture
@@ -58,7 +58,7 @@ Each evidence item also records:
 
 `SourceRecord` (`sources.ts`) stores each retrieved text verbatim, along with its citation, retrieval date and license note. `GraphBundle.sources` carries these records, so tests can re-verify every quote.
 
-Reuse cards carry a `reuse_classification`: directly_reusable, potentially_adaptable, shared_infrastructure_precedent or discovery_lead.
+Reuse cards carry a `reuse_classification`: directly_reusable, potentially_adaptable, shared_infrastructure_precedent or discovery_lead. A featured card can also carry a `story`: labelled lines, each citing its own evidence edges.
 
 ## Evidence status: one rule, one place
 

@@ -16,7 +16,7 @@ import { HomepageOrgProvider } from "../src/lib/providers/orgs";
 
 const OUT = path.join(process.cwd(), "data", "real", "sources.json");
 
-const ANCHOR_PMIDS = ["32472944", "35483386", "39867409"];
+const ANCHOR_PMIDS = ["32472944", "35483386", "39867409", "31147226"]; // 31147226 = ref 22 of PMID 32472944 (CDD severity assessment)
 const NCTS = ["NCT02738281", "NCT02705677"];
 const MONDO = ["MONDO:0100039", "MONDO:0010726", "MONDO:0100040", "MONDO:0010283"];
 const HPO = ["HP:0001250", "HP:0011097", "HP:0100704", "HP:0002376"];

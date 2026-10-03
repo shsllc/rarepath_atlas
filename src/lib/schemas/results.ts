@@ -62,6 +62,8 @@ export const ReusableAssetOpportunity = z.object({
   source_disease_id: z.string(),
   headline: z.string(), // "Natural-history protocol from Rett syndrome"
   reuse_classification: ReuseClassification.default("discovery_lead"),
+  /** Optional featured narrative: each line cites its own evidence edges. */
+  story: z.array(z.object({ label: z.string(), text: z.string(), evidence_edge_ids: z.array(z.string()).min(1) })).default([]),
   why_it_may_transfer: z.array(z.string()).min(1),
   what_differs: z.array(z.string()).min(1),
   what_is_uncertain: z.array(z.string()).min(1),

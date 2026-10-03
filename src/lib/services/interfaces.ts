@@ -56,10 +56,15 @@ export interface OpenAIEntityReconciler {
 }
 
 export interface PathExplanation {
-  plain_language: string;
-  caveats: string[];
+  why_it_matters: string;
+  evidence_shows: string;
+  does_not_show: string;
+  next_question: string;
   /** Edge ids the explanation relies on — the explainer may not cite anything outside the path. */
   cited_edge_ids: string[];
+  word_count: number;
+  /** Empty when the output passed checkExplanation(); shown to the user otherwise. */
+  quality_issues: string[];
 }
 
 /** Role 3 — translate a supported graph path into patient-readable language. */

@@ -12,6 +12,7 @@ export const PREDICATE_LABEL: Record<Predicate, string> = {
   co_studied_with: "was studied in the same research infrastructure as",
   clinically_differs_from: "differs clinically from",
   applied_to: "has been applied in",
+  informed_development_of: "informed the development of",
   studied_in: "is studied in",
   produced_asset: "produced",
   asset_measures: "measures",

@@ -36,6 +36,7 @@ const P1 = "pubmed:32472944"; // Cutri-French 2020, Ann Neurol — comparison of
 const PMC1 = "pmc:PMC8882337"; // full-text excerpts of the same paper
 const P2 = "pubmed:35483386"; // Leonard 2022, Lancet Neurol — CDD review
 const P3 = "pubmed:39867409"; // Aledo-Serrano 2025, medRxiv PREPRINT — CDD into adulthood
+const P4 = "pubmed:31147226"; // Demarest 2019, Pediatr Neurol — CDD severity assessment (ref 22 of P1)
 const NHS = "ctgov:NCT02738281";
 const BIO = "ctgov:NCT02705677";
 const GRANT = "reporter:U54HD061222";
@@ -149,6 +150,16 @@ export const NODES: NodeSpec[] = [
     ids: [],
   },
   {
+    id: "asset:cdd-severity",
+    type: "ResearchAsset",
+    asset_kind: "outcome_measure",
+    owner_disease_id: "disease:cdd",
+    label: "CDKL5 Deficiency Disorder severity assessment (Demarest et al., 2019)",
+    aliases: ["CDD severity assessment", "severity assessment"],
+    access_notes: "Published in Pediatric Neurology 2019 (PMID 31147226). The authors state ongoing validation is required.",
+    ids: [],
+  },
+  {
     id: "asset:biobank",
     type: "ResearchAsset",
     asset_kind: "research_infrastructure",
@@ -161,6 +172,7 @@ export const NODES: NodeSpec[] = [
 
   { id: "paper:32472944", type: "Paper", label: "Comparison of Core Features in Four Developmental Encephalopathies in the Rett Natural History Study", aliases: [], ids: [["PMID", "32472944", P1]] },
   { id: "paper:35483386", type: "Paper", label: "CDKL5 deficiency disorder: clinical features, diagnosis, and management", aliases: [], ids: [["PMID", "35483386", P2]] },
+  { id: "paper:31147226", type: "Paper", label: "Severity Assessment in CDKL5 Deficiency Disorder", aliases: [], ids: [["PMID", "31147226", P4]] },
   { id: "paper:39867409", type: "Paper", label: "The natural history of CDKL5 deficiency disorder into adulthood (preprint)", aliases: [], ids: [["PMID", "39867409", P3]] },
 
   { id: "org:ifcr", type: "PatientOrganization", label: "International Foundation for CDKL5 Research", aliases: ["IFCR"], website: "https://cdkl5.com/", ids: [] },
@@ -191,7 +203,9 @@ export const EDGES: EdgeSpec[] = [
     evidence: [
       { src: P2, quote: "Although initially considered a variant of Rett syndrome, CDD is now recognised as an independent disorder" },
       { src: PMC1, quote: "they were often imprecisely named “atypical or variant RTT” or “RTT-like”" },
-      { src: P1, quote: "Although they are historically linked, no direct comparison has been performed." },
+      // Trimmed on purpose: the rest of this sentence ("no direct comparison has been performed") describes the
+      // situation before this 2020 paper, which is itself that comparison. Out of context it reads as current fact.
+      { src: P1, quote: "Although they are historically linked" },
     ],
   },
   // … and the classification claim itself (contradicted by current literature)
@@ -393,6 +407,41 @@ export const EDGES: EdgeSpec[] = [
       { src: P3, quote: "16% never achieved any CDS skill, but most attained at least three, and 28% attained six or all seven." },
     ],
   },
+  {
+    key: "sa-cdd",
+    s: "asset:cdd-severity",
+    p: "applied_to",
+    o: "disease:cdd",
+    confidence: "high",
+    evidence: [
+      { src: P4, quote: "A specific severity assessment is lacking, required to monitor the clinical course and needed to define the natural history and for clinical trial readiness." },
+      { src: P4, quote: "The final severity assessment comprised 51 items that comprehensively describe domains of epilepsy; motor; cognition, behavior, vision, and speech; and autonomic functions." },
+      { src: P4, quote: "Refinement through ongoing validation is required for future clinical trials.", stance: "qualifies" },
+    ],
+  },
+  {
+    key: "nhs-informed-sa",
+    s: "study:nhs",
+    p: "informed_development_of",
+    o: "asset:cdd-severity",
+    confidence: "high",
+    evidence: [
+      { src: P4, quote: "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium and the National Institutes of Health Rett and Rett-Related Disorders Natural History Study consortium." },
+      { src: PMC1, quote: "disease-specific severity scales are needed to be developed (and one has been developed for CDD)" },
+    ],
+  },
+  {
+    key: "ifcr-informed-sa",
+    s: "org:ifcr",
+    p: "informed_development_of",
+    o: "asset:cdd-severity",
+    confidence: "high",
+    evidence: [
+      { src: P4, quote: "A severity assessment was developed based on clinical and research experience from the International Foundation for CDKL5 Research Centers of Excellence consortium" },
+      { src: P4, quote: "The revised version of the severity assessment was presented for review, comment, and piloting to families at the International Foundation for CDKL5 Research-sponsored family meeting (Colorado, 2018)." },
+    ],
+  },
+  { key: "sa-paper", s: "asset:cdd-severity", p: "described_in", o: "paper:31147226", confidence: "high", evidence: [{ src: P4, quote: "A severity assessment was rapidly developed with input from multiple stakeholders." }] },
   { key: "css-paper", s: "asset:rtt-css", p: "described_in", o: "paper:32472944", confidence: "high", evidence: [{ src: PMC1, quote: "The clinical severity scale (CSS) used was previously published by Schanen et al." }] },
   { key: "cds-paper", s: "asset:cds", p: "described_in", o: "paper:39867409", confidence: "moderate", evidence: [{ src: P3, quote: "CDKL5 Developmental Score (CDS)" }] },
   { key: "cdd-review", s: "disease:cdd", p: "described_in", o: "paper:35483386", confidence: "high", evidence: [{ src: P2, quote: "CDKL5 deficiency disorder (CDD) was first identified as a cause of human disease in 2004." }] },
@@ -480,6 +529,7 @@ export interface OpportunitySpec {
   requires_expert_validation: string[];
   edges: string[];
   confidence: Confidence;
+  story?: { label: string; text: string; edges: string[] }[];
   next_actions: { id: string; kind: "contact_organization" | "contact_researcher" | "review_protocol" | "compare_outcome_measures" | "compare_eligibility" | "request_data_access" | "ask_expert_question"; label: string; target_node_id?: string; edges: string[] }[];
 }
 
@@ -509,8 +559,35 @@ export const OPPORTUNITIES: OpportunitySpec[] = [
       "Which recruitment, longitudinal-data or outcome-measure components are transferable to a CDD-focused effort?",
       "Is the CDD data already collected here enough for your organisation's question, or is a CDD-specific cohort needed?",
     ],
-    edges: ["cdd-in-nhs", "nhs-paper", "nhs-infra", "costudy-rett", "differs-rett"],
+    edges: ["cdd-in-nhs", "nhs-paper", "nhs-infra", "costudy-rett", "differs-rett", "nhs-informed-sa"],
     confidence: "moderate",
+    story: [
+      {
+        label: "What happened",
+        text: "CDD participants were enrolled in the same NIH-funded natural-history study as Rett syndrome, FOXG1 disorder and MECP2 duplication syndrome.",
+        edges: ["cdd-in-nhs", "costudy-rett", "nhs-paper"],
+      },
+      {
+        label: "Why it matters",
+        text: "Cross-disorder infrastructure sharing has already happened. Experience from this study's consortium also helped build a CDD-specific severity assessment.",
+        edges: ["nhs-informed-sa", "nhs-infra"],
+      },
+      {
+        label: "Potentially adaptable asset",
+        text: "Outcome-measure experience: the RTT Clinical Severity Scale was given to every participant, including people with CDD (median score 29).",
+        edges: ["css-cdd"],
+      },
+      {
+        label: "Important limitation",
+        text: "The Rett scale is not established as valid for CDD; its authors note CDD's more frequent seizures may raise scores. The CDD-specific assessment also still needs validation.",
+        edges: ["css-cdd", "sa-cdd"],
+      },
+      {
+        label: "Next research question",
+        text: "How do the RTT Clinical Severity Scale and the CDD-specific severity assessment compare in people with CDD, and could the Natural History Study database support that comparison?",
+        edges: ["css-cdd", "sa-cdd", "nhs-infra"],
+      },
+    ],
     next_actions: [
       {
         id: "act:review-methods",
@@ -549,24 +626,24 @@ export const OPPORTUNITIES: OpportunitySpec[] = [
     ],
     what_differs: [
       "The scale was built for Rett syndrome. The authors note that CDD's more frequent seizures may partly drive its higher scores.",
-      "CDD-specific measures exist. The 2025 adult-cohort preprint used the CDKL5 Developmental Score (CDS).",
+      "A CDD-specific severity assessment exists (51 items covering epilepsy, motor, cognition/behaviour/vision/speech and autonomic function), and the 2025 adult-cohort preprint used the CDKL5 Developmental Score (CDS).",
     ],
     what_is_uncertain: [
       "Whether the Rett scale is valid or sensitive to change in CDD. No retrieved source establishes this.",
       "The NIH-funded research centre's abstract says outcome measures 'require special consideration for these disorders'.",
-      "The CDD-specific scale that the 2020 paper refers to has not been retrieved or identified.",
+      "The CDD-specific severity assessment still needs validation, according to its own authors.",
     ],
-    requires_expert_validation: ["Should a CDD study use the Rett scale, a CDD-specific instrument such as the CDS, or both for comparability?"],
-    edges: ["css-cdd", "cds-cdd", "differs-rett"],
+    requires_expert_validation: ["Should a CDD study use the Rett scale, the CDD-specific severity assessment, or both for comparability across disorders?"],
+    edges: ["css-cdd", "sa-cdd", "cds-cdd", "differs-rett"],
     confidence: "moderate",
     next_actions: [
       {
         id: "act:compare-scales",
         kind: "compare_outcome_measures",
         label:
-          "With a CDD clinical researcher, compare the RTT Clinical Severity Scale against CDD-specific measures such as the CDKL5 Developmental Score. The 2020 authors note this comparison could be run on the Natural History Study database.",
+          "With a CDD clinical researcher, compare the RTT Clinical Severity Scale against the CDD-specific severity assessment. The 2020 authors note this comparison could be run on the Natural History Study database.",
         target_node_id: "asset:rtt-css",
-        edges: ["css-cdd", "cds-cdd", "nhs-infra"],
+        edges: ["css-cdd", "sa-cdd", "nhs-infra"],
       },
     ],
   },
@@ -622,9 +699,9 @@ export const GAPS: (Omit<KnowledgeGap, "related_edge_ids"> & { edges: string[] }
   {
     id: "gap:css-validity",
     kind: "open_question",
-    statement: "Whether the RTT Clinical Severity Scale is valid or responsive in CDD has not been established in the retrieved sources.",
-    suggested_question_or_experiment: "Compare it against a CDD-specific measure in CDD participants, as the 2020 authors suggest.",
-    edges: ["css-cdd"],
+    statement: "Whether the RTT Clinical Severity Scale is valid or responsive in CDD has not been established, and the CDD-specific severity assessment itself still requires validation.",
+    suggested_question_or_experiment: "Compare the two instruments in CDD participants, as the 2020 authors suggest.",
+    edges: ["css-cdd", "sa-cdd"],
   },
   {
     id: "gap:no-transfer",
@@ -636,8 +713,8 @@ export const GAPS: (Omit<KnowledgeGap, "related_edge_ids"> & { edges: string[] }
   {
     id: "gap:preprint",
     kind: "missing_evidence",
-    statement: "The adult natural-history study (PMID 39867409) is a medRxiv preprint and had not been peer reviewed when it was retrieved.",
-    suggested_question_or_experiment: "Check for a peer-reviewed version before relying on its figures.",
+    statement: "The adult natural-history study (PMID 39867409) is a medRxiv preprint. No peer-reviewed version was found in PubMed on 2026-10-03.",
+    suggested_question_or_experiment: "Re-check for a peer-reviewed version before relying on its figures.",
     edges: ["cds-cdd", "cdd-spasm"],
   },
   {

@@ -12,16 +12,17 @@ It walks from *diagnosis → evidence-backed connection → related community �
 
 It does not diagnose, recommend treatment, or claim that two diseases are clinically equivalent.
 
-## Status: Gate 2 (verified featured journey)
+## Status: Gate 3 (judge-ready demo)
 
-Search **CDKL5** to see a real, sourced journey:
+Open **http://localhost:3000/results?q=CDKL5&demo=1**, or click *Start the 60-second demo* on the home page.
 
-- **CDKL5 deficiency disorder** (MONDO:0100039) is shown as a distinct disorder. Its historical "Rett variant" classification is displayed as **Contradictory**.
-- CDD was **enrolled in the Rett and Rett-Related Disorders Natural History Study** (ClinicalTrials.gov **NCT02738281**; NIH U54HD061222). The study's 2020 paper (PMID 32472944) compared 793 participants across four disorders.
-- Reuse is classified conservatively: a **shared research-infrastructure precedent**, a **potentially adaptable** outcome measure (RTT Clinical Severity Scale, administered to CDD participants), and a biobank **discovery lead**.
-- The page shows documented differences (seizure onset, regression, severity), seven open gaps, and a sourced next action.
+- **Thesis:** CDKL5 deficiency disorder (MONDO:0100039) is a distinct disease. CDD participants were nonetheless enrolled in shared Rett and Rett-related natural-history infrastructure (ClinicalTrials.gov **NCT02738281**). That is a real precedent for cross-disease research reuse, without implying biological equivalence or treatment transfer.
+- **Featured reusable research:** a shared research-infrastructure precedent. Each of its five lines (*what happened, why it matters, adaptable asset, important limitation, next research question*) cites its own evidence. New in Gate 3: Demarest et al. 2019 (PMID 31147226) shows the NHS consortium's experience helped build a **CDD-specific severity assessment**.
+- **Contradiction spotlight:** the historical "Atypical Rett" label vs. current evidence that CDD is a distinct disorder, with dates.
+- **Interactive evidence graph** (Cytoscape.js): line style encodes evidence status (solid = Known, dashed = AI-inferred, double = Contradictory, dotted = Unknown). Click a line for its source quotes, or a node for its identifiers. Analyst-unreviewed AI extractions are hidden by default.
+- **10× opportunity:** a defensible, measurable framing with no invented time savings. See [docs/10x-impact.md](docs/10x-impact.md).
 
-Sources, method, limitations, and what the demo does and does not prove are documented in [docs/demo-path.md](docs/demo-path.md).
+Sources, method, limitations, and what the demo does and does not prove: [docs/demo-path.md](docs/demo-path.md).
 
 ## Where OpenAI is used (runtime product)
 
@@ -29,9 +30,9 @@ Sources, method, limitations, and what the demo does and does not prove are docu
 |---|---|---|
 | **Evidence Extractor** | Ingestion, `scripts/extract-claims.ts` | Claims are kept only if their quote appears verbatim in the retrieved text. Treatment statements are excluded. |
 | **Entity Reconciler** | Ingestion | Can only choose among curated candidates. Only high-confidence matches are used. |
-| **Path Explainer** | Runtime: **Explain (OpenAI)** in the evidence drawer (`POST /api/explain`) | May cite only the edges it was given, and must flag disputed or inferred steps. |
+| **Path Explainer** | Runtime: **Explain this connection** in the evidence drawer (`POST /api/explain`) | Four parts (why it matters / what the evidence shows / what it does not show / next question), 180 words maximum. Validated by `checkExplanation()`, with one corrective retry. May cite only the edges it was given. |
 
-Gate 2 run: 85 quote-verified claims from 7 sources; 27 corroborate analyst-curated edges; 12 extractor-only edges, which are badged and kept out of cards and actions. Run metadata is stored in the bundle and shown on the results page.
+Latest ingestion run: 114 quote-verified claims from 8 sources; 26 corroborate analyst-curated edges; 13 extractor-only edges, which are badged, hidden from the default graph and kept out of cards and actions. Run metadata is stored in the bundle and shown on the results page.
 
 ## Run locally
 
@@ -63,7 +64,8 @@ npx tsx scripts/build-real-bundle.ts   # verifies every quote/ID, writes data/re
 
 ```bash
 npm run typecheck
-npm test            # 37 tests: provenance, quote verification, status rules, guardrails, search journey
+npm test            # 51 tests: provenance, quote verification, status rules, graph styling, 10× claims, explainer rules
+RUN_LIVE_OPENAI=1 npx vitest run tests/live-explainer.test.ts   # optional: 2 live Path Explainer checks (paid API calls)
 npm run build
 ```
 
