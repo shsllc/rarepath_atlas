@@ -5,8 +5,8 @@ import { PREDICATE_LABEL } from "@/lib/format";
 import { StatusBadge } from "./StatusBadge";
 
 /**
- * Gate 1 placeholder: a filterable edge table that already uses the real
- * evidence contract. Gate 3 replaces the table with Cytoscape.js, using
+ * Placeholder: a filterable edge table that already uses the real
+ * evidence contract. A later gate replaces the table with Cytoscape.js, using
  * line style per status: solid=supported, dashed=inferred, double=contradictory, dotted=unknown.
  */
 export function GraphPlaceholder({ nodes, edges, onSelectEdge }: { nodes: GraphNode[]; edges: EvidenceEdge[]; onSelectEdge: (e: EvidenceEdge) => void }) {

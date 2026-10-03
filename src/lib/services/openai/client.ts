@@ -1,16 +1,47 @@
+import fs from "node:fs";
+import path from "node:path";
+import { parse } from "dotenv";
 import OpenAI from "openai";
 
 let client: OpenAI | null | undefined;
+let keySource: KeySource = "none";
 
-/** Server-only. Returns null when OPENAI_API_KEY is not set so the app still runs on fixtures. */
+export type KeySource = ".env.local" | "process.env" | "none";
+
+/**
+ * Resolve OpenAI settings with .env.local taking precedence over machine-level
+ * environment variables. (Next.js normally lets an existing process env var win.)
+ * Server-only: never import this from a client component.
+ */
+function readLocalEnv(): Record<string, string> {
+  try {
+    return parse(fs.readFileSync(path.join(process.cwd(), ".env.local")));
+  } catch {
+    return {};
+  }
+}
+
+export function resolveOpenAIConfig(): { apiKey: string | null; model: string; keySource: KeySource } {
+  const local = readLocalEnv();
+  const localKey = local.OPENAI_API_KEY?.trim();
+  const envKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = localKey || envKey || null;
+  const source: KeySource = localKey ? ".env.local" : envKey ? "process.env" : "none";
+  const model = local.OPENAI_MODEL?.trim() || process.env.OPENAI_MODEL?.trim() || "gpt-5-mini";
+  return { apiKey, model, keySource: source };
+}
+
+/** Returns null when no key is configured so the app still runs without AI. */
 export function getOpenAI(): OpenAI | null {
   if (client !== undefined) return client;
-  const apiKey = process.env.OPENAI_API_KEY;
+  const { apiKey, keySource: src } = resolveOpenAIConfig();
+  keySource = src;
   client = apiKey ? new OpenAI({ apiKey }) : null;
   return client;
 }
 
-export const openAIModel = () => process.env.OPENAI_MODEL || "gpt-5-mini";
+export const openAIModel = () => resolveOpenAIConfig().model;
+export const openAIKeySource = (): KeySource => (getOpenAI(), keySource);
 
 export class OpenAINotConfiguredError extends Error {
   constructor() {

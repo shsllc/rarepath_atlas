@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { deriveEvidenceStatus, type EvidenceEdge, type GraphNode } from "@/lib/schemas";
-import { PREDICATE_LABEL } from "@/lib/format";
+import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceItem, type GraphNode } from "@/lib/schemas";
+import { METHOD_LABEL, PREDICATE_LABEL } from "@/lib/format";
 import { FixtureChip, StatusBadge } from "./StatusBadge";
 
 export interface DrawerRequest {
@@ -96,33 +96,105 @@ export function EvidenceDrawer({ request, onClose, nodes, edges }: Props) {
                 <p className="mt-2 font-medium">
                   {label(e.subject_id)} <span className="font-normal text-muted">{PREDICATE_LABEL[e.predicate]}</span> {label(e.object_id)}
                 </p>
-                <blockquote className="mt-2 border-l-2 border-line pl-3 text-sm text-ink/80">{e.quoted_or_structured_evidence}</blockquote>
+                {e.evidence_type === "llm_extraction" && (
+                  <p className="mt-2 rounded bg-canvas p-2 text-xs text-muted">
+                    Found by the OpenAI Evidence Extractor. The quote is verified verbatim in the source, but this relationship has not been reviewed by an analyst.
+                  </p>
+                )}
                 {e.contradiction_status !== "none" && (
                   <p className="mt-2 rounded bg-contradictory-bg p-2 text-sm text-contradictory">
                     <strong>{e.contradiction_status}:</strong> {e.contradiction_notes}
                   </p>
                 )}
-                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs text-muted">
-                  <dt>Source</dt>
-                  <dd>
-                    <a href={e.source_url} target="_blank" rel="noreferrer" className="text-ink underline">
-                      {e.source}
-                    </a>
-                  </dd>
-                  <dt>Source type</dt>
-                  <dd>{e.source_type}</dd>
-                  <dt>Evidence type</dt>
-                  <dd>{e.evidence_type}</dd>
-                  <dt>Retrieved</dt>
-                  <dd>{e.retrieval_date}</dd>
-                  <dt>Edge id</dt>
-                  <dd className="font-mono">{e.id}</dd>
-                </dl>
+                <ul className="mt-3 space-y-3">
+                  {(e.evidence.length ? e.evidence : [fallbackItem(e)]).map((ev) => (
+                    <EvidenceItemView key={ev.id} ev={ev} />
+                  ))}
+                </ul>
+                <p className="mt-2 font-mono text-[10px] text-muted">{e.id}</p>
               </li>
             );
           })}
         </ol>
       </aside>
     </div>
+  );
+}
+
+function fallbackItem(e: EvidenceEdge): EvidenceItem {
+  return {
+    id: `${e.id}:primary`,
+    source: e.source,
+    source_url: e.source_url,
+    retrieval_date: e.retrieval_date,
+    source_type: e.source_type,
+    evidence_type: e.evidence_type,
+    quoted_or_structured_evidence: e.quoted_or_structured_evidence,
+    method: e.source_type === "demo_fixture" ? "fixture" : "analyst_quote",
+    stance: "supports",
+  };
+}
+
+const STANCE = {
+  supports: { label: "Supports", cls: "text-supported" },
+  contradicts: { label: "Contradicts", cls: "text-contradictory" },
+  qualifies: { label: "Limitation / caveat", cls: "text-muted" },
+} as const;
+
+function CitationLinks({ c }: { c: EvidenceItem["citation"] }) {
+  if (!c) return null;
+  const links: [string, string][] = [];
+  if (c.pmid) links.push([`PMID ${c.pmid}`, `https://pubmed.ncbi.nlm.nih.gov/${c.pmid}/`]);
+  if (c.pmcid) links.push([c.pmcid, `https://pmc.ncbi.nlm.nih.gov/articles/${c.pmcid}/`]);
+  if (c.doi) links.push([`DOI ${c.doi}`, `https://doi.org/${c.doi}`]);
+  if (c.nct) links.push([c.nct, `https://clinicaltrials.gov/study/${c.nct}`]);
+  if (links.length === 0) return null;
+  return (
+    <span className="flex flex-wrap gap-2">
+      {links.map(([t, u]) => (
+        <a key={u} href={u} target="_blank" rel="noreferrer" className="text-ink underline">
+          {t}
+        </a>
+      ))}
+    </span>
+  );
+}
+
+function EvidenceItemView({ ev }: { ev: EvidenceItem }) {
+  const stance = STANCE[ev.stance ?? "supports"];
+  return (
+    <li className="rounded border border-line p-3">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className={`font-semibold ${stance.cls}`}>{stance.label}</span>
+        {ev.method === "openai_extractor" && <span className="rounded bg-ink px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">OpenAI extracted</span>}
+        {ev.source_type === "demo_fixture" && <FixtureChip />}
+      </div>
+      <blockquote className="mt-2 border-l-2 border-line pl-3 text-sm text-ink/80">&ldquo;{ev.quoted_or_structured_evidence}&rdquo;</blockquote>
+      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs text-muted">
+        <dt>Source</dt>
+        <dd>
+          <a href={ev.source_url} target="_blank" rel="noreferrer" className="text-ink underline">
+            {ev.source}
+          </a>
+        </dd>
+        {ev.citation && (ev.citation.pmid || ev.citation.nct || ev.citation.doi) && (
+          <>
+            <dt>Citation</dt>
+            <dd>
+              <CitationLinks c={ev.citation} />
+            </dd>
+          </>
+        )}
+        <dt>Source type</dt>
+        <dd>{ev.source_type.replace(/_/g, " ")}</dd>
+        <dt>How obtained</dt>
+        <dd>
+          {METHOD_LABEL[ev.method ?? "fixture"]}
+          {ev.extraction && ` · ${ev.extraction.model}`}
+        </dd>
+        <dt>Retrieved</dt>
+        <dd>{ev.retrieval_date}</dd>
+      </dl>
+    </li>
   );
 }

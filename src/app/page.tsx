@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
 
-const examples = ["CDKL5 deficiency disorder", "CDKL5", "CDD", "Seizure", "Rett syndrome"];
+const examples = ["CDKL5", "CDKL5 deficiency disorder", "CDD", "Seizure", "Rett syndrome"];
 
 export default function Home() {
   return (
@@ -26,7 +26,7 @@ export default function Home() {
       <div className="mt-12 flex justify-center">
         <StatusLegend />
       </div>
-      <p className="mt-6 text-xs text-muted">Prototype. Shows one seeded journey using clearly labelled demo data. Not a diagnosis or treatment tool.</p>
+      <p className="mt-6 text-xs text-muted">Prototype covering one verified journey (CDKL5 deficiency disorder), built from retrieved public sources. Not a diagnosis or treatment tool.</p>
     </div>
   );
 }

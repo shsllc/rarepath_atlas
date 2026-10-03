@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { GraphNode } from "./entities";
+import { SourceRecord } from "./sources";
 import { Confidence, EvidenceEdge, EvidenceStatus } from "./evidence";
 
 /** A concrete next step a patient organization can take. Never clinical advice. */
@@ -27,7 +28,15 @@ export type ActionRecommendation = z.infer<typeof ActionRecommendation>;
 export const CandidateConnection = z.object({
   id: z.string(),
   disease_id: z.string(),
-  connection_type: z.enum(["phenotypic_overlap", "shared_gene", "shared_mechanism", "historical_classification", "shared_asset"]),
+  connection_type: z.enum([
+    "phenotypic_overlap",
+    "shared_gene",
+    "shared_mechanism",
+    "historical_classification",
+    "shared_asset",
+    "shared_research_infrastructure",
+    "clinical_difference",
+  ]),
   why_connected: z.string(), // plain language
   evidence_edge_ids: z.array(z.string()).min(1),
   evidence_count: z.number().int().nonnegative(),
@@ -37,12 +46,22 @@ export const CandidateConnection = z.object({
 });
 export type CandidateConnection = z.infer<typeof CandidateConnection>;
 
+/** Conservative reuse classes. "directly_reusable" should be rare and needs strong evidence. */
+export const ReuseClassification = z.enum([
+  "directly_reusable",
+  "potentially_adaptable",
+  "shared_infrastructure_precedent",
+  "discovery_lead",
+]);
+export type ReuseClassification = z.infer<typeof ReuseClassification>;
+
 /** HERO object: something another community built that may be reusable. */
 export const ReusableAssetOpportunity = z.object({
   id: z.string(),
   asset_id: z.string(),
   source_disease_id: z.string(),
   headline: z.string(), // "Natural-history protocol from Rett syndrome"
+  reuse_classification: ReuseClassification.default("discovery_lead"),
   why_it_may_transfer: z.array(z.string()).min(1),
   what_differs: z.array(z.string()).min(1),
   what_is_uncertain: z.array(z.string()).min(1),
@@ -71,6 +90,15 @@ export const EvidenceCoverage = z.object({
 });
 export type EvidenceCoverage = z.infer<typeof EvidenceCoverage>;
 
+/** Build provenance: which OpenAI roles ran, when, with what model. */
+export const BuildInfo = z.object({
+  built_at: z.string(),
+  openai_runs: z
+    .array(z.object({ role: z.string(), model: z.string(), run_id: z.string(), created_at: z.string(), summary: z.string() }))
+    .default([]),
+});
+export type BuildInfo = z.infer<typeof BuildInfo>;
+
 /** The full payload the results page renders. */
 export const SearchResult = z.object({
   query: z.string(),
@@ -95,6 +123,8 @@ export const SearchResult = z.object({
   }),
   gaps: z.array(KnowledgeGap),
   /** Subgraph for the evidence explorer and drawer lookups. */
+  sources: z.array(SourceRecord).default([]),
+  build_info: BuildInfo.optional(),
   nodes: z.array(GraphNode),
   edges: z.array(EvidenceEdge),
 });
@@ -125,5 +155,9 @@ export const GraphBundle = z.object({
   connections: z.array(CandidateConnection),
   opportunities: z.array(ReusableAssetOpportunity),
   gaps: z.array(KnowledgeGap),
+  /** Retrieved source texts every real quote is verified against. Empty for fixtures. */
+  sources: z.array(SourceRecord).default([]),
+  /** Build provenance: which OpenAI roles ran, when, with what model. */
+  build_info: BuildInfo.optional(),
 });
 export type GraphBundle = z.infer<typeof GraphBundle>;

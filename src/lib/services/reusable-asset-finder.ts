@@ -2,11 +2,11 @@ import { combineStatuses, deriveEvidenceStatus, type CandidateConnection, type E
 import type { GraphService, ReusableAssetFinder } from "./interfaces";
 
 /**
- * Gate 1: returns the curated connections/opportunities stored in the bundle,
- * but RECOMPUTES every status from the underlying edges so a hand-edited
- * fixture can never claim more certainty than its evidence supports.
+ * Returns the curated connections/opportunities stored in the bundle, but
+ * RECOMPUTES every status from the underlying edges so hand-written curation
+ * can never claim more certainty than its evidence supports.
  *
- * Gate 2: replace the bundle lookup with traversal:
+ * Future: replace the bundle lookup with traversal:
  *   focus Disease -(phenotypically_overlaps|shares_mechanism_with|...)-> Disease B
  *   Disease B -(studied_in)-> Study -(produced_asset)-> ResearchAsset
  */

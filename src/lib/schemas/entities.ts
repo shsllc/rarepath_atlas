@@ -62,11 +62,24 @@ export const PaperNode = NodeBase.extend({
   type: z.literal("Paper"),
   year: z.number().int().optional(),
   journal: z.string().optional(),
+  authors: z.array(z.string()).default([]),
+  pub_date: z.string().optional(),
+  pmid: z.string().optional(),
+  pmcid: z.string().optional(),
+  doi: z.string().optional(),
+  /** "preprint" must be shown to users: it has not been peer reviewed. */
+  publication_status: z.enum(["peer_reviewed", "preprint", "unknown"]).default("unknown"),
 });
 export const StudyNode = NodeBase.extend({
   type: z.literal("Study"),
-  study_type: z.enum(["natural_history", "interventional", "observational", "registry", "other"]),
+  study_type: z.enum(["natural_history", "interventional", "observational", "registry", "biobank", "other"]),
   status: z.string().optional(),
+  nct: z.string().optional(),
+  conditions: z.array(z.string()).default([]),
+  enrollment: z.number().int().optional(),
+  sponsor: z.string().optional(),
+  start_date: z.string().optional(),
+  completion_date: z.string().optional(),
 });
 
 export const ResearchAssetKind = z.enum([

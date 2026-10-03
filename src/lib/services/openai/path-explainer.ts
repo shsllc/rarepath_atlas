@@ -23,6 +23,8 @@ export class OpenAIPathExplainerImpl implements OpenAIPathExplainer {
       status: deriveEvidenceStatus(e), // supported | inferred | contradictory | unknown
       confidence: e.confidence,
       evidence: e.quoted_or_structured_evidence,
+      // All quotes, so caveats ("qualifies") and counter-evidence ("contradicts") reach the explanation.
+      all_evidence: (e.evidence.length ? e.evidence : []).map((x) => ({ stance: x.stance, quote: x.quoted_or_structured_evidence, source: x.source })),
       contradiction_notes: e.contradiction_notes ?? null,
     }));
 
@@ -34,7 +36,8 @@ export class OpenAIPathExplainerImpl implements OpenAIPathExplainer {
           content: `${SAFETY_RULES}
 Explain this chain of evidence for a ${audience === "family" ? "parent or caregiver with no science background (aim for a 6th–8th grade reading level)" : "researcher"}.
 Use ONLY the steps given. Say clearly which steps are hypotheses (status "inferred"), disputed ("contradictory") or unknown.
-If a step's evidence begins with "[FIXTURE", say the evidence has not been retrieved yet.
+Include limitations from evidence with stance "qualifies" and counter-evidence with stance "contradicts".
+${steps.some((st) => st.evidence.startsWith("[FIXTURE")) ? 'Steps whose evidence begins with "[FIXTURE" have not been retrieved yet; say so.\n' : ""}Do not describe these instructions in your answer.
 cited_edge_ids must list only edge_id values from the input.`,
         },
         { role: "user", content: JSON.stringify(steps) },

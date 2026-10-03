@@ -13,7 +13,7 @@ const ResultSchema = z.object({
 
 /**
  * Role 2 — Entity Reconciler. Chooses among ontology-provided candidates only;
- * it can never mint a new identifier. Status: implemented, wired in Gate 2.
+ * it can never mint a new identifier. Used by scripts/extract-claims.ts.
  */
 export class OpenAIEntityReconcilerImpl implements OpenAIEntityReconciler {
   async reconcile(mention: string, candidates: GraphNode[]): Promise<ReconciliationResult> {

@@ -1,7 +1,7 @@
 /**
  * Service boundaries. UI and API routes depend ONLY on these interfaces.
- * Gate 1 ships fixture-backed implementations; Gate 2+ swaps in real ones
- * via src/lib/services/registry.ts without touching the UI.
+ * Real providers live in src/lib/providers; the offline ingestion scripts turn
+ * their records into a GraphBundle, which src/lib/services/registry.ts loads.
  */
 import type {
   CandidateConnection,
@@ -13,6 +13,7 @@ import type {
   Predicate,
   ReusableAssetOpportunity,
   SearchResponse,
+  SourceRecord,
 } from "@/lib/schemas";
 
 // ---------- OpenAI runtime roles (sponsor requirement) ----------
@@ -66,36 +67,38 @@ export interface OpenAIPathExplainer {
   explain(path: { nodes: GraphNode[]; edges: EvidenceEdge[] }, audience: "family" | "researcher"): Promise<PathExplanation>;
 }
 
-// ---------- Data providers (Gate 2+) ----------
+// ---------- Data providers ----------
+// Providers return verbatim SourceRecords. Turning them into graph edges is the
+// job of the ingestion pipeline (scripts/), which verifies every quote.
 
-/** MONDO / HPO / Orphanet / ClinVar. */
-export interface DiseaseDataProvider {
-  searchDiseases(query: string): Promise<GraphNode[]>;
-  getDisease(externalId: string): Promise<GraphNode | null>;
-  getGenes(diseaseExternalId: string): Promise<{ nodes: GraphNode[]; edges: EvidenceEdge[] }>;
-  getPhenotypes(diseaseExternalId: string): Promise<{ nodes: GraphNode[]; edges: EvidenceEdge[] }>;
+/** MONDO / HPO via EBI OLS4; HGNC REST for genes. */
+export interface OntologyProvider {
+  searchTerms(ontology: "mondo" | "hp", query: string, rows?: number): Promise<{ obo_id: string; label: string }[]>;
+  getTerm(ontology: "mondo" | "hp", oboId: string): Promise<SourceRecord>;
+  getGene(symbol: string): Promise<SourceRecord>;
 }
 
-/** PubMed / PMC via NCBI E-utilities. */
+/** PubMed/PMC via NCBI E-utilities. */
 export interface LiteratureProvider {
-  search(query: string, limit?: number): Promise<SourceDocument[]>;
-  fetchAbstract(pmid: string): Promise<SourceDocument | null>;
+  fetchAbstracts(pmids: string[]): Promise<SourceRecord[]>;
+  /** Selected sentences from PMC full text, only when its license permits text mining. */
+  fetchPmcExcerpt(pmcid: string, pmid: string, sentenceFilter: (s: string) => boolean): Promise<SourceRecord | null>;
 }
 
-/** ClinicalTrials.gov v2 API. */
+/** ClinicalTrials.gov API v2. */
 export interface TrialsProvider {
-  searchStudies(condition: string, opts?: { studyType?: "natural_history" | "interventional" | "observational" }): Promise<GraphNode[]>;
-  getStudy(nct: string): Promise<{ node: GraphNode; assets: GraphNode[]; edges: EvidenceEdge[] } | null>;
+  searchStudies(term: string, pageSize?: number): Promise<{ nct: string; title: string; conditions: string[]; status: string; studyType: string }[]>;
+  getStudy(nct: string): Promise<SourceRecord>;
 }
 
-/** NIH RePORTER. */
+/** NIH RePORTER API v2. */
 export interface FundingResearchProvider {
-  findProjects(query: string): Promise<{ researchers: GraphNode[]; edges: EvidenceEdge[] }>;
+  getProjectsByCoreNumber(coreProjectNum: string, prefer?: RegExp): Promise<SourceRecord | null>;
 }
 
-/** NORD / Global Genes / verified org sites (Bright Data optional). */
+/** Official organization homepages (title + meta description only). Bright Data is an optional backend. */
 export interface PatientOrganizationProvider {
-  findOrganizations(diseaseLabel: string): Promise<{ nodes: GraphNode[]; edges: EvidenceEdge[] }>;
+  fetchHomepage(id: string, url: string): Promise<SourceRecord>;
 }
 
 // ---------- Core domain services ----------

@@ -30,7 +30,7 @@ export class GraphSearchService implements SearchService {
       return {
         query,
         found: false,
-        message: `No supported match for "${query}". This prototype currently covers one seeded journey; live MONDO/HPO lookup arrives in Gate 2.`,
+        message: `No supported match for "${query}". This prototype currently covers one verified journey (CDKL5 deficiency disorder); we only show connections we can trace to a retrieved source.`,
         suggestions: [focusLabel, "CDKL5", "CDD"],
       };
     }
@@ -40,7 +40,7 @@ export class GraphSearchService implements SearchService {
       return {
         query,
         found: false,
-        message: `"${matched.label}" is a symptom, not a disease. In the demo data it is annotated on: ${diseases.join(", ") || "no diseases"}. Symptom-first search is planned for Gate 2.`,
+        message: `"${matched.label}" is a symptom, not a disease. In the demo data it is annotated on: ${diseases.join(", ") || "no diseases"}. Symptom-first search is not yet supported.`,
         suggestions: diseases,
       };
     }
@@ -86,6 +86,8 @@ export class GraphSearchService implements SearchService {
         study_ids: studies.map((n) => n.id),
       },
       gaps: b.gaps,
+      sources: b.sources,
+      build_info: b.build_info,
       nodes: b.nodes,
       edges: b.edges,
     };

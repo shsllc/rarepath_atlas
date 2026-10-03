@@ -66,3 +66,9 @@ export class JsonGraphService implements GraphService {
 }
 
 export const DEFAULT_FIXTURE = path.join(process.cwd(), "data", "fixtures", "cdd-demo.json");
+export const REAL_BUNDLE = path.join(process.cwd(), "data", "real", "cdd-real.json");
+
+/** DATA_BUNDLE=real (default) uses the verified CDD dataset; DATA_BUNDLE=fixture uses the Gate 1 demo fixture. */
+export function bundlePath(): string {
+  return process.env.DATA_BUNDLE === "fixture" ? DEFAULT_FIXTURE : REAL_BUNDLE;
+}

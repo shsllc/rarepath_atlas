@@ -33,20 +33,28 @@ Browser ──GET /results?q=──▶ results/page.tsx (server component)
                                        └─ EvidenceDrawer ──POST /api/explain──▶ OpenAIPathExplainer
 ```
 
-## Modules (`src/lib/services`)
+## Modules
 
-| Interface | Gate 1 implementation | Gate 2+ plan |
-|---|---|---|
-| `GraphService` | `JsonGraphService`: in-memory graph over a bundle | Same class, fed from `data/cache/*.json` built by providers |
-| `ReusableAssetFinder` | `CuratedReusableAssetFinder` returns the curated cards but **recomputes their status from the edges** | Traversal: Disease → related Disease → Study → ResearchAsset, with OpenAI drafting the "why / differs / uncertain" text from the cited edges |
-| `SearchService` | `GraphSearchService`: alias resolution, then page assembly | Add the Entity Reconciler for fuzzy matches against MONDO candidates |
-| `DiseaseDataProvider` | stub | MONDO via OLS4, HPO annotations, ClinVar via E-utilities |
-| `LiteratureProvider` | stub | PubMed/PMC via NCBI E-utilities |
-| `TrialsProvider` | stub | ClinicalTrials.gov API v2 (no key needed) |
-| `FundingResearchProvider` | stub | NIH RePORTER API v2 (no key needed) |
-| `PatientOrganizationProvider` | stub | NORD and Global Genes directories plus verified org sites. Bright Data is optional. |
+| Module | Implementation |
+|---|---|
+| `GraphService` | `JsonGraphService`: in-memory graph over a Zod-validated bundle (`data/real/cdd-real.json` by default) |
+| `ReusableAssetFinder` | `CuratedReusableAssetFinder` returns the curated cards and **recomputes every status from the edges**; reuse cards are never "Known" |
+| `SearchService` | `GraphSearchService`: alias resolution, then page assembly; honest not-found for anything off-scope |
+| `LiteratureProvider` | `PubMedProvider`: E-utilities esummary/efetch; PMC excerpts only when the license permits text mining |
+| `TrialsProvider` | `ClinicalTrialsGovProvider`: API v2; renders the record as labelled text so quotes can be verified |
+| `FundingResearchProvider` | `NihReporterProvider`: RePORTER v2, with deterministic sub-project selection |
+| `OntologyProvider` | `OlsOntologyProvider`: MONDO/HPO via EBI OLS4, genes via HGNC REST |
+| `PatientOrganizationProvider` | `HomepageOrgProvider`: reads the title and meta description only, with no crawling. Bright Data is unused. |
 
-Stubs **throw** rather than return empty arrays, so a missing integration can never look like "no evidence found".
+Providers live in `src/lib/providers/` and share a polite fetch helper (`http.ts`). It spaces calls per host (NCBI: 10 req/s with a key, 3 req/s without) and retries on 429 and 5xx responses.
+
+## Ingestion pipeline (offline, `scripts/`)
+
+1. `fetch-sources.ts` retrieves sources into `data/real/sources.json`.
+2. `extract-claims.ts` runs the OpenAI Extractor and Reconciler into `data/real/extractions.json`. It refuses to run unless the key comes from `.env.local`.
+3. `build-real-bundle.ts` merges the analyst curation (`scripts/curation/cdd.ts`) with the OpenAI claims. It verifies every quote, identifier and predicate type signature, then writes `data/real/cdd-real.json`.
+
+`scripts/load-env.ts` gives `.env.local` precedence for scripts. `src/lib/services/openai/client.ts` does the same at runtime.
 
 ## OpenAI runtime roles (sponsor requirement)
 
@@ -58,8 +66,4 @@ All three run server-side (`src/lib/services/openai/`) through the Responses API
 
 Shared `SAFETY_RULES`: no diagnosis, no treatment advice, no clinical-equivalence claims, no claim that a therapy transfers because of a shared pathway, and no upgrading of the source's hedges.
 
-Wiring status: the Path Explainer is live in the UI and was verified against the API in Gate 1. The Extractor and Reconciler are implemented and typechecked but are not called until providers supply text and candidates (Gate 2).
-
-## Swapping fixtures for real data
-
-`src/lib/services/registry.ts` is the only wiring point. In Gate 2, a script runs the providers for the chosen disease, sends abstracts and registry text through the Extractor, and writes a `GraphBundle` to `data/cache/<disease>.json` with `is_fixture: false`. The registry then loads that file. UI and API code do not change.
+Wiring status: the Path Explainer is live in the UI. The Extractor and Reconciler ran during Gate 2 ingestion; their run metadata is stored in `build_info.openai_runs`.

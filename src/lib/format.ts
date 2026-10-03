@@ -8,6 +8,10 @@ export const PREDICATE_LABEL: Record<Predicate, string> = {
   phenotypically_overlaps: "shares features with",
   shares_mechanism_with: "may share a mechanism with",
   historically_classified_with: "was historically grouped with",
+  classified_as_variant_of: "is classified as a variant of",
+  co_studied_with: "was studied in the same research infrastructure as",
+  clinically_differs_from: "differs clinically from",
+  applied_to: "has been applied in",
   studied_in: "is studied in",
   produced_asset: "produced",
   asset_measures: "measures",
@@ -33,4 +37,20 @@ export const CONNECTION_TYPE_LABEL = {
   shared_mechanism: "Shared mechanism",
   historical_classification: "Historical classification",
   shared_asset: "Shared research asset",
+  shared_research_infrastructure: "Shared research infrastructure",
+  clinical_difference: "Important clinical differences",
+} as const;
+
+export const REUSE_LABEL = {
+  directly_reusable: "Directly reusable",
+  potentially_adaptable: "Potentially adaptable",
+  shared_infrastructure_precedent: "Shared research-infrastructure precedent",
+  discovery_lead: "Discovery lead — needs expert review",
+} as const;
+
+export const METHOD_LABEL = {
+  structured_api: "Copied from the source's API record",
+  analyst_quote: "Verbatim quote selected by an analyst",
+  openai_extractor: "Extracted by OpenAI Evidence Extractor (quote verified verbatim)",
+  fixture: "Demo fixture (not retrieved)",
 } as const;

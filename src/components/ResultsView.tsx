@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { EvidenceEdge, GraphNode, SearchResult } from "@/lib/schemas";
-import { ASSET_KIND_LABEL, CONNECTION_TYPE_LABEL } from "@/lib/format";
+import { ASSET_KIND_LABEL, CONNECTION_TYPE_LABEL, REUSE_LABEL } from "@/lib/format";
 import { EvidenceDrawer, type DrawerRequest } from "./EvidenceDrawer";
 import { FixtureChip, STATUS_META, StatusBadge, StatusLegend } from "./StatusBadge";
 import { GraphPlaceholder } from "./GraphPlaceholder";
@@ -62,6 +62,19 @@ export function ResultsView({ result }: { result: SearchResult }) {
           <strong>Demo data.</strong> {result.fixture_warning}
         </div>
       )}
+      {!result.is_fixture && (
+        <div className="mb-6 rounded-lg border border-line bg-white p-3 text-sm">
+          <strong>Built from {result.sources.length} retrieved public sources</strong>{" "}
+          <span className="text-muted">
+            (PubMed, PubMed Central, ClinicalTrials.gov, NIH RePORTER, MONDO/HPO, HGNC, official organization sites). Every statement opens to its verbatim source quote.
+          </span>
+          {result.build_info?.openai_runs.map((r) => (
+            <p key={r.run_id} className="mt-1 text-xs text-muted">
+              OpenAI {r.role} ({r.model}): {r.summary}
+            </p>
+          ))}
+        </div>
+      )}
       <StatusLegend />
 
       {/* 1. YOUR DISEASE */}
@@ -85,7 +98,7 @@ export function ResultsView({ result }: { result: SearchResult }) {
               <dd className="mt-1 flex flex-wrap gap-1">
                 {disease.external_ids.map((x) => (
                   <a key={x.system + x.id} href={x.url} target="_blank" rel="noreferrer" className="rounded border border-line px-1.5 py-0.5 font-mono text-xs" title={`verification: ${x.verification}`}>
-                    {x.system}:{x.id}
+                    {x.id.includes(":") ? x.id : `${x.system}:${x.id}`}
                     {x.verification !== "verified" && <span className="ml-1 text-yellow-700">({x.verification === "pending" ? "pending" : "unverified"})</span>}
                   </a>
                 ))}
@@ -97,7 +110,7 @@ export function ResultsView({ result }: { result: SearchResult }) {
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted">Mechanism / pathway</dt>
-              <dd className="mt-1">{result.disease.mechanism_ids.map(label).join("; ") || "—"}</dd>
+              <dd className="mt-1">{result.disease.mechanism_ids.map(label).join("; ") || <span className="text-muted">Not described in the retrieved sources (see &ldquo;What we don&apos;t know&rdquo;)</span>}</dd>
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted">Key features</dt>
@@ -155,7 +168,9 @@ export function ResultsView({ result }: { result: SearchResult }) {
               <article key={o.id} className={`rounded-xl border border-line bg-white p-5 shadow-sm ${STATUS_META[o.status].card}`}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">Potential reusable asset · {kind}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      <span className="rounded bg-ink px-1.5 py-0.5 text-white">{REUSE_LABEL[o.reuse_classification]}</span> · {kind}
+                    </p>
                     <h3 className="mt-1 text-lg font-semibold">{o.headline}</h3>
                     <p className="text-sm text-muted">Built by the {label(o.source_disease_id)} community</p>
                   </div>
@@ -168,7 +183,7 @@ export function ResultsView({ result }: { result: SearchResult }) {
                   </div>
                 </div>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
-                  <List title="Why it may transfer" items={o.why_it_may_transfer} />
+                  <List title="Why it may help" items={o.why_it_may_transfer} />
                   <List title="What differs" items={o.what_differs} />
                   <List title="What remains uncertain" items={o.what_is_uncertain} />
                   <List title="Requires expert validation" items={o.requires_expert_validation} />
@@ -228,19 +243,66 @@ export function ResultsView({ result }: { result: SearchResult }) {
           <div className="rounded-xl border border-line bg-white p-4">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Investigators</h3>
             <ul className="mt-2 space-y-2 text-sm">
-              {result.people.researcher_ids.map((id) => (
-                <li key={id}>
-                  {label(id)} <StatusBadge status="unknown" compact />
-                </li>
-              ))}
+              {result.people.researcher_ids.map((id) => {
+                const n = nodes.get(id);
+                const ev = result.edges.filter((e) => e.subject_id === id).map((e) => e.id);
+                return (
+                  <li key={id} className="flex items-start justify-between gap-2">
+                    <span>
+                      {label(id)}
+                      {n?.type === "Researcher" && n.description && <span className="block text-xs text-muted">{n.description}</span>}
+                    </span>
+                    {ev.length > 0 && (
+                      <button onClick={() => open(label(id), ev)} className="shrink-0 text-xs underline">
+                        evidence
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div className="rounded-xl border border-line bg-white p-4">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Studies & labs</h3>
             <ul className="mt-2 space-y-2 text-sm">
-              {result.people.study_ids.map((id) => (
-                <li key={id}>{label(id)}</li>
-              ))}
+              {result.people.study_ids.map((id) => {
+                const n = nodes.get(id);
+                return (
+                  <li key={id}>
+                    {n?.type === "Study" && n.nct ? (
+                      <a href={`https://clinicaltrials.gov/study/${n.nct}`} target="_blank" rel="noreferrer" className="underline">
+                        {label(id)}
+                      </a>
+                    ) : (
+                      label(id)
+                    )}
+                    {n?.type === "Study" && n.conditions.length > 0 && (
+                      <span className="block text-xs text-muted">
+                        Conditions: {n.conditions.join("; ")}
+                        {n.status ? ` · ${n.status.toLowerCase()}` : ""}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <h3 className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted">Key publications</h3>
+            <ul className="mt-2 space-y-2 text-sm">
+              {result.nodes
+                .filter((n) => n.type === "Paper")
+                .map((n) =>
+                  n.type === "Paper" ? (
+                    <li key={n.id}>
+                      <a href={n.pmid ? `https://pubmed.ncbi.nlm.nih.gov/${n.pmid}/` : "#"} target="_blank" rel="noreferrer" className="underline">
+                        {n.label}
+                      </a>
+                      <span className="block text-xs text-muted">
+                        {n.journal} {n.pub_date} {n.pmid && `· PMID ${n.pmid}`}
+                        {n.publication_status === "preprint" && <span className="ml-1 rounded bg-yellow-100 px-1 font-semibold text-yellow-900">Preprint — not peer reviewed</span>}
+                      </span>
+                    </li>
+                  ) : null,
+                )}
             </ul>
           </div>
         </div>

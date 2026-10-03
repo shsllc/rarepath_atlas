@@ -8,7 +8,11 @@ export const Predicate = z.enum([
   "involves_mechanism", // Disease|Gene -> Mechanism
   "phenotypically_overlaps", // Disease -> Disease
   "shares_mechanism_with", // Disease -> Disease
-  "historically_classified_with", // Disease -> Disease
+  "historically_classified_with", // Disease -> Disease (a past naming/grouping, stated as history)
+  "classified_as_variant_of", // Disease -> Disease (the classification claim itself; may be contradicted)
+  "co_studied_with", // Disease -> Disease (enrolled in the same study/infrastructure)
+  "clinically_differs_from", // Disease -> Disease (evidence of distinct features)
+  "applied_to", // ResearchAsset -> Disease (instrument/infrastructure used in that population)
   "studied_in", // Disease -> Study
   "produced_asset", // Study -> ResearchAsset
   "asset_measures", // ResearchAsset -> Phenotype
@@ -48,6 +52,15 @@ export type ContradictionStatus = z.infer<typeof ContradictionStatus>;
 export const Confidence = z.enum(["high", "moderate", "low", "insufficient"]);
 export type Confidence = z.infer<typeof Confidence>;
 
+/** How an evidence item was produced. Shown in the UI so OpenAI's role is visible. */
+export const EvidenceMethod = z.enum([
+  "structured_api", // field copied from a registry/ontology API response
+  "analyst_quote", // a human selected a verbatim quote from retrieved source text
+  "openai_extractor", // OpenAI Evidence Extractor produced the claim; quote verified verbatim
+  "fixture", // hand-entered demo data
+]);
+export type EvidenceMethod = z.infer<typeof EvidenceMethod>;
+
 /** A single piece of provenance. An edge may carry several. */
 export const EvidenceItem = z.object({
   id: z.string(),
@@ -60,8 +73,15 @@ export const EvidenceItem = z.object({
   quoted_or_structured_evidence: z.string(),
   /** Optional structured citation fields. */
   citation: z
-    .object({ pmid: z.string().optional(), nct: z.string().optional(), doi: z.string().optional() })
+    .object({ pmid: z.string().optional(), pmcid: z.string().optional(), nct: z.string().optional(), doi: z.string().optional() })
     .optional(),
+  method: EvidenceMethod.default("fixture"),
+  /** Id of the stored SourceRecord the quote was checked against (real data only). */
+  source_record_id: z.string().optional(),
+  /** Does this item support, contradict, or qualify (limit/caveat) the edge's claim? */
+  stance: z.enum(["supports", "contradicts", "qualifies"]).default("supports"),
+  /** Present when an OpenAI role produced this item. */
+  extraction: z.object({ model: z.string(), run_id: z.string(), created_at: z.string() }).optional(),
 });
 export type EvidenceItem = z.infer<typeof EvidenceItem>;
 
