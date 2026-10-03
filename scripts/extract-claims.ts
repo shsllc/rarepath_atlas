@@ -23,6 +23,7 @@ const TEXT_KINDS = new Set(["pubmed_abstract", "pmc_excerpt", "ctgov_record", "f
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 async function main() {
+  process.env.OPENAI_TIMEOUT_MS ??= "120000"; // long abstracts; set before the client is created
   if (!getOpenAI()) throw new Error("No OPENAI_API_KEY configured.");
   const src = openAIKeySource();
   if (src !== ".env.local" && !process.argv.includes("--allow-env-key")) {

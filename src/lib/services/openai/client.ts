@@ -36,7 +36,9 @@ export function getOpenAI(): OpenAI | null {
   if (client !== undefined) return client;
   const { apiKey, keySource: src } = resolveOpenAIConfig();
   keySource = src;
-  client = apiKey ? new OpenAI({ apiKey }) : null;
+  // Server-side timeout so a slow provider never hangs a request. Ingestion scripts raise it via OPENAI_TIMEOUT_MS.
+  const timeout = Number(process.env.OPENAI_TIMEOUT_MS) || 25_000;
+  client = apiKey ? new OpenAI({ apiKey, timeout, maxRetries: 1 }) : null;
   return client;
 }
 

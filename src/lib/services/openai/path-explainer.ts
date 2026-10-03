@@ -45,9 +45,11 @@ cited_edge_ids must list only edge_id values from the input.`;
       return res.output_parsed;
     };
 
+    const started = Date.now();
     let out = await run("");
     let check = checkExplanation(out);
-    if (!check.ok) {
+    // One corrective retry, only if there is time left inside the serverless budget.
+    if (!check.ok && Date.now() - started < 20_000) {
       // One corrective retry with the specific problems listed.
       out = await run(`\nYour previous answer had these problems: ${check.issues.join("; ")}. Fix them.`);
       check = checkExplanation(out);

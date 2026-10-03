@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run test"
+    "check": "npm run typecheck && npm run test",
+    "audit": "tsx scripts/audit-evidence.ts"
   },
   "type": "commonjs",
   "dependencies": {

@@ -88,13 +88,13 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
           onClose={() => setShowDemo(false)}
           steps={[
             { label: "Search CDKL5", done: true },
-            { label: "See “Shared research infrastructure found”", go: () => scrollTo("disease") },
-            { label: "Open the Rett natural-history study", go: () => openNode("study:nhs") },
-            { label: "See the history vs. current-evidence contradiction", go: () => scrollTo("contradiction") },
-            { label: "Inspect the reusable research asset", go: () => scrollTo("hero") },
-            { label: "Click “Explain this connection”", go: () => open(featured.headline, heroEdges) },
-            { label: "Open the evidence graph", go: () => scrollTo("graph") },
-            { label: "End at the next research question", go: () => scrollTo("next-question") },
+            { label: "Distinct from Rett, but historically linked", go: () => scrollTo("contradiction") },
+            { label: "Shared natural-history study: CDD participants enrolled", go: () => openNode("study:nhs") },
+            { label: "Reusable insight: it informed a CDD-specific severity scale", go: () => scrollTo("hero") },
+            { label: "The limitation: not equivalence, not treatment transfer", go: () => scrollTo("limitation") },
+            { label: "Explain this connection (OpenAI)", go: () => open(featured.headline, heroEdges) },
+            { label: "The concrete next research question", go: () => scrollTo("next-question") },
+            { label: "Evidence graph and citations", go: () => scrollTo("graph") },
           ]}
         />
       ) : (
@@ -105,6 +105,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         )
       )}
 
+      <h1 className="sr-only">RarePath results for {disease.label}</h1>
       <EvidenceKey />
 
       {/* 1. YOUR DISEASE */}
@@ -329,6 +330,7 @@ function FeaturedCard({
           <span className="rounded bg-ink px-2 py-1 text-xs font-bold uppercase tracking-wide text-white">{REUSE_LABEL[o.reuse_classification]}</span>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{o.headline}</h3>
           <p className="text-sm text-muted">Built by the {label(o.source_disease_id)} community. Evidence includes the registry record, the 2020 comparison paper and the NIH grant.</p>
+          <p className="mt-1 text-xs text-muted">A natural-history study follows people over time to learn how a condition changes. An outcome measure is a scale used to track those changes.</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           <span className="flex items-center gap-1">
@@ -341,7 +343,7 @@ function FeaturedCard({
 
       <dl className="mt-5 divide-y divide-line border-y border-line">
         {o.story.map((s) => (
-          <div key={s.label} id={s.label === "Next research question" ? "next-question" : undefined} className="grid scroll-mt-6 gap-2 py-3 sm:grid-cols-[180px_1fr_auto] sm:items-start">
+          <div key={s.label} id={s.label === "Next research question" ? "next-question" : s.label === "Important limitation" ? "limitation" : undefined} className="grid scroll-mt-6 gap-2 py-3 sm:grid-cols-[180px_1fr_auto] sm:items-start">
             <dt className={`text-xs font-bold uppercase tracking-wide ${s.label === "Important limitation" ? "text-contradictory" : s.label === "Next research question" ? "text-ink" : "text-muted"}`}>{s.label}</dt>
             <dd className={s.label === "Next research question" ? "text-base font-semibold" : "text-sm"}>{s.text}</dd>
             <dd>
@@ -367,7 +369,7 @@ function FeaturedCard({
                 <span className="mr-2 font-semibold">{i + 1}.</span>
                 {a.label}
               </span>
-              <button onClick={() => open(`Why: ${a.label}`, a.evidence_edge_ids)} className="shrink-0 text-xs underline">
+              <button onClick={() => open(`Why: ${a.label}`, a.evidence_edge_ids)} className="shrink-0 text-xs underline" aria-label={`Why this action: show evidence for "${a.label}"`}>
                 why?
               </button>
             </li>
@@ -427,7 +429,7 @@ function OpportunityCard({
         {o.next_actions.map((a) => (
           <p key={a.id} className="mt-1 flex items-start justify-between gap-3">
             <span>{a.label}</span>
-            <button onClick={() => open(`Why: ${a.label}`, a.evidence_edge_ids)} className="shrink-0 text-xs underline">
+            <button onClick={() => open(`Why: ${a.label}`, a.evidence_edge_ids)} className="shrink-0 text-xs underline" aria-label={`Why this action: show evidence for "${a.label}"`}>
               why?
             </button>
           </p>
@@ -563,7 +565,7 @@ function PeopleSection({
                 ) : (
                   <span>{label(id)}</span>
                 )}
-                <button onClick={() => open(label(id), evFrom(id))} className="shrink-0 text-xs underline">
+                <button onClick={() => open(label(id), evFrom(id))} className="shrink-0 text-xs underline" aria-label={`Evidence for ${label(id)}`}>
                   evidence
                 </button>
               </li>
@@ -582,7 +584,7 @@ function PeopleSection({
                   {label(id)}
                   {n?.type === "Researcher" && n.description && <span className="block text-xs text-muted">{n.description}</span>}
                 </span>
-                <button onClick={() => open(label(id), evFrom(id))} className="shrink-0 text-xs underline">
+                <button onClick={() => open(label(id), evFrom(id))} className="shrink-0 text-xs underline" aria-label={`Evidence for ${label(id)}`}>
                   evidence
                 </button>
               </li>

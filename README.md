@@ -1,94 +1,107 @@
 # RarePath Atlas
 
-> Rare shouldn't mean researching alone.
+**Rare shouldn't mean researching alone.** RarePath connects scattered disease research, patient communities, studies and reusable research infrastructure, with evidence behind every connection.
 
-Hack-Nation 7th Global AI Hackathon · Challenge 05 (Buffalo Initiative × OpenAI): AI Atlas for the World's Rare Diseases.
+Hack-Nation 7th Global AI Hackathon · Challenge 05: Buffalo Initiative × OpenAI, *AI Atlas for the World's Rare Diseases*.
 
-RarePath Atlas helps a rare-disease patient organization answer one question:
+## The problem
 
-**"What has another rare-disease community already built that we may be able to reuse?"**
+Rare-disease patient organizations often have to do their own research. They search PubMed, trial registries, ontologies and funding databases one at a time, trying to learn whether another community has already built something they could learn from. The key facts are scattered across registry eligibility fields, methods sections and grant abstracts, and old disease names can point in the wrong direction.
 
-It walks from *diagnosis → evidence-backed connection → related community → reusable research asset → who to talk to → concrete next action*. Every step carries a verbatim source quote and an evidence status: **Known**, **AI-inferred**, **Contradictory** or **Unknown**.
+## What RarePath does
 
-It does not diagnose, recommend treatment, or claim that two diseases are clinically equivalent.
+Search a disease or gene. RarePath shows:
 
-## Status: Gate 3 (judge-ready demo)
+1. **Connected communities:** which related disorders yours has been studied alongside, and exactly how (shared study, historical naming, clinical differences).
+2. **Reusable research:** natural-history infrastructure, outcome measures and biobanks, each classified cautiously (*shared-infrastructure precedent*, *potentially adaptable*, *discovery lead*). These are never shown as established fact.
+3. **What it does not mean:** differences, contradictions and open questions, shown next to the connection.
+4. **A next question:** a concrete research or collaboration question, with the evidence behind it.
 
-Open **http://localhost:3000/results?q=CDKL5&demo=1**, or click *Start the 60-second demo* on the home page.
+Every claim opens to its **verbatim source quote**, with a link and retrieval date.
 
-- **Thesis:** CDKL5 deficiency disorder (MONDO:0100039) is a distinct disease. CDD participants were nonetheless enrolled in shared Rett and Rett-related natural-history infrastructure (ClinicalTrials.gov **NCT02738281**). That is a real precedent for cross-disease research reuse, without implying biological equivalence or treatment transfer.
-- **Featured reusable research:** a shared research-infrastructure precedent. Each of its five lines (*what happened, why it matters, adaptable asset, important limitation, next research question*) cites its own evidence. New in Gate 3: Demarest et al. 2019 (PMID 31147226) shows the NHS consortium's experience helped build a **CDD-specific severity assessment**.
-- **Contradiction spotlight:** the historical "Atypical Rett" label vs. current evidence that CDD is a distinct disorder, with dates.
-- **Interactive evidence graph** (Cytoscape.js): line style encodes evidence status (solid = Known, dashed = AI-inferred, double = Contradictory, dotted = Unknown). Click a line for its source quotes, or a node for its identifiers. Analyst-unreviewed AI extractions are hidden by default.
-- **10× opportunity:** a defensible, measurable framing with no invented time savings. See [docs/10x-impact.md](docs/10x-impact.md).
+## Demo
 
-Sources, method, limitations, and what the demo does and does not prove: [docs/demo-path.md](docs/demo-path.md).
+- **Production:** `https://<vercel-url>` *(pending Vercel import; see [Deploy](#deploy))*
+- **Canonical 60-second demo:** `/results?q=CDKL5&demo=1`
+- **Repository:** https://github.com/shsllc/rarepath_atlas
 
-## Where OpenAI is used (runtime product)
+## Why this example matters
 
-| Role | Where | Guardrail |
-|---|---|---|
-| **Evidence Extractor** | Ingestion, `scripts/extract-claims.ts` | Claims are kept only if their quote appears verbatim in the retrieved text. Treatment statements are excluded. |
-| **Entity Reconciler** | Ingestion | Can only choose among curated candidates. Only high-confidence matches are used. |
-| **Path Explainer** | Runtime: **Explain this connection** in the evidence drawer (`POST /api/explain`) | Four parts (why it matters / what the evidence shows / what it does not show / next question), 180 words maximum. Validated by `checkExplanation()`, with one corrective retry. May cite only the edges it was given. |
+**CDKL5 deficiency disorder (CDD)** was once labelled a variant of Rett syndrome. It is now recognised as a distinct disorder. Even so, people with CDD were **enrolled in the same NIH-funded Rett and Rett-Related Disorders Natural History Study** (ClinicalTrials.gov NCT02738281; 793 participants compared in PMID 32472944). That consortium's experience then **informed a CDD-specific severity assessment** (PMID 31147226).
 
-Latest ingestion run: 114 quote-verified claims from 8 sources; 26 corroborate analyst-curated edges; 13 extractor-only edges, which are badged, hidden from the default graph and kept out of cards and actions. Run metadata is stored in the bundle and shown on the results page.
+That is a real precedent for cross-disease research reuse. RarePath also says plainly that it is **not** evidence of shared biology, and that nothing here suggests Rett treatments carry over to CDD.
+
+## Built with OpenAI
+
+| Role | When | What it does | Guardrail |
+|---|---|---|---|
+| **Evidence Extractor** | Ingestion | Extracts biomedical claims from retrieved abstracts, PMC excerpts, registry records and grant text (114 claims from 8 sources) | A claim is kept only if its quote appears **verbatim** in the stored source text |
+| **Entity Reconciler** | Ingestion | Maps mentions like "CDKL5 deficiency disorder (CDD)" to curated entities | Can only choose supplied candidates; type-aware; only high-confidence matches are used |
+| **Path Explainer** | Live, *Explain this connection* | A four-part plain-language explanation: why it matters, what the evidence shows, what it does not show, next question | 180 words maximum; rejects treatment-transfer phrasing; explains only relationships already in the graph; rate-limited and cached |
+
+The sourced journey works even if OpenAI is unavailable. The explanation then shows a calm error with a retry, and the evidence is unchanged.
+
+## Evidence integrity
+
+- **Verbatim quote checks:** the dataset build fails if any quote is not found in its stored source text.
+- **Source provenance:** every relationship records its source, URL, retrieval date, how the evidence was obtained (registry/ontology API, analyst-selected quote, or OpenAI extraction) and its stance (supports / contradicts / limitation).
+- **Reviewed vs. unreviewed AI claims:** 13 OpenAI-only relationships are quote-verified but not analyst-reviewed. They are hidden by default and labelled "AI-extracted" when shown.
+- **Contradictions:** the superseded "Rett variant" classification is shown as **Contradictory**, with the historical label next to the current evidence.
+- **Uncertainty:** reuse cards are always "AI-inferred"; a "What we don't know" section lists gaps; the preprint is flagged.
+- **Audit:** [docs/final-evidence-audit.md](docs/final-evidence-audit.md) (10/10 checks pass). There are 60 automated tests.
 
 ## Run locally
 
-Requires Node.js 20 or later (tested on Node 24).
+Requires Node.js 20 or later.
 
 ```bash
 npm install
 cp .env.example .env.local   # PowerShell: Copy-Item .env.example .env.local
-# edit .env.local: OPENAI_API_KEY (required for Explain), optional NCBI_API_KEY / NCBI_EMAIL
-npm run dev
+# set OPENAI_API_KEY (and optionally OPENAI_MODEL, NCBI_API_KEY, NCBI_EMAIL)
+npm run dev                  # http://localhost:3000/results?q=CDKL5&demo=1
 ```
 
-Open http://localhost:3000 and search **CDKL5**.
-
-- `.env.local` takes precedence over machine-level environment variables, and it is gitignored.
-- Without an OpenAI key the app still runs on the committed dataset; Explain returns "not configured".
-- `DATA_BUNDLE=fixture` loads the Gate 1 demo fixture, which keeps its fixture warnings. It is for development only.
-
-### Rebuild the real dataset (optional)
-
-```bash
-npx tsx scripts/check-credentials.ts   # presence + minimal OpenAI/NCBI checks, never prints secrets
-npx tsx scripts/fetch-sources.ts       # PubMed/PMC, ClinicalTrials.gov, RePORTER, OLS (MONDO/HPO), HGNC, org sites
-npx tsx scripts/extract-claims.ts      # OpenAI Evidence Extractor + Entity Reconciler (requires key in .env.local)
-npx tsx scripts/build-real-bundle.ts   # verifies every quote/ID, writes data/real/cdd-real.json
-```
-
-### Checks
+Checks:
 
 ```bash
 npm run typecheck
-npm test            # 51 tests: provenance, quote verification, status rules, graph styling, 10× claims, explainer rules
-RUN_LIVE_OPENAI=1 npx vitest run tests/live-explainer.test.ts   # optional: 2 live Path Explainer checks (paid API calls)
+npm test
 npm run build
+npx tsx scripts/audit-evidence.ts
 ```
 
-### Endpoints
+Rebuild the dataset (optional):
 
-| Route | Purpose |
-|---|---|
-| `GET /api/search?q=` | Results-page payload, or an honest "no supported connection" |
-| `POST /api/explain` `{ edge_ids, audience }` | OpenAI Path Explainer |
-| `GET /api/health` | Bundle, counts, OpenAI key *source* and model (never the key) |
+```bash
+npx tsx scripts/fetch-sources.ts
+npx tsx scripts/extract-claims.ts
+npx tsx scripts/build-real-bundle.ts
+```
 
-## Scientific limitations
+## Architecture
 
-- One disease journey only. CDD and Rett are related here through research history and shared infrastructure, **not** through shared biology.
-- No treatment-transfer claims. Rett outcome measures are not established as valid in CDD.
-- PMID 39867409 is a preprint. Access to study data and samples is unverified.
+- **Next.js 15 + TypeScript + Tailwind**, deployed on Vercel. OpenAI is called only from server routes.
+- **Zod** schemas for entities and evidence-bearing relationships (`src/lib/schemas`).
+- **Offline pipeline** (`scripts/`): fetch sources, then OpenAI extraction and reconciliation, then a verified build of `data/real/cdd-real.json`.
+- **Cytoscape.js** evidence graph. Line style encodes status: solid = Known, dashed = AI-inferred, double = Contradictory, dotted = Unknown.
+- Details: [docs/architecture.md](docs/architecture.md), [docs/data-model.md](docs/data-model.md).
 
-## Docs
+## Limitations
 
-- [docs/demo-path.md](docs/demo-path.md): the verified journey, sources, OpenAI usage, limitations
-- [docs/architecture.md](docs/architecture.md): stack, modules, service boundaries
-- [docs/data-model.md](docs/data-model.md): nodes, evidence edges, status rules
+- One verified journey (CDKL5 deficiency disorder), not a comprehensive atlas.
+- Research navigation only: no diagnosis, no treatment recommendations, no clinical-equivalence claims.
+- The RTT Clinical Severity Scale is not established as valid in CDD; the CDD-specific assessment still needs validation.
+- PMID 39867409 is a preprint. Access terms for the study database and biobank are not stated in the sources.
+- Rate limiting is in-memory per server instance, which is fine for a demo but is not a production gateway.
+
+## Data sources
+
+PubMed and PubMed Central (NCBI E-utilities; PMC excerpts only where the license permits text mining), ClinicalTrials.gov API v2, NIH RePORTER, MONDO and HPO (EBI OLS4), HGNC, and official patient-organization websites. Full list: [docs/demo-path.md](docs/demo-path.md).
 
 ## Deploy
 
-On Vercel, import the repo and set `OPENAI_API_KEY` and `OPENAI_MODEL`. The verified dataset is committed, so no ingestion runs at deploy time.
+On Vercel, import `shsllc/rarepath_atlas` (framework preset: Next.js, no build settings needed). Then add these **server-side** environment variables, with no `NEXT_PUBLIC_` prefix: `OPENAI_API_KEY`, `OPENAI_MODEL`, `NCBI_API_KEY`, `NCBI_EMAIL`. The verified dataset is committed, so no ingestion runs at deploy time.
+
+## Submission docs
+
+[60-second script](docs/demo-script-60s.md) · [shot list](docs/demo-shot-list.md) · [technical video outline](docs/technical-video-outline.md) · [10× case](docs/10x-impact.md) · [submission checklist](docs/submission-checklist.md)

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceItem, type GraphNode, type SourceRecord } from "@/lib/schemas";
 import { METHOD_LABEL, PREDICATE_LABEL } from "@/lib/format";
 import type { DrawerTarget } from "@/lib/graph-view";
@@ -27,6 +27,20 @@ type Explain = { state: "idle" } | { state: "loading" } | { state: "error"; mess
 
 export function EvidenceDrawer({ request, onClose, onNavigate, nodes, edges, sources }: Props) {
   const [explain, setExplain] = useState<Explain>({ state: "idle" });
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<Element | null>(null);
+  const isOpen = request !== null;
+
+  // Focus moves into the dialog on open and returns to the opener on close.
+  useEffect(() => {
+    if (isOpen) {
+      openerRef.current ??= document.activeElement;
+      closeRef.current?.focus();
+    } else if (openerRef.current instanceof HTMLElement) {
+      openerRef.current.focus();
+      openerRef.current = null;
+    }
+  }, [isOpen, request]);
 
   useEffect(() => {
     setExplain({ state: "idle" });
@@ -47,14 +61,26 @@ export function EvidenceDrawer({ request, onClose, onNavigate, nodes, edges, sou
 
   async function runExplain() {
     setExplain({ state: "loading" });
-    const res = await fetch("/api/explain", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ edge_ids: edgeIds.slice(0, 20), audience: "family" }),
-    });
-    const json = await res.json();
-    if (!res.ok) setExplain({ state: "error", message: json.error ?? `HTTP ${res.status}` });
-    else setExplain({ state: "done", e: json });
+    let res: Response;
+    try {
+      res = await fetch("/api/explain", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ edge_ids: edgeIds.slice(0, 12), audience: "family" }),
+      });
+    } catch {
+      setExplain({ state: "error", message: "Could not reach the explanation service. The evidence below is unchanged. Please try again." });
+      return;
+    }
+    let json: { error?: string } & Partial<Explanation> = {};
+    try {
+      json = await res.json();
+    } catch {
+      /* non-JSON error page */
+    }
+    if (!res.ok || !json.why_it_matters) {
+      setExplain({ state: "error", message: json.error ?? "The explanation service is unavailable right now. The evidence below is unchanged. Please try again." });
+    } else setExplain({ state: "done", e: json as Explanation });
   }
 
   return (
@@ -66,7 +92,7 @@ export function EvidenceDrawer({ request, onClose, onNavigate, nodes, edges, sou
             <p className="text-xs font-medium uppercase tracking-wide text-muted">{request.kind === "node" ? `Entity · ${node?.type ?? ""}` : "Evidence trail"}</p>
             <h2 className="mt-1 text-lg font-semibold">{title}</h2>
           </div>
-          <button onClick={onClose} className="rounded px-2 py-1 text-muted hover:bg-canvas" aria-label="Close">
+          <button ref={closeRef} onClick={onClose} className="rounded px-2 py-1 text-muted hover:bg-canvas" aria-label="Close evidence panel">
             ✕
           </button>
         </div>
@@ -81,7 +107,19 @@ export function EvidenceDrawer({ request, onClose, onNavigate, nodes, edges, sou
                 {explain.state === "loading" ? "Explaining…" : "Explain (OpenAI)"}
               </button>
             </div>
-            {explain.state === "error" && <p className="mt-2 text-contradictory">{explain.message}</p>}
+            {explain.state === "error" && (
+              <div role="status" className="mt-2 rounded border border-line bg-white p-2 text-sm">
+                <p>{explain.message}</p>
+                <button onClick={runExplain} className="mt-1 text-xs font-medium underline">
+                  Try again
+                </button>
+              </div>
+            )}
+            {explain.state === "loading" && (
+              <p role="status" className="mt-2 text-xs text-muted">
+                Writing a plain-language summary of the quotes below…
+              </p>
+            )}
             {explain.state === "done" && (
               <div className="mt-3 space-y-3">
                 <ExplainPart title="Why this connection matters" text={explain.e.why_it_matters} />
