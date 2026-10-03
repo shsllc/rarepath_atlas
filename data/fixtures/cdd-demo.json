@@ -1,0 +1,1321 @@
+{
+  "bundle_id": "cdd-demo-v1",
+  "is_fixture": true,
+  "fixture_warning": "Demo fixture for UI and data-contract development. Relationships describe what each source is EXPECTED to say; nothing here has been retrieved or verified. Do not present as evidence.",
+  "focus_disease_id": "disease:cdd",
+  "nodes": [
+    {
+      "id": "disease:cdd",
+      "type": "Disease",
+      "label": "CDKL5 deficiency disorder",
+      "aliases": [
+        "CDD",
+        "CDKL5 deficiency",
+        "CDKL5 disorder",
+        "Developmental and epileptic encephalopathy 2",
+        "DEE2",
+        "Early infantile epileptic encephalopathy 2",
+        "EIEE2"
+      ],
+      "external_ids": [
+        {
+          "system": "OMIM",
+          "id": "300672",
+          "url": "https://omim.org/entry/300672",
+          "verification": "unverified_fixture"
+        },
+        {
+          "system": "MONDO",
+          "id": "pending",
+          "url": "https://www.ebi.ac.uk/ols4/search?q=CDKL5%20deficiency%20disorder&ontology=mondo",
+          "verification": "pending"
+        }
+      ],
+      "lay_summary": "A rare genetic condition caused by changes in the CDKL5 gene, usually beginning with seizures in the first months of life.",
+      "inheritance": [
+        "X-linked dominant (fixture — verify)"
+      ],
+      "typical_onset": "Early infancy (fixture — verify)",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "disease:rett",
+      "type": "Disease",
+      "label": "Rett syndrome",
+      "aliases": [
+        "RTT",
+        "Rett"
+      ],
+      "external_ids": [
+        {
+          "system": "OMIM",
+          "id": "312750",
+          "url": "https://omim.org/entry/312750",
+          "verification": "unverified_fixture"
+        },
+        {
+          "system": "ORPHA",
+          "id": "778",
+          "url": "https://www.orpha.net/en/disease/detail/778",
+          "verification": "unverified_fixture"
+        },
+        {
+          "system": "MONDO",
+          "id": "pending",
+          "url": "https://www.ebi.ac.uk/ols4/search?q=Rett%20syndrome&ontology=mondo",
+          "verification": "pending"
+        }
+      ],
+      "lay_summary": "A rare genetic neurodevelopmental condition most often caused by changes in the MECP2 gene.",
+      "inheritance": [
+        "X-linked dominant (fixture — verify)"
+      ],
+      "typical_onset": "Usually after an early period of typical development (fixture — verify)",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "disease:foxg1",
+      "type": "Disease",
+      "label": "FOXG1 syndrome",
+      "aliases": [
+        "FOXG1 disorder"
+      ],
+      "external_ids": [
+        {
+          "system": "MONDO",
+          "id": "pending",
+          "url": "https://www.ebi.ac.uk/ols4/search?q=FOXG1%20syndrome&ontology=mondo",
+          "verification": "pending"
+        }
+      ],
+      "lay_summary": "A rare genetic neurodevelopmental condition caused by changes in the FOXG1 gene.",
+      "inheritance": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "gene:cdkl5",
+      "type": "Gene",
+      "label": "CDKL5",
+      "symbol": "CDKL5",
+      "aliases": [
+        "STK9"
+      ],
+      "external_ids": [
+        {
+          "system": "HGNC",
+          "id": "HGNC:11411",
+          "url": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:11411",
+          "verification": "unverified_fixture"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "gene:mecp2",
+      "type": "Gene",
+      "label": "MECP2",
+      "symbol": "MECP2",
+      "aliases": [],
+      "external_ids": [
+        {
+          "system": "HGNC",
+          "id": "HGNC:6990",
+          "url": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:6990",
+          "verification": "unverified_fixture"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "gene:foxg1",
+      "type": "Gene",
+      "label": "FOXG1",
+      "symbol": "FOXG1",
+      "aliases": [],
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "mech:cdkl5-kinase",
+      "type": "Mechanism",
+      "label": "Loss of CDKL5 kinase function",
+      "aliases": [],
+      "external_ids": [],
+      "lay_summary": "The CDKL5 protein is an enzyme (a kinase); disease variants are thought to reduce its activity.",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "mech:mecp2-chromatin",
+      "type": "Mechanism",
+      "label": "MeCP2 chromatin / transcriptional regulation",
+      "aliases": [],
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "mech:synaptic",
+      "type": "Mechanism",
+      "label": "Synaptic development and plasticity (hypothesised shared downstream effect)",
+      "aliases": [],
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "pheno:seizure",
+      "type": "Phenotype",
+      "label": "Seizure",
+      "aliases": [
+        "seizures",
+        "epilepsy"
+      ],
+      "external_ids": [
+        {
+          "system": "HPO",
+          "id": "HP:0001250",
+          "url": "https://hpo.jax.org/browse/term/HP:0001250",
+          "verification": "unverified_fixture"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "pheno:hypotonia",
+      "type": "Phenotype",
+      "label": "Hypotonia",
+      "aliases": [
+        "low muscle tone"
+      ],
+      "external_ids": [
+        {
+          "system": "HPO",
+          "id": "HP:0001252",
+          "url": "https://hpo.jax.org/browse/term/HP:0001252",
+          "verification": "unverified_fixture"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "pheno:cvi",
+      "type": "Phenotype",
+      "label": "Cortical visual impairment",
+      "aliases": [
+        "CVI"
+      ],
+      "external_ids": [
+        {
+          "system": "HPO",
+          "id": "pending",
+          "verification": "pending"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "pheno:regression",
+      "type": "Phenotype",
+      "label": "Developmental regression",
+      "aliases": [
+        "loss of skills"
+      ],
+      "external_ids": [
+        {
+          "system": "HPO",
+          "id": "pending",
+          "verification": "pending"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "pheno:hand-stereotypy",
+      "type": "Phenotype",
+      "label": "Hand stereotypies",
+      "aliases": [
+        "hand wringing"
+      ],
+      "external_ids": [
+        {
+          "system": "HPO",
+          "id": "pending",
+          "verification": "pending"
+        }
+      ],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "study:rett-nhs",
+      "type": "Study",
+      "label": "Rett and Rett-related disorders natural history study (record to be verified)",
+      "study_type": "natural_history",
+      "aliases": [],
+      "external_ids": [
+        {
+          "system": "NCT",
+          "id": "pending",
+          "url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "verification": "pending"
+        }
+      ],
+      "description": "Placeholder for a Rett natural-history study record. Enrolment criteria, sites and outcome measures must be pulled from ClinicalTrials.gov in Gate 2.",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "asset:rett-nhs-protocol",
+      "type": "ResearchAsset",
+      "asset_kind": "natural_history_protocol",
+      "owner_disease_id": "disease:rett",
+      "label": "Rett natural-history study protocol",
+      "aliases": [],
+      "external_ids": [],
+      "access_notes": "Protocol summary is typically on the registry record; full protocol via the study team or consortium (to be confirmed).",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "asset:rett-outcome-measures",
+      "type": "ResearchAsset",
+      "asset_kind": "outcome_measure",
+      "owner_disease_id": "disease:rett",
+      "label": "Rett clinician- and caregiver-reported outcome measures",
+      "aliases": [],
+      "external_ids": [],
+      "access_notes": "Specific instruments (names, licensing, validation populations) to be extracted from the study record and publications.",
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "org:irsf",
+      "type": "PatientOrganization",
+      "label": "International Rett Syndrome Foundation",
+      "aliases": [
+        "IRSF"
+      ],
+      "website": "https://www.rettsyndrome.org/",
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "org:ifcr",
+      "type": "PatientOrganization",
+      "label": "International Foundation for CDKL5 Research",
+      "aliases": [
+        "IFCR"
+      ],
+      "website": "https://www.cdkl5.com/",
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "org:loulou",
+      "type": "PatientOrganization",
+      "label": "Loulou Foundation",
+      "aliases": [],
+      "website": "https://www.louloufoundation.org/",
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "org:foxg1rf",
+      "type": "PatientOrganization",
+      "label": "FOXG1 Research Foundation",
+      "aliases": [],
+      "website": "https://www.foxg1research.org/",
+      "external_ids": [],
+      "verification": "unverified_fixture"
+    },
+    {
+      "id": "researcher:rett-nhs-pi",
+      "type": "Researcher",
+      "label": "Study investigators — pending NIH RePORTER / ClinicalTrials.gov lookup",
+      "aliases": [],
+      "external_ids": [],
+      "description": "Deliberately unnamed. Real investigator names will only appear once retrieved from a registry record.",
+      "verification": "pending"
+    },
+    {
+      "id": "paper:cdd-classification",
+      "type": "Paper",
+      "label": "Literature on CDD vs. Rett classification — pending PubMed retrieval",
+      "aliases": [],
+      "external_ids": [
+        {
+          "system": "PMID",
+          "id": "pending",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20Rett%20variant%20distinct%20disorder",
+          "verification": "pending"
+        }
+      ],
+      "verification": "pending"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:01",
+      "subject_id": "disease:cdd",
+      "predicate": "caused_by_variant_in",
+      "object_id": "gene:cdkl5",
+      "source": "Demo fixture (target source: MONDO / ClinVar)",
+      "source_url": "https://www.ebi.ac.uk/ols4/search?q=CDKL5%20deficiency%20disorder&ontology=mondo",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking CDKL5 deficiency disorder to CDKL5.",
+      "evidence": [
+        {
+          "id": "ev:01",
+          "source": "Demo fixture (target source: MONDO / ClinVar)",
+          "source_url": "https://www.ebi.ac.uk/ols4/search?q=CDKL5%20deficiency%20disorder&ontology=mondo",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking CDKL5 deficiency disorder to CDKL5."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:02",
+      "subject_id": "disease:rett",
+      "predicate": "caused_by_variant_in",
+      "object_id": "gene:mecp2",
+      "source": "Demo fixture (target source: MONDO / ClinVar)",
+      "source_url": "https://www.ebi.ac.uk/ols4/search?q=Rett%20syndrome&ontology=mondo",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking Rett syndrome to MECP2.",
+      "evidence": [
+        {
+          "id": "ev:02",
+          "source": "Demo fixture (target source: MONDO / ClinVar)",
+          "source_url": "https://www.ebi.ac.uk/ols4/search?q=Rett%20syndrome&ontology=mondo",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking Rett syndrome to MECP2."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:03",
+      "subject_id": "disease:foxg1",
+      "predicate": "caused_by_variant_in",
+      "object_id": "gene:foxg1",
+      "source": "Demo fixture (target source: MONDO)",
+      "source_url": "https://www.ebi.ac.uk/ols4/search?q=FOXG1%20syndrome&ontology=mondo",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking FOXG1 syndrome to FOXG1.",
+      "evidence": [
+        {
+          "id": "ev:03",
+          "source": "Demo fixture (target source: MONDO)",
+          "source_url": "https://www.ebi.ac.uk/ols4/search?q=FOXG1%20syndrome&ontology=mondo",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: ontology assertion linking FOXG1 syndrome to FOXG1."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:04",
+      "subject_id": "gene:cdkl5",
+      "predicate": "involves_mechanism",
+      "object_id": "mech:cdkl5-kinase",
+      "source": "Demo fixture (target source: PubMed / UniProt)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20kinase%20activity",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: source stating CDKL5 encodes a serine/threonine kinase.",
+      "evidence": [
+        {
+          "id": "ev:04",
+          "source": "Demo fixture (target source: PubMed / UniProt)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20kinase%20activity",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: source stating CDKL5 encodes a serine/threonine kinase."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:05",
+      "subject_id": "gene:mecp2",
+      "predicate": "involves_mechanism",
+      "object_id": "mech:mecp2-chromatin",
+      "source": "Demo fixture (target source: PubMed / UniProt)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=MeCP2%20transcriptional%20regulation",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: source describing MeCP2 role in chromatin/transcriptional regulation.",
+      "evidence": [
+        {
+          "id": "ev:05",
+          "source": "Demo fixture (target source: PubMed / UniProt)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=MeCP2%20transcriptional%20regulation",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: source describing MeCP2 role in chromatin/transcriptional regulation."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:06",
+      "subject_id": "disease:cdd",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:seizure",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/browse/term/HP:0001250",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (early-onset seizures).",
+      "evidence": [
+        {
+          "id": "ev:06",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/browse/term/HP:0001250",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (early-onset seizures)."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:07",
+      "subject_id": "disease:cdd",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:hypotonia",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/browse/term/HP:0001252",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation.",
+      "evidence": [
+        {
+          "id": "ev:07",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/browse/term/HP:0001252",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:08",
+      "subject_id": "disease:cdd",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:cvi",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (cortical visual impairment).",
+      "evidence": [
+        {
+          "id": "ev:08",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (cortical visual impairment)."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:09",
+      "subject_id": "disease:rett",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:regression",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (developmental regression).",
+      "evidence": [
+        {
+          "id": "ev:09",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (developmental regression)."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:10",
+      "subject_id": "disease:rett",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:hand-stereotypy",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (hand stereotypies).",
+      "evidence": [
+        {
+          "id": "ev:10",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (hand stereotypies)."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:11",
+      "subject_id": "disease:rett",
+      "predicate": "has_phenotype",
+      "object_id": "pheno:seizure",
+      "source": "Demo fixture (target source: HPO annotations)",
+      "source_url": "https://hpo.jax.org/browse/term/HP:0001250",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (seizures, variable frequency).",
+      "evidence": [
+        {
+          "id": "ev:11",
+          "source": "Demo fixture (target source: HPO annotations)",
+          "source_url": "https://hpo.jax.org/browse/term/HP:0001250",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: HPO disease annotation (seizures, variable frequency)."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:12",
+      "subject_id": "disease:cdd",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:rett",
+      "source": "Demo fixture (target source: HPO phenotype-set similarity)",
+      "source_url": "https://hpo.jax.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: computed overlap of HPO annotation sets (e.g. seizures, hand stereotypies, hypotonia). Overlap score not yet computed.",
+      "evidence": [
+        {
+          "id": "ev:12",
+          "source": "Demo fixture (target source: HPO phenotype-set similarity)",
+          "source_url": "https://hpo.jax.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: computed overlap of HPO annotation sets (e.g. seizures, hand stereotypies, hypotonia). Overlap score not yet computed."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:13",
+      "subject_id": "disease:cdd",
+      "predicate": "historically_classified_with",
+      "object_id": "disease:rett",
+      "source": "Demo fixture (target source: PubMed)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20Rett%20variant%20distinct%20disorder",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: literature describing CDKL5-related cases as an early-seizure variant of Rett, and later literature describing CDD as a distinct disorder.",
+      "evidence": [
+        {
+          "id": "ev:13",
+          "source": "Demo fixture (target source: PubMed)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20Rett%20variant%20distinct%20disorder",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: literature describing CDKL5-related cases as an early-seizure variant of Rett, and later literature describing CDD as a distinct disorder."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "contested",
+      "contradiction_notes": "Older and newer literature disagree on whether CDD is a Rett variant or a distinct disorder. Treat as historical context, not equivalence.",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:14",
+      "subject_id": "disease:cdd",
+      "predicate": "shares_mechanism_with",
+      "object_id": "disease:rett",
+      "source": "Demo fixture (target source: OpenAI Path Explainer (hypothesis))",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20MECP2%20synaptic",
+      "retrieval_date": "2026-10-03",
+      "source_type": "model_inference",
+      "evidence_type": "llm_inference",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Hypothesis only: both conditions may converge on synaptic development pathways. No direct supporting source has been retrieved.",
+      "evidence": [
+        {
+          "id": "ev:14",
+          "source": "Demo fixture (target source: OpenAI Path Explainer (hypothesis))",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20MECP2%20synaptic",
+          "retrieval_date": "2026-10-03",
+          "source_type": "model_inference",
+          "evidence_type": "llm_inference",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Hypothesis only: both conditions may converge on synaptic development pathways. No direct supporting source has been retrieved."
+        }
+      ],
+      "confidence": "low",
+      "inferred": true,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:15",
+      "subject_id": "mech:cdkl5-kinase",
+      "predicate": "involves_mechanism",
+      "object_id": "mech:synaptic",
+      "source": "Demo fixture (target source: OpenAI Evidence Extractor (hypothesis))",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20synapse",
+      "retrieval_date": "2026-10-03",
+      "source_type": "model_inference",
+      "evidence_type": "llm_inference",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Hypothesis only: CDKL5 loss may affect synaptic function. Needs extraction from retrieved papers.",
+      "evidence": [
+        {
+          "id": "ev:15",
+          "source": "Demo fixture (target source: OpenAI Evidence Extractor (hypothesis))",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20synapse",
+          "retrieval_date": "2026-10-03",
+          "source_type": "model_inference",
+          "evidence_type": "llm_inference",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Hypothesis only: CDKL5 loss may affect synaptic function. Needs extraction from retrieved papers."
+        }
+      ],
+      "confidence": "low",
+      "inferred": true,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:16",
+      "subject_id": "disease:rett",
+      "predicate": "studied_in",
+      "object_id": "study:rett-nhs",
+      "source": "Demo fixture (target source: ClinicalTrials.gov)",
+      "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry record listing Rett syndrome as a studied condition.",
+      "evidence": [
+        {
+          "id": "ev:16",
+          "source": "Demo fixture (target source: ClinicalTrials.gov)",
+          "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry record listing Rett syndrome as a studied condition."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:17",
+      "subject_id": "study:rett-nhs",
+      "predicate": "produced_asset",
+      "object_id": "asset:rett-nhs-protocol",
+      "source": "Demo fixture (target source: ClinicalTrials.gov)",
+      "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry record with protocol description, eligibility and visit schedule.",
+      "evidence": [
+        {
+          "id": "ev:17",
+          "source": "Demo fixture (target source: ClinicalTrials.gov)",
+          "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry record with protocol description, eligibility and visit schedule."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:18",
+      "subject_id": "study:rett-nhs",
+      "predicate": "produced_asset",
+      "object_id": "asset:rett-outcome-measures",
+      "source": "Demo fixture (target source: ClinicalTrials.gov)",
+      "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry 'Outcome Measures' fields naming the instruments used.",
+      "evidence": [
+        {
+          "id": "ev:18",
+          "source": "Demo fixture (target source: ClinicalTrials.gov)",
+          "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: registry 'Outcome Measures' fields naming the instruments used."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:19",
+      "subject_id": "disease:cdd",
+      "predicate": "studied_in",
+      "object_id": "study:rett-nhs",
+      "source": "Demo fixture (target source: ClinicalTrials.gov)",
+      "source_url": "https://clinicaltrials.gov/search?term=CDKL5%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: whether CDKL5 participants were eligible for or enrolled in this study. Must be checked on the registry record.",
+      "evidence": [
+        {
+          "id": "ev:19",
+          "source": "Demo fixture (target source: ClinicalTrials.gov)",
+          "source_url": "https://clinicaltrials.gov/search?term=CDKL5%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: whether CDKL5 participants were eligible for or enrolled in this study. Must be checked on the registry record."
+        }
+      ],
+      "confidence": "insufficient",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:20",
+      "subject_id": "asset:rett-outcome-measures",
+      "predicate": "asset_measures",
+      "object_id": "pheno:regression",
+      "source": "Demo fixture (target source: ClinicalTrials.gov / PubMed)",
+      "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: outcome measure description covering motor/communication skills and regression.",
+      "evidence": [
+        {
+          "id": "ev:20",
+          "source": "Demo fixture (target source: ClinicalTrials.gov / PubMed)",
+          "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: outcome measure description covering motor/communication skills and regression."
+        }
+      ],
+      "confidence": "low",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:21",
+      "subject_id": "asset:rett-outcome-measures",
+      "predicate": "asset_measures",
+      "object_id": "pheno:seizure",
+      "source": "Demo fixture (target source: ClinicalTrials.gov / PubMed)",
+      "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: whether the instruments capture seizure burden in a way relevant to CDD.",
+      "evidence": [
+        {
+          "id": "ev:21",
+          "source": "Demo fixture (target source: ClinicalTrials.gov / PubMed)",
+          "source_url": "https://clinicaltrials.gov/search?term=Rett%20natural%20history",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: whether the instruments capture seizure burden in a way relevant to CDD."
+        }
+      ],
+      "confidence": "insufficient",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:22",
+      "subject_id": "org:irsf",
+      "predicate": "supports_community",
+      "object_id": "disease:rett",
+      "source": "Demo fixture (target source: Organization website)",
+      "source_url": "https://www.rettsyndrome.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming Rett syndrome.",
+      "evidence": [
+        {
+          "id": "ev:22",
+          "source": "Demo fixture (target source: Organization website)",
+          "source_url": "https://www.rettsyndrome.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming Rett syndrome."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:23",
+      "subject_id": "org:ifcr",
+      "predicate": "supports_community",
+      "object_id": "disease:cdd",
+      "source": "Demo fixture (target source: Organization website)",
+      "source_url": "https://www.cdkl5.com/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming CDKL5 deficiency disorder.",
+      "evidence": [
+        {
+          "id": "ev:23",
+          "source": "Demo fixture (target source: Organization website)",
+          "source_url": "https://www.cdkl5.com/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming CDKL5 deficiency disorder."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:24",
+      "subject_id": "org:loulou",
+      "predicate": "supports_community",
+      "object_id": "disease:cdd",
+      "source": "Demo fixture (target source: Organization website)",
+      "source_url": "https://www.louloufoundation.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming CDKL5 deficiency disorder.",
+      "evidence": [
+        {
+          "id": "ev:24",
+          "source": "Demo fixture (target source: Organization website)",
+          "source_url": "https://www.louloufoundation.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming CDKL5 deficiency disorder."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:25",
+      "subject_id": "org:foxg1rf",
+      "predicate": "supports_community",
+      "object_id": "disease:foxg1",
+      "source": "Demo fixture (target source: Organization website)",
+      "source_url": "https://www.foxg1research.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming FOXG1 syndrome.",
+      "evidence": [
+        {
+          "id": "ev:25",
+          "source": "Demo fixture (target source: Organization website)",
+          "source_url": "https://www.foxg1research.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: organization mission statement naming FOXG1 syndrome."
+        }
+      ],
+      "confidence": "high",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:26",
+      "subject_id": "researcher:rett-nhs-pi",
+      "predicate": "investigates",
+      "object_id": "study:rett-nhs",
+      "source": "Demo fixture (target source: ClinicalTrials.gov / NIH RePORTER)",
+      "source_url": "https://reporter.nih.gov/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: investigator names not yet retrieved.",
+      "evidence": [
+        {
+          "id": "ev:26",
+          "source": "Demo fixture (target source: ClinicalTrials.gov / NIH RePORTER)",
+          "source_url": "https://reporter.nih.gov/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Unknown: investigator names not yet retrieved."
+        }
+      ],
+      "confidence": "insufficient",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:27",
+      "subject_id": "disease:foxg1",
+      "predicate": "phenotypically_overlaps",
+      "object_id": "disease:cdd",
+      "source": "Demo fixture (target source: HPO phenotype-set similarity)",
+      "source_url": "https://hpo.jax.org/",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: computed overlap of HPO annotation sets. Overlap score not yet computed.",
+      "evidence": [
+        {
+          "id": "ev:27",
+          "source": "Demo fixture (target source: HPO phenotype-set similarity)",
+          "source_url": "https://hpo.jax.org/",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: computed overlap of HPO annotation sets. Overlap score not yet computed."
+        }
+      ],
+      "confidence": "low",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    },
+    {
+      "id": "edge:28",
+      "subject_id": "disease:cdd",
+      "predicate": "described_in",
+      "object_id": "paper:cdd-classification",
+      "source": "Demo fixture (target source: PubMed)",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20deficiency%20disorder",
+      "retrieval_date": "2026-10-03",
+      "source_type": "demo_fixture",
+      "evidence_type": "placeholder",
+      "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: review article(s) on CDD clinical features and classification.",
+      "evidence": [
+        {
+          "id": "ev:28",
+          "source": "Demo fixture (target source: PubMed)",
+          "source_url": "https://pubmed.ncbi.nlm.nih.gov/?term=CDKL5%20deficiency%20disorder",
+          "retrieval_date": "2026-10-03",
+          "source_type": "demo_fixture",
+          "evidence_type": "placeholder",
+          "quoted_or_structured_evidence": "[FIXTURE — NOT RETRIEVED EVIDENCE] Expected: review article(s) on CDD clinical features and classification."
+        }
+      ],
+      "confidence": "moderate",
+      "inferred": false,
+      "contradiction_status": "none",
+      "created_at": "2026-10-03"
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn:rett-phenotype",
+      "disease_id": "disease:rett",
+      "connection_type": "phenotypic_overlap",
+      "why_connected": "Children with CDD and children with Rett syndrome can share several features, such as seizures, low muscle tone and repetitive hand movements.",
+      "evidence_edge_ids": [
+        "edge:12"
+      ],
+      "evidence_count": 1,
+      "confidence": "moderate",
+      "status": "supported",
+      "key_difference": "Seizures in CDD usually start in the first months of life; Rett more often follows a period of typical early development and then regression."
+    },
+    {
+      "id": "conn:rett-history",
+      "disease_id": "disease:rett",
+      "connection_type": "historical_classification",
+      "why_connected": "CDD was once described as a form of Rett syndrome, so the two communities share research history.",
+      "evidence_edge_ids": [
+        "edge:13"
+      ],
+      "evidence_count": 1,
+      "confidence": "moderate",
+      "status": "contradictory",
+      "key_difference": "Current literature (to be retrieved) treats CDD as its own disorder. Shared history is not the same as shared biology."
+    },
+    {
+      "id": "conn:rett-mechanism",
+      "disease_id": "disease:rett",
+      "connection_type": "shared_mechanism",
+      "why_connected": "An AI-generated hypothesis suggests both genes may affect how brain connections (synapses) develop.",
+      "evidence_edge_ids": [
+        "edge:14",
+        "edge:15"
+      ],
+      "evidence_count": 2,
+      "confidence": "low",
+      "status": "inferred",
+      "key_difference": "The genes do different jobs (CDKL5 is an enzyme; MeCP2 regulates other genes). A shared downstream effect is unproven."
+    },
+    {
+      "id": "conn:foxg1-phenotype",
+      "disease_id": "disease:foxg1",
+      "connection_type": "phenotypic_overlap",
+      "why_connected": "FOXG1 syndrome is another neurodevelopmental condition with some overlapping features.",
+      "evidence_edge_ids": [
+        "edge:27"
+      ],
+      "evidence_count": 1,
+      "confidence": "low",
+      "status": "supported",
+      "key_difference": "Different gene and different typical features; overlap score has not been computed yet."
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "opp:rett-nhs-protocol",
+      "asset_id": "asset:rett-nhs-protocol",
+      "source_disease_id": "disease:rett",
+      "headline": "Natural-history protocol from the Rett syndrome community",
+      "why_it_may_transfer": [
+        "Overlapping clinical features (seizures, low muscle tone, hand movements) mean some visit assessments may already fit CDD.",
+        "Shared research history means investigators may already know both conditions."
+      ],
+      "what_differs": [
+        "Age at onset: CDD seizures usually begin in early infancy; a Rett schedule may start too late to capture this.",
+        "Different gene and protein function (kinase vs. gene regulator).",
+        "Seizure burden is typically central in CDD and may need heavier measurement."
+      ],
+      "what_is_uncertain": [
+        "Whether CDD participants were ever eligible for or enrolled in this study (not yet checked).",
+        "Whether the protocol is shareable and under what terms."
+      ],
+      "requires_expert_validation": [
+        "Would the visit schedule and assessments capture the earliest CDD milestones?",
+        "Which protocol elements would need to change for a seizure-dominant, early-onset population?"
+      ],
+      "evidence_edge_ids": [
+        "edge:12",
+        "edge:16",
+        "edge:17",
+        "edge:19"
+      ],
+      "confidence": "moderate",
+      "status": "inferred",
+      "next_actions": [
+        {
+          "id": "act:1",
+          "kind": "review_protocol",
+          "label": "Pull the study's registry record and read its eligibility and visit schedule",
+          "target_node_id": "study:rett-nhs",
+          "evidence_edge_ids": [
+            "edge:16",
+            "edge:17"
+          ]
+        },
+        {
+          "id": "act:2",
+          "kind": "contact_organization",
+          "label": "Ask the International Rett Syndrome Foundation who coordinates the study and whether the protocol can be shared",
+          "target_node_id": "org:irsf",
+          "evidence_edge_ids": [
+            "edge:22",
+            "edge:16"
+          ]
+        },
+        {
+          "id": "act:3",
+          "kind": "ask_expert_question",
+          "label": "Bring the 'what differs' list to your scientific advisory board before adapting anything",
+          "evidence_edge_ids": [
+            "edge:12"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "opp:rett-outcome-measures",
+      "asset_id": "asset:rett-outcome-measures",
+      "source_disease_id": "disease:rett",
+      "headline": "Outcome measures developed for Rett syndrome",
+      "why_it_may_transfer": [
+        "Measures of motor, hand-use and communication skills target features that partly overlap with CDD."
+      ],
+      "what_differs": [
+        "CDD commonly involves visual impairment and early seizures that Rett instruments may not capture.",
+        "The typical regression pattern differs between the two conditions."
+      ],
+      "what_is_uncertain": [
+        "Whether these instruments have ever been validated in CDD.",
+        "Whether CDD-specific measures already exist that should be preferred (check first)."
+      ],
+      "requires_expert_validation": [
+        "Are these measures psychometrically valid in CDD, or would they need re-validation?"
+      ],
+      "evidence_edge_ids": [
+        "edge:18",
+        "edge:20",
+        "edge:21",
+        "edge:12"
+      ],
+      "confidence": "low",
+      "status": "inferred",
+      "next_actions": [
+        {
+          "id": "act:4",
+          "kind": "compare_outcome_measures",
+          "label": "List the instruments from the Rett study record side by side with any CDD-specific measures",
+          "target_node_id": "asset:rett-outcome-measures",
+          "evidence_edge_ids": [
+            "edge:18"
+          ]
+        },
+        {
+          "id": "act:5",
+          "kind": "contact_researcher",
+          "label": "Ask study investigators whether the instruments were tried in CDD participants",
+          "target_node_id": "researcher:rett-nhs-pi",
+          "evidence_edge_ids": [
+            "edge:26",
+            "edge:19"
+          ]
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "id": "gap:1",
+      "kind": "missing_evidence",
+      "statement": "No study record has been retrieved yet. Whether CDD participants were included in the Rett natural-history study is unknown.",
+      "suggested_question_or_experiment": "Retrieve the ClinicalTrials.gov record and check conditions + eligibility.",
+      "related_edge_ids": [
+        "edge:19"
+      ]
+    },
+    {
+      "id": "gap:2",
+      "kind": "contradictory_evidence",
+      "statement": "Older and newer literature disagree on whether CDD is a Rett variant or a distinct disorder.",
+      "suggested_question_or_experiment": "Retrieve the key papers on both sides and show the dates and reasoning.",
+      "related_edge_ids": [
+        "edge:13"
+      ]
+    },
+    {
+      "id": "gap:3",
+      "kind": "assumption",
+      "statement": "Phenotypic overlap is being used as a reason to look at Rett assets. Overlap does not mean the same protocol or measure will work.",
+      "related_edge_ids": [
+        "edge:12"
+      ]
+    },
+    {
+      "id": "gap:4",
+      "kind": "open_question",
+      "statement": "The shared-synaptic-mechanism link is an AI hypothesis with no retrieved supporting source.",
+      "suggested_question_or_experiment": "Run the Evidence Extractor over retrieved CDKL5 and MECP2 papers; keep the link only if a source states it.",
+      "related_edge_ids": [
+        "edge:14",
+        "edge:15"
+      ]
+    },
+    {
+      "id": "gap:5",
+      "kind": "missing_evidence",
+      "statement": "All identifiers on this page (OMIM, ORPHA, HGNC, HPO) are hand-entered fixtures and MONDO IDs are pending.",
+      "suggested_question_or_experiment": "Resolve every entity through MONDO/HPO/HGNC lookups in Gate 2.",
+      "related_edge_ids": []
+    }
+  ]
+}
