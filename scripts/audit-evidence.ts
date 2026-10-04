@@ -69,6 +69,16 @@ ${checks.map(([name, ok, detail]) => `| ${name} | ${ok ? "PASS" : "**FAIL**"} | 
 - Registry vs. paper counts differ (1,044 enrolled vs. 793 analysed; 14 listed locations vs. 15 sites). Both are shown as a gap.
 - ${b.edges.filter(isUnreviewedAiEdge).length} OpenAI-extracted relationships are quote-verified but not analyst-reviewed. They are visible only behind an opt-in graph filter, labelled "AI-extracted".
 - One featured journey only (CDKL5 deficiency disorder). No treatment, mechanism or clinical-equivalence claims are made.
+
+## Claim freeze
+
+**Status: ${failed.length === 0 ? "FROZEN (evidence set frozen on 2026-10-03)" : "NOT FROZEN — fix failing checks first"}.** No further source retrieval unless a factual error is found.
+
+- Severity-scale statement → PMID 31147226 (methods sentence quoted verbatim)
+- Shared-infrastructure anchor → NCT02738281 (conditions + eligibility list CDKL5)
+- CDD and Rett distinct → contradicted "Rett variant" claim; PMIDs 35483386 and 32472944
+- Featured story and actions cite analyst-reviewed edges only (no OpenAI-only edges)
+- Preprint (PMID 39867409) flagged; no fixture data in the default journey; no treatment-transfer claims
 `;
   fs.writeFileSync(path.join(process.cwd(), "docs", "final-evidence-audit.md"), md);
   for (const [name, ok] of checks) console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
