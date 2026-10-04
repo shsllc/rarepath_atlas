@@ -432,14 +432,23 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
             {p.clinical.registries.some((r) => r.registry === "EU Clinical Trials Register") && <p className="mt-1 text-muted">EU Clinical Trials Register statuses are shown per country as last reported to that (legacy) register and may be out of date. Source: EU Clinical Trials Register (EMA).</p>}
           </div>
         )}
-        {p.clinical.status_counts.length > 0 && (
+        {p.clinical.studies.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2 text-[11px]">
-            {p.clinical.status_counts.map((x) => (
-              <span key={x.status} className="rounded border border-line px-2 py-0.5">
-                {x.label}: <strong>{x.count}</strong>
-              </span>
-            ))}
-            <span className="text-muted">among {p.clinical.studies.length} trials retrieved</span>
+            {(
+              [
+                ["active", "Active / recruiting"],
+                ["completed", "Completed"],
+                ["caution", "Terminated / withdrawn / suspended / stopped"],
+                ["unknown", "Status unknown"],
+              ] as const
+            ).map(([cat, label]) =>
+              p.clinical.groups[cat].length ? (
+                <span key={cat} className={`rounded px-2 py-0.5 font-semibold ${CATEGORY_STYLE[cat]}`}>
+                  {CATEGORY_ICON[cat]} {label}: {p.clinical.groups[cat].length}
+                </span>
+              ) : null,
+            )}
+            <span className="text-muted">among {p.clinical.studies.length} trials retrieved; each card shows the registry&apos;s exact status</span>
           </div>
         )}
         {p.clinical.studies.length === 0 && <Empty>No registered studies returned for this condition.</Empty>}
