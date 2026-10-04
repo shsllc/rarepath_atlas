@@ -8,7 +8,9 @@
  *   people        ORCID (or OpenAlex author id). Without ORCID: same normalized name AND an
  *                 identical normalized affiliation string. NEVER name alone.
  *   institutions  ROR
- *   studies       NCT → EudraCT → CTIS → WHO UTN (so a future ICTRP/CTIS record collapses onto the same trial)
+ *   studies       registry cross-references: NCT, EudraCT, EU CT (CTIS), WHO UTN, ISRCTN, DRKS, ANZCTR, CTRI, jRCT,
+ *                 ChiCTR, and sponsor protocol id only together with the same sponsor. Never title / sponsor /
+ *                 disease similarity: look-alikes without a shared id stay separate and are flagged POSSIBLE DUPLICATE.
  *   organizations exact normalized name (sponsors/collaborators only; never applied to people)
  *   outcomes      identical normalized measure wording (no fuzzy matching)
  *   datasets      DOI
@@ -26,7 +28,8 @@ const ID_KEYS: Partial<Record<ResearchRecord["kind"], IdSystem[]>> = {
   gene: ["ensembl", "hgnc", "symbol"],
   person: ["orcid", "openalex"],
   institution: ["ror"],
-  study: ["nct", "eudract", "ctis", "utn"],
+  // sponsor_protocol values are stored as "<normalized sponsor>|<protocol id>", so a bare protocol number never merges.
+  study: ["nct", "eudract", "ctis", "utn", "isrctn", "drks", "anzctr", "ctri", "jrct", "chictr", "sponsor_protocol"],
   organization: ["orgname"],
   dataset: ["doi", "datacite"],
   drug: ["chembl"],
@@ -117,6 +120,10 @@ export interface ReconcileOptions {
 export function reconcile(records: ResearchRecord[], links: ResearchLink[], opts: ReconcileOptions = {}): { records: ResearchRecord[]; links: ResearchLink[]; merges: number } {
   const dsu = new DSU();
   const byId = new Map<string, string>();
+  const byKey = new Map(records.map((r) => [r.key, r]));
+  // Two study records with DIFFERENT primary registry ids for the same registry are different trials, whatever else they share.
+  const PRIMARY: IdSystem[] = ["nct", "isrctn", "drks", "anzctr", "ctri", "jrct", "chictr", "ctis", "eudract"];
+  const conflicts = (a?: ResearchRecord, b?: ResearchRecord) => !!a && !!b && a.kind === "study" && b.kind === "study" && PRIMARY.some((k) => a.ids[k] && b.ids[k] && String(a.ids[k]).toLowerCase() !== String(b.ids[k]).toLowerCase());
   for (const r of records) {
     dsu.find(r.key);
     for (const sys of ID_KEYS[r.kind] ?? []) {
@@ -124,8 +131,8 @@ export function reconcile(records: ResearchRecord[], links: ResearchLink[], opts
       if (!v) continue;
       const k = `${r.kind}|${sys}|${String(v).toLowerCase()}`;
       const prev = byId.get(k);
-      if (prev) dsu.union(prev, r.key);
-      else byId.set(k, r.key);
+      if (prev && !conflicts(byKey.get(prev), r)) dsu.union(prev, r.key);
+      else if (!prev) byId.set(k, r.key);
     }
   }
   // Conservative person merge without ORCID: same normalized name AND an identical normalized affiliation string.
@@ -164,6 +171,21 @@ export function reconcile(records: ResearchRecord[], links: ResearchLink[], opts
     for (const r of g) keyMap.set(r.key, canonical);
     merges += g.length - 1;
     out.push(m);
+  }
+
+  // Look-alike studies that share no identifier: identical normalized title, or identical sponsor + start date.
+  const studies = out.filter((r): r is Extract<ResearchRecord, { kind: "study" }> => r.kind === "study");
+  for (let i = 0; i < studies.length; i++) {
+    for (let j = i + 1; j < studies.length; j++) {
+      const a = studies[i];
+      const b = studies[j];
+      const sameTitle = normName(a.label) === normName(b.label) || (!!a.official_title && normName(a.official_title) === normName(b.official_title ?? ""));
+      const sameSponsorStart = !!a.sponsor && !!a.start_date && normName(a.sponsor) === normName(b.sponsor ?? "") && a.start_date === b.start_date;
+      if (sameTitle || sameSponsorStart) {
+        a.possible_duplicates = [...new Set([...(a.possible_duplicates ?? []), b.key])];
+        b.possible_duplicates = [...new Set([...(b.possible_duplicates ?? []), a.key])];
+      }
+    }
   }
 
   const linkMap = new Map<string, ResearchLink>();

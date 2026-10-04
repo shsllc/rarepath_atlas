@@ -16,11 +16,14 @@ import { HpoProvider } from "./providers/hpo";
 import { ClinGenProvider } from "./providers/clingen";
 import { ClinVarProvider } from "./providers/clinvar";
 import { AllianceProvider } from "./providers/alliance";
+import { IsrctnProvider } from "./providers/isrctn";
+import { EuCtrProvider } from "./providers/euctr";
 import type { ResearchProvider } from "./types";
 
 export function liveProviders(): ResearchProvider[] {
   return [new OpenTargetsProvider(), new GwasProvider(), new ClinicalTrialsProvider(), new EuropePmcProvider(), new DataCiteProvider(), new OpenAlexProvider(), new CrossrefProvider(), new TrialPublicationsProvider(),
-    new MonarchProvider(), new OrphadataProvider(), new HpoProvider(), new ClinGenProvider(), new ClinVarProvider(), new AllianceProvider()];
+    new MonarchProvider(), new OrphadataProvider(), new HpoProvider(), new ClinGenProvider(), new ClinVarProvider(), new AllianceProvider(),
+    new IsrctnProvider(), new EuCtrProvider()];
 }
 
 export type SourceUse = "discovery" | "metadata" | "reviewed_ingestion";
@@ -39,8 +42,10 @@ export interface SourceEntry {
 const OFFLINE: SourceEntry[] = [
   { name: "PubMed / PubMed Central (NCBI E-utilities)", data_types: ["Abstracts", "PMC full-text excerpts", "Author & affiliation lines"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://pubmed.ncbi.nlm.nih.gov", note: "Retrieved offline, stored verbatim, analyst-reviewed into the CDD journey." },
   { name: "ClinicalTrials.gov (registry records)", data_types: ["Full study records for reviewed studies"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://clinicaltrials.gov", note: "The two reviewed CDD studies were retrieved offline; live search uses the same API for discovery." },
-  { name: "WHO ICTRP", data_types: ["International trial registrations"], mode: "not_integrated", uses: [], homepage: "https://trialsearch.who.int", note: "Programmatic access requires a WHO web-service subscription; the search portal is not scraped. Trial records already carry EudraCT/CTIS/UTN secondary ids so ICTRP records can be deduplicated when access is granted." },
-  { name: "EMA CTIS", data_types: ["EU/EEA trials"], mode: "not_integrated", uses: [], homepage: "https://euclinicaltrials.eu", note: "No documented, versioned public API with reuse terms was found; the portal's internal endpoints are not scraped. EudraCT/CTIS numbers from ClinicalTrials.gov records are kept for future reconciliation." },
+  { name: "WHO ICTRP", data_types: ["International trial registrations from all WHO primary registries"], mode: "not_integrated", uses: [], homepage: "https://trialsearch.who.int", note: "Available with approval, not immediately: the XML Web Service is for research use with cost 'provided upon request', the crawling service is currently unavailable, the new-records SharePoint feed is by request, and commercial use is prohibited. The portal is not scraped. Trial records keep EudraCT / EU CT / UTN / registry ids so ICTRP records can be deduplicated if access is granted." },
+  { name: "EMA CTIS", data_types: ["EU/EEA trials under the Clinical Trials Regulation"], mode: "not_integrated", uses: [], homepage: "https://euclinicaltrials.eu", note: "The public portal's JSON endpoints are undocumented and not endorsed by EMA, so they are not used. Legacy EU trials come from the EU Clinical Trials Register instead; EU CT numbers on ClinicalTrials.gov records are kept for reconciliation." },
+  { name: "DDrare (NIBN, Japan)", data_types: ["Drug development for rare diseases, trials via ICTRP, drug targets and pathways"], mode: "not_integrated", uses: [], homepage: "https://ddrare.nibn.go.jp/index_e.html", note: "Active and highly relevant, but has no API and its terms require prior permission to use the information. Linked to, not ingested." },
+  { name: "ANZCTR, jRCT, ChiCTR, CTRI, PACTR, ReBEC, CRiS, IRCT, RPCEC, DRKS", data_types: ["National / regional trial registries"], mode: "not_integrated", uses: [], homepage: "https://www.who.int/tools/clinical-trials-registry-platform/network/primary-registries", note: "No free documented API usable today: jRCT prohibits automated download, ANZCTR blocks automated clients and its XML export is unavailable, DRKS's download interface is still planned, and the others offer web pages only. Reachable legitimately via WHO ICTRP once approved." },
   { name: "DisGeNET", data_types: ["Gene-disease associations"], mode: "not_integrated", uses: [], homepage: "https://www.disgenet.com", note: "Requires a registered account and licence tier; not used." },
   { name: "MONDO / HPO (EBI OLS4) and HGNC", data_types: ["Disease, phenotype and gene identity"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://www.ebi.ac.uk/ols4", note: "Identity verification for reviewed nodes." },
   { name: "NIH RePORTER", data_types: ["Funded projects"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://reporter.nih.gov", note: "Funding record for the shared natural-history infrastructure." },

@@ -130,6 +130,16 @@ query ──▶ reviewed graph (always first; reviewed matches never call an API
 - **Organizations and people stay separate.** Sponsors and collaborators are organization records with explicit relations, not investigators. Listed officials are people, merged only under the strict identity rules. Contact e-mails and phone numbers are never requested.
 - **Not integrated:** WHO ICTRP (its web service requires a subscription) and EMA CTIS (no documented, versioned public API). Neither portal is scraped. Trial records keep EudraCT, CTIS and UTN secondary ids so records from those registries can collapse onto the same trial later.
 
+## Global trial registries
+
+- **ISRCTN** is queried live through its official keyless API. A recruitment-status override is kept verbatim; otherwise the status is derived from the registered dates and labelled as derived.
+- **The EU Clinical Trials Register** is queried through the register's own summary download (one page per search). Each country's status is kept (for example "IT: Prematurely Ended; ES: Completed").
+- **Merging across registries:** trials merge only on shared registry ids (NCT, EudraCT, EU CT, UTN, ISRCTN, DRKS, ANZCTR, CTRI, jRCT, ChiCTR), or on a sponsor protocol id together with the same sponsor.
+  - Different primary ids from the same registry block a merge.
+  - Look-alikes are flagged POSSIBLE DUPLICATE and kept separate.
+  - Every registration of a merged trial is listed.
+- **What is not used:** WHO ICTRP is available with approval; CTIS's API is undocumented; DDrare needs permission. Full evaluation: [global-trial-strategy.md](global-trial-strategy.md).
+
 ## Rare-disease sources
 
 - **Monarch v3:** disease cross-references, causal genes with their knowledge source (e.g. ClinGen, OMIM), and cross-species genotype models.

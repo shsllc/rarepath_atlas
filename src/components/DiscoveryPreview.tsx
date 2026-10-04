@@ -86,6 +86,19 @@ export function Study({ s }: { s: StudyView }) {
         </a>
       </span>
       <span className="mt-1 block text-[11px] font-semibold text-ink">{s.guidance}</span>
+      <span className="mt-1 flex flex-wrap items-center gap-1 text-[11px]">
+        <span className="text-muted">Registered in:</span>
+        {s.registrations.map((r) => (
+          <a key={r.registry + r.id} href={r.url} target="_blank" rel="noreferrer" className="rounded border border-line px-1.5 py-0.5 font-mono hover:border-brand">
+            {r.registry} · {r.id}
+          </a>
+        ))}
+        {s.possible_duplicates && s.possible_duplicates.length > 0 && (
+          <span title="Looks like another record (same title, or same sponsor and start date) but shares no registry identifier, so it is kept separate." className="rounded border-2 border-dotted border-unknown px-1.5 py-0.5 font-bold text-unknown">
+            ? POSSIBLE DUPLICATE of {s.possible_duplicates.map((k) => k.replace(/^study:(nct|isrctn|eudract):/, "")).join(", ")}
+          </span>
+        )}
+      </span>
       {s.status_category === "caution" && s.why_stopped && <span className="mt-0.5 block text-[11px] text-contradictory">Reason stated in the registry: &ldquo;{s.why_stopped}&rdquo;</span>}
       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted">
         <span className="font-mono">{s.nct}</span>
@@ -397,7 +410,28 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         </Section>
       </div>
 
-      <Section title="Clinical research" note="ClinicalTrials.gov studies listing this condition, grouped by status. Completed, terminated, withdrawn and recruiting studies are never treated as equivalent, and a completed study or posted results do not mean the study succeeded.">
+      <Section
+        title={p.clinical.registries.length > 1 ? "Global clinical research" : "Clinical research"}
+        note="Registered studies listing this condition, grouped by status. Completed, terminated, withdrawn and recruiting studies are never treated as equivalent, and a completed study or posted results do not mean the study succeeded. The same trial in several registries is shown once, with every registration."
+      >
+        {p.clinical.registries.length > 0 && (
+          <div className="mb-3 rounded-lg bg-canvas p-3 text-[11px]">
+            <p className="font-semibold text-ink">Registry coverage</p>
+            <ul className="mt-1 flex flex-wrap gap-2">
+              {p.clinical.registries.map((r) => (
+                <li key={r.registry} className="rounded border border-line bg-white px-2 py-0.5">
+                  {r.registry}: <strong>{r.trials}</strong> shown{r.total_reported ? ` of ${n(r.total_reported)} registered` : ""}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1 text-muted">
+              {p.clinical.not_on_ctgov} of {p.clinical.studies.length} trials shown are not in ClinicalTrials.gov · {p.clinical.countries.length} countries
+              {p.clinical.possible_duplicates > 0 && ` · ${p.clinical.possible_duplicates} flagged as possible duplicates (kept separate: no shared registry id)`}
+            </p>
+            {p.clinical.countries.length > 0 && <p className="mt-1 text-muted">Countries: {p.clinical.countries.slice(0, 30).join(", ")}</p>}
+            {p.clinical.registries.some((r) => r.registry === "EU Clinical Trials Register") && <p className="mt-1 text-muted">EU Clinical Trials Register statuses are shown per country as last reported to that (legacy) register and may be out of date. Source: EU Clinical Trials Register (EMA).</p>}
+          </div>
+        )}
         {p.clinical.status_counts.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2 text-[11px]">
             {p.clinical.status_counts.map((x) => (
@@ -405,10 +439,10 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
                 {x.label}: <strong>{x.count}</strong>
               </span>
             ))}
-            <span className="text-muted">among {p.clinical.studies.length} retrieved of {n(p.clinical.total)} registered studies</span>
+            <span className="text-muted">among {p.clinical.studies.length} trials retrieved</span>
           </div>
         )}
-        {p.clinical.studies.length === 0 && <Empty>No ClinicalTrials.gov studies returned for this condition.</Empty>}
+        {p.clinical.studies.length === 0 && <Empty>No registered studies returned for this condition.</Empty>}
         {(
           [
             ["active", "Active / recruiting: potential current research leads"],

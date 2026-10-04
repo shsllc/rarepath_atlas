@@ -34,6 +34,8 @@ export const PROVIDER_NAME: Record<ProviderId, string> = {
   clingen: "ClinGen",
   clinvar: "ClinVar",
   alliance: "Alliance",
+  isrctn: "ISRCTN",
+  euctr: "EU CTR",
 };
 
 export type PaperView = {
@@ -57,6 +59,8 @@ export type StudyView = Omit<StudyRecord, "kind" | "key" | "ids" | "provenance" 
   nct: string;
   url: string;
   secondary_ids: string[];
+  /** Every registry record merged into this trial (primary registry first). */
+  registrations: { registry: string; id: string; url: string }[];
   /** What this status family means for a research lead (never "enroll", never "success"). */
   guidance: string;
   officials: { name: string; role: string; affiliation?: string }[];
@@ -88,6 +92,11 @@ export type DiscoveryPreview = {
     infrastructure: StudyView[];
     shared_endpoints: SharedEndpointView[];
     status_counts: { status: string; label: string; count: number }[];
+    /** Registries that contributed records, with how many trials each contributed (a merged trial counts for each). */
+    registries: { registry: string; trials: number; total_reported?: number }[];
+    countries: string[];
+    possible_duplicates: number;
+    not_on_ctgov: number;
   };
   genetics: { gene_total: number; genes: GeneView[]; variant_total: number; variants: { label: string; gene?: string; statement: string; url: string }[]; gwas_total: number; gwas: { label: string; statement: string; url: string }[] };
   assets: { dataset_total: number; datasets: { label: string; doi: string; url: string; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] }[]; reuse_leads: StudyView[] };
@@ -125,6 +134,9 @@ export type DiscoveryOutcome = { kind: "preview"; preview: DiscoveryPreview } | 
 export interface DiscoveryService {
   preview(query: string): Promise<DiscoveryOutcome>;
 }
+
+/** Registry display names for trial providers. */
+const REGISTRY_NAME: Partial<Record<ProviderId, string>> = { clinicaltrials: "ClinicalTrials.gov", isrctn: "ISRCTN", euctr: "EU Clinical Trials Register" };
 
 const PREDICATE: Partial<Record<LinkRelation, { p: Predicate; reverse?: boolean }>> = {
   associated_with: { p: "associated_with" },
@@ -255,9 +267,12 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
     const { kind: _k, key, ids, provenance: _p, review_status: _r, ...rest } = s;
     return {
       ...rest,
-      nct: ids.nct!,
-      url: `https://clinicaltrials.gov/study/${ids.nct}`,
-      secondary_ids: [ids.eudract && `EudraCT ${ids.eudract}`, ids.ctis && `CTIS ${ids.ctis}`, ids.utn && `UTN ${ids.utn}`].filter((x): x is string => !!x),
+      nct: ids.nct ?? s.provenance[0].source_id,
+      url: ids.nct ? `https://clinicaltrials.gov/study/${ids.nct}` : s.provenance[0].url,
+      secondary_ids: [ids.eudract && `EudraCT ${ids.eudract}`, ids.ctis && `EU CT ${ids.ctis}`, ids.utn && `UTN ${ids.utn}`, ids.isrctn && ids.isrctn, ids.drks && ids.drks, ids.anzctr && ids.anzctr, ids.ctri && ids.ctri, ids.jrct && ids.jrct, ids.chictr && ids.chictr].filter((x): x is string => !!x),
+      registrations: s.provenance
+        .filter((p, i, a) => a.findIndex((q) => q.source_id === p.source_id) === i)
+        .map((p) => ({ registry: REGISTRY_NAME[p.provider] ?? PROVIDER_NAME[p.provider], id: p.source_id, url: p.url })),
       guidance: CATEGORY_GUIDANCE[s.status_category],
       officials: officials(key),
       publications: pubsFor(key),
@@ -382,6 +397,16 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       infrastructure,
       shared_endpoints: sharedEndpoints,
       status_counts: [...statusCounts.entries()].map(([status, v]) => ({ status, ...v })).sort((a, b) => b.count - a.count),
+      registries: (["ClinicalTrials.gov", "ISRCTN", "EU Clinical Trials Register"] as const)
+        .map((registry) => ({
+          registry,
+          trials: studies.filter((x) => x.registrations.some((r) => r.registry === registry)).length,
+          total_reported: registry === "ClinicalTrials.gov" ? g.totals.studies : registry === "ISRCTN" ? g.totals.isrctn_trials : undefined,
+        }))
+        .filter((r) => r.trials > 0),
+      countries: [...new Set(studies.flatMap((x) => x.countries))].sort(),
+      possible_duplicates: studies.filter((x) => x.possible_duplicates?.length).length,
+      not_on_ctgov: studies.filter((x) => !x.registrations.some((r) => r.registry === "ClinicalTrials.gov")).length,
     },
     genetics: {
       gene_total: g.totals.genes ?? 0,

@@ -110,10 +110,19 @@ export function normalizeStudy(ps: any, extras: { hasResults?: boolean; document
   const sc = ps.sponsorCollaboratorsModule ?? {};
   const rp = sc.responsibleParty;
   const ids: StudyRecord["ids"] = { nct };
+  const orgStudyId: string | undefined = ps.identificationModule?.orgStudyIdInfo?.id;
+  if (orgStudyId && sc.leadSponsor?.name) ids.sponsor_protocol = `${normName(sc.leadSponsor.name)}|${orgStudyId}`;
   for (const x of ps.identificationModule?.secondaryIdInfos ?? []) {
     if (x.type === "EUDRACT_NUMBER") ids.eudract = x.id;
     if (x.type === "CTIS") ids.ctis = x.id;
     if (/^U\d{4}-\d{4}-\d{4}$/.test(x.id)) ids.utn = x.id;
+    if (/^ISRCTN\d{8}$/i.test(x.id)) ids.isrctn = x.id.toUpperCase();
+    if (/^DRKS\d{8}$/i.test(x.id)) ids.drks = x.id.toUpperCase();
+    if (/^ACTRN\d{14}$/i.test(x.id)) ids.anzctr = x.id.toUpperCase();
+    if (/^CTRI\/\d{4}\/\d+\/\d+$/i.test(x.id)) ids.ctri = x.id.toUpperCase();
+    if (/^jRCT\w+$/.test(x.id)) ids.jrct = x.id;
+    if (/^ChiCTR[\w-]+$/i.test(x.id)) ids.chictr = x.id;
+    if (/^\d{4}-\d{6}-\d{2}-\d{2}$/.test(x.id) && x.type !== "EUDRACT_NUMBER") ids.ctis = x.id;
   }
   const outcomes: StudyRecord["outcomes"] = [
     ...(ps.outcomesModule?.primaryOutcomes ?? []).map((o: any) => ({ role: "primary" as const, measure: o.measure, time_frame: o.timeFrame, description: o.description?.slice(0, 400) })),
@@ -130,6 +139,7 @@ export function normalizeStudy(ps: any, extras: { hasResults?: boolean; document
   const study: StudyRecord = {
     kind: "study",
     key,
+    primary_registry: "ClinicalTrials.gov",
     label: ps.identificationModule.briefTitle,
     official_title: ps.identificationModule.officialTitle,
     ids,

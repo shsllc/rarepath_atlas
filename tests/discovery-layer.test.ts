@@ -37,9 +37,9 @@ async function preview(fail: Failures = {}, q = "Dravet syndrome"): Promise<Disc
 }
 
 describe("provider contract", () => {
-  it("fourteen live providers, each declaring role, mode and data types", () => {
+  it("sixteen live providers, each declaring role, mode and data types", () => {
     const ps = liveProviders();
-    expect(ps.map((p) => p.meta.id).sort()).toEqual(["alliance", "clingen", "clinicaltrials", "clinvar", "crossref", "datacite", "europepmc", "gwas", "hpo", "monarch", "openalex", "opentargets", "orphadata", "trialpubs"]);
+    expect(ps.map((p) => p.meta.id).sort()).toEqual(["alliance", "clingen", "clinicaltrials", "clinvar", "crossref", "datacite", "euctr", "europepmc", "gwas", "hpo", "isrctn", "monarch", "openalex", "opentargets", "orphadata", "trialpubs"]);
     for (const p of ps) {
       expect(p.meta.mode).toBe("live");
       expect(["discovery", "metadata"]).toContain(p.meta.role);
@@ -50,7 +50,7 @@ describe("provider contract", () => {
 
   it("the sources view lists live and offline sources honestly", () => {
     const s = researchSources();
-    expect(s.filter((x) => x.mode === "live")).toHaveLength(14);
+    expect(s.filter((x) => x.mode === "live")).toHaveLength(16);
     expect(s.filter((x) => x.mode === "not_integrated").map((x) => x.name)).toEqual(expect.arrayContaining(["WHO ICTRP", "EMA CTIS", "DisGeNET"]));
     expect(s.some((x) => x.mode === "offline" && /PubMed/.test(x.name))).toBe(true);
     expect(s.filter((x) => x.mode === "live").every((x) => !x.uses.includes("reviewed_ingestion"))).toBe(true);
@@ -155,9 +155,10 @@ describe("scientific-integrity boundaries", () => {
     expect(by.NCT00000002.status_label).toBe("Terminated (stopped early)");
     expect(by.NCT00000003.status_label).toBe("Withdrawn (stopped before enrolling)");
     expect(by.NCT00000004.status).toBe("RECRUITING");
-    expect(new Set(p.clinical.status_counts.map((s) => s.status)).size).toBe(5);
+    // Five ClinicalTrials.gov statuses plus ISRCTN / EU CTR statuses, each kept distinct.
+    expect(p.clinical.status_counts.map((s) => s.status)).toEqual(expect.arrayContaining(["COMPLETED", "TERMINATED", "WITHDRAWN", "RECRUITING", "ACTIVE_NOT_RECRUITING"]));
     // Reuse leads keep their status visible; the terminated registry is listed last with its caution.
-    expect(p.assets.reuse_leads.map((s) => [s.nct, s.status])).toEqual([["NCT00000005", "ACTIVE_NOT_RECRUITING"], ["NCT00000007", "TERMINATED"]]);
+    expect(p.assets.reuse_leads.map((s) => [s.nct, s.status])).toEqual([["NCT00000005", "ACTIVE_NOT_RECRUITING"], ["ISRCTN22222222", "RECRUITING"], ["NCT00000007", "TERMINATED"]]);
   });
 
   it("GWAS associations stay explicitly non-causal", async () => {
@@ -206,7 +207,7 @@ describe("failure isolation and caching", () => {
   });
 
   it("every provider down → graceful not-found; reviewed CDD search unaffected", async () => {
-    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down", monarch: "down", orphadata: "down", hpo: "down", clingen: "down", clinvar: "down", alliance: "down" });
+    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down", monarch: "down", orphadata: "down", hpo: "down", clingen: "down", clinvar: "down", alliance: "down", isrctn: "down", euctr: "down" });
     const search = new GraphSearchService(g, finder, svc);
     const r = await search.search("Dravet syndrome");
     expect(r.found).toBe(false);

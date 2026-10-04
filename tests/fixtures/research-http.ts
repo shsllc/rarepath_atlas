@@ -5,7 +5,7 @@
  */
 import { vi } from "vitest";
 
-export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance", "down" | "http500" | "timeout">>;
+export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr", "down" | "http500" | "timeout">>;
 // Note: trial-publication links use the Europe PMC host, so a europepmc failure also fails them.
 
 const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
@@ -160,10 +160,83 @@ const ALLIANCE_ORTH = { total: 2, results: [
 ] };
 const ALLIANCE_MODELS = (gene: string) => ({ total: 1, results: gene.startsWith("MGI") ? [{ model: { primaryExternalId: "MGI:4950073", name: { displayText: "Scn1a<tm1Kea>/Scn1a<+>" } }, diseaseModels: [{ associationType: "IS_MODEL_OF", diseaseModel: "Dravet syndrome" }] }] : [{ model: { primaryExternalId: "ZFIN:ZDB-FISH-161012-5", name: "scn1lab<sup>s552/s552</sup>" }, diseaseModels: [{ associationType: "IS_MODEL_OF", diseaseModel: "Dravet syndrome" }] }] });
 
+// ---- International registries (shapes of the ISRCTN XML API and the EU CTR summary download) ----
+export const ISRCTN_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<allTrials totalCount="3" xmlns="http://www.67bricks.com/isrctn">
+<fullTrial>
+  <trial lastUpdated="2025-01-10T00:00:00Z" version="3" isPublished="true">
+    <isrctn dateAssigned="2020-01-01T00:00:00Z">11111111</isrctn>
+    <trialDescription><title>Study NCT00000001</title><scientificTitle>Official title of NCT00000001</scientificTitle></trialDescription>
+    <externalRefs><doi>10.1186/ISRCTN11111111</doi><eudraCTNumber>2019-000123-45</eudraCTNumber><clinicalTrialsGovNumber>NCT00000001</clinicalTrialsGovNumber><protocolSerialNumber>EX-001</protocolSerialNumber></externalRefs>
+    <trialDesign><primaryStudyDesign>Interventional</primaryStudyDesign><interventionalTrialDesign><allocation>Randomized controlled trial</allocation><masking>Blinded (masking used)</masking><purposes><purpose>Treatment</purpose></purposes></interventionalTrialDesign><secondaryStudyDesign>Randomised controlled trial</secondaryStudyDesign><overallEndDate>2023-06-30T00:00:00.000Z</overallEndDate></trialDesign>
+    <conditions><condition><description>Dravet syndrome</description></condition></conditions>
+    <interventions><intervention><interventionType>Drug</interventionType><drugNames>Investigational product</drugNames></intervention></interventions>
+    <primaryOutcome>Change in convulsive seizure frequency</primaryOutcome>
+    <participants><recruitmentCountries><country>United Kingdom</country></recruitmentCountries><trialCentres><trialCentre id="c1"><name>Great Ormond Street Hospital</name><city>London</city><country>England</country></trialCentre></trialCentres><targetEnrolment>40</targetEnrolment><totalFinalEnrolment>38</totalFinalEnrolment><ageRange>Child</ageRange><gender>All</gender><recruitmentStart>2020-01-01T00:00:00.000Z</recruitmentStart><recruitmentEnd>2022-12-31T00:00:00.000Z</recruitmentEnd></participants>
+    <parties><sponsorId>s1</sponsorId><funderId>f1</funderId><contactId>k1</contactId></parties>
+    <outputs><output><outputType>Results article</outputType></output></outputs>
+  </trial>
+  <sponsor id="s1"><organisation>Example Sponsor</organisation><rorId>https://ror.org/000000009</rorId></sponsor>
+  <funder id="f1"><name>Example Funder</name></funder>
+  <contact id="k1"><contactTypes><contactType>Principal investigator</contactType></contactTypes><forename>Ada</forename><surname>Lovelace</surname><orcid>https://orcid.org/0000-0002-0000-0001</orcid><contactDetails><email>ada@example.org</email><telephone>+44 0000</telephone></contactDetails></contact>
+</fullTrial>
+<fullTrial>
+  <trial lastUpdated="2026-08-01T00:00:00Z" version="1" isPublished="true">
+    <isrctn dateAssigned="2026-01-01T00:00:00Z">22222222</isrctn>
+    <trialDescription><title>UK natural history registry of Dravet syndrome</title></trialDescription>
+    <externalRefs><clinicalTrialsGovNumber/><eudraCTNumber/><protocolSerialNumber>NH-2</protocolSerialNumber></externalRefs>
+    <trialDesign><primaryStudyDesign>Observational</primaryStudyDesign><secondaryStudyDesign>Cohort study</secondaryStudyDesign><overallEndDate>2031-01-01T00:00:00.000Z</overallEndDate></trialDesign>
+    <conditions><condition><description>Dravet syndrome</description></condition></conditions>
+    <primaryOutcome>Seizure burden measured with a seizure diary over 5 years</primaryOutcome>
+    <participants><recruitmentCountries><country>United Kingdom</country><country>Ireland</country></recruitmentCountries><targetEnrolment>300</targetEnrolment><totalFinalEnrolment>0</totalFinalEnrolment><gender>All</gender><recruitmentStart>2026-01-01T00:00:00.000Z</recruitmentStart><recruitmentEnd>2029-12-31T00:00:00.000Z</recruitmentEnd></participants>
+    <parties><sponsorId>s2</sponsorId><contactId>k2</contactId></parties>
+  </trial>
+  <sponsor id="s2"><organisation>University of Example</organisation></sponsor>
+  <contact id="k2"><contactTypes><contactType>Principal investigator</contactType></contactTypes><forename>No</forename><surname>Orcid</surname><contactDetails><email>noorcid@example.org</email></contactDetails></contact>
+</fullTrial>
+<fullTrial>
+  <trial lastUpdated="2024-01-01T00:00:00Z" version="1" isPublished="true">
+    <isrctn>33333333</isrctn>
+    <trialDescription><title>Study NCT00000004</title></trialDescription>
+    <externalRefs><clinicalTrialsGovNumber/><eudraCTNumber/></externalRefs>
+    <trialDesign><primaryStudyDesign>Interventional</primaryStudyDesign><overallEndDate>2020-01-01T00:00:00.000Z</overallEndDate></trialDesign>
+    <recruitmentStatusOverride>Stopped</recruitmentStatusOverride>
+    <participants><recruitmentCountries><country>Germany</country></recruitmentCountries></participants>
+  </trial>
+</fullTrial>
+</allTrials>`;
+
+export const EUCTR_TXT = `
+
+EudraCT Number:          2019-000123-45
+Sponsor Protocol Number: EX-001
+Sponsor Name:            Example Sponsor
+Full Title:              Official title of NCT00000001
+Start Date:              2020-02-01
+Medical condition:       Dravet syndrome
+Disease:                 Version: 21.1, SOC Term: 10010331 - Congenital, familial and genetic disorders, Classification Code: 10077260, Term: Dravet syndrome, Level: PT
+Population Age:          Children, Adolescents
+Gender:                  Male, Female
+Trial protocol:          FR(Completed) DE(Completed)
+Link:                    https://www.clinicaltrialsregister.eu/ctr-search/search?query=eudract_number:2019-000123-45
+
+EudraCT Number:          2016-000999-11
+Sponsor Protocol Number: STOP-9
+Sponsor Name:            Another Sponsor
+Full Title:              An EU-only trial in Dravet syndrome
+Start Date:              2016-05-01
+Medical condition:       Dravet syndrome
+Disease:                 Version: 19.0, Term: Dravet syndrome, Level: PT
+Population Age:          Children
+Gender:                  Male, Female
+Trial protocol:          IT(Prematurely Ended) ES(Completed)
+Link:                    https://www.clinicaltrialsregister.eu/ctr-search/search?query=eudract_number:2016-000999-11
+`;
+
 export function researchRouter(fail: Failures = {}) {
   return vi.fn(async (url: string, init?: RequestInit): Promise<Response> => {
     const host = new URL(url).host;
-    const provider = host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : host.includes("monarchinitiative") ? "monarch" : host.includes("orphadata") ? "orphadata" : host.includes("ontology.jax.org") ? "hpo" : host.includes("clinicalgenome") ? "clingen" : host.includes("eutils.ncbi") ? "clinvar" : host.includes("alliancegenome") ? "alliance" : null;
+    const provider = host.includes("clinicaltrialsregister.eu") ? "euctr" : host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : host.includes("monarchinitiative") ? "monarch" : host.includes("orphadata") ? "orphadata" : host.includes("ontology.jax.org") ? "hpo" : host.includes("clinicalgenome") ? "clingen" : host.includes("eutils.ncbi") ? "clinvar" : host.includes("alliancegenome") ? "alliance" : host.includes("isrctn.com") ? "isrctn" : host.includes("clinicaltrialsregister.eu") ? "euctr" : null;
     if (!provider) throw new Error(`unexpected URL ${url}`);
     const f = fail[provider];
     if (f === "down") throw new TypeError("fetch failed");
@@ -205,6 +278,10 @@ export function researchRouter(fail: Failures = {}) {
         return json(url.includes("esearch") ? CLINVAR_SEARCH : CLINVAR_SUMMARY);
       case "alliance":
         return json(url.includes("/orthologs") ? ALLIANCE_ORTH : ALLIANCE_MODELS(decodeURIComponent(new URL(url).pathname.split("/")[3] ?? "")));
+      case "isrctn":
+        return new Response(ISRCTN_XML, { status: 200, headers: { "content-type": "application/xml" } });
+      case "euctr":
+        return new Response(EUCTR_TXT, { status: 200, headers: { "content-type": "application/octet-stream" } });
       case "datacite":
         return json(DATACITE);
     }

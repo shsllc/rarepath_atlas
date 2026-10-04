@@ -117,6 +117,8 @@ RarePath has two evidence tiers:
 | GWAS Catalog (REST v2) | Trait associations, variants, mapped genes, studies | Live | Discovery |
 | ClinicalTrials.gov (API v2) | Studies grouped by explicit status (active / completed / caution), design, typed interventions, outcome measures with time frames, sponsors vs collaborators vs listed officials, age/sex, sites, results-posted flag, protocol/SAP documents, RESULT/DERIVED/BACKGROUND references, natural-history/registry/cohort/biobank flags, shared-endpoint leads | Live (offline for the reviewed records) | Discovery / reviewed |
 | Europe PMC accession index | Papers that mention a registered NCT id (trial → paper leads) | Live | Discovery |
+| ISRCTN registry (official API; CC BY / CC0) | UK and international trials with NCT / EudraCT / IRAS / sponsor-protocol cross-references, design, outcomes, sponsors and funders (ROR), countries and centres | Live | Discovery |
+| EU Clinical Trials Register (EudraCT, EMA) | Legacy EU/EEA trials with per-country status, sponsor protocol, MedDRA condition (official summary download, one page per search, acknowledged) | Live, cached | Discovery |
 | Monarch Initiative (v3) | Disease identity and cross-references, curated causal genes with knowledge source, cross-species disease models | Live | Discovery |
 | Orphadata (Orphanet API, CC BY 4.0) | ORPHA codes and validated mappings, synonyms, HPO phenotypes with frequency (incl. excluded), gene associations by Orphanet type, epidemiology, natural history | Live | Discovery |
 | HPO annotations (JAX API) | Disease → HPO terms with frequency, onset, sex, references | Live | Discovery |
@@ -129,7 +131,7 @@ RarePath has two evidence tiers:
 | DataCite | DOI-registered datasets and collections, creators (ORCID), ROR affiliations, funders | Live | Discovery |
 | PubMed / PMC (E-utilities), MONDO/HPO (OLS4), HGNC, NIH RePORTER, patient-org sites | Sources of the reviewed CDKL5 journey | Offline | Reviewed |
 | DisGeNET | Gene-disease associations | Not integrated: requires a registered account and licence tier. | — |
-| WHO ICTRP, EMA CTIS | International / EU trial registrations | Not integrated: ICTRP's web service needs a WHO subscription; CTIS has no documented public API. Neither portal is scraped. EudraCT/CTIS/UTN ids are kept on trial records for future deduplication. | — |
+| WHO ICTRP, EMA CTIS, DDrare, other national registries | International trial registrations | Not integrated. ICTRP is available with approval (fee on request, no commercial use) and its crawling service is unavailable. CTIS's API is undocumented. DDrare requires permission. jRCT prohibits automated download, and ANZCTR blocks automated clients. Nothing is scraped. See [docs/global-trial-strategy.md](docs/global-trial-strategy.md). | — |
 
 - **Deduplication:**
   - Records merge only on stable identifiers: DOI, PMID, PMCID, MONDO/EFO, Ensembl/HGNC, ORCID, ROR, NCT ID or dataset DOI.

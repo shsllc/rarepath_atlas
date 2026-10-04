@@ -40,9 +40,10 @@ describe("trial status", () => {
 
   it("studies are grouped by status family, never flattened into assets", async () => {
     const p = await preview();
-    expect(p.clinical.groups.active.map((s) => s.nct).sort()).toEqual(["NCT00000004", "NCT00000005"]);
-    expect(p.clinical.groups.completed.map((s) => s.nct).sort()).toEqual(["NCT00000001", "NCT00000006"]);
-    expect(p.clinical.groups.caution.map((s) => s.nct).sort()).toEqual(["NCT00000002", "NCT00000003", "NCT00000007"]);
+    const ct = (xs: { nct: string }[]) => xs.map((s) => s.nct).filter((x) => x.startsWith("NCT")).sort();
+    expect(ct(p.clinical.groups.active)).toEqual(["NCT00000004", "NCT00000005"]);
+    expect(ct(p.clinical.groups.completed)).toEqual(["NCT00000001", "NCT00000006"]);
+    expect(ct(p.clinical.groups.caution)).toEqual(["NCT00000002", "NCT00000003", "NCT00000007"]);
   });
 
   it("terminated / withdrawn studies always carry a caution and their stated reason", async () => {
@@ -94,7 +95,7 @@ describe("design, outcomes and infrastructure", () => {
     const outcomes = p.records.filter((r): r is Extract<ResearchRecord, { kind: "outcome_measure" }> => r.kind === "outcome_measure");
     expect(outcomes.length).toBeGreaterThan(0);
     for (const o of outcomes) {
-      expect(o.provenance.every((x) => x.provider === "clinicaltrials" && /_outcome$/.test(x.native_type))).toBe(true);
+      expect(o.provenance.every((x) => (x.provider === "clinicaltrials" || x.provider === "isrctn") && /_outcome$/.test(x.native_type))).toBe(true);
       expect(Object.keys(o)).not.toContain("biomarker");
     }
     for (const l of p.links.filter((x) => x.relation === "uses_outcome_measure")) expect(l.statement).toMatch(/registers ".+" as a (primary|secondary|other) outcome measure/);
@@ -132,7 +133,7 @@ describe("deduplication and linking", () => {
   it("trial → paper links require a stable identifier and keep the registry's reference type", async () => {
     const p = await preview();
     const s = byNct(p).NCT00000001;
-    expect(s.secondary_ids).toEqual(["EudraCT 2019-000123-45"]);
+    expect(s.secondary_ids).toEqual(["EudraCT 2019-000123-45", "ISRCTN11111111"]);
     const result = s.publications.find((x) => x.pmid === "555")!;
     expect(result.relation).toBe("trial_publication");
     expect(s.publications.find((x) => x.pmid === "556")!.relation).toBe("trial_background_reference");

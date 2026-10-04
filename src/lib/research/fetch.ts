@@ -68,3 +68,16 @@ export const normName = (s: string) =>
 
 /** The routed fetch, for clients that take a FetchLike (Open Targets, GWAS). */
 export const researchFetch: FetchLike = (u, i) => fetchImpl(u, i);
+
+/** Text responses (XML / plain text registries) through the same routed fetch, timeout and error mapping. */
+export async function fetchText(provider: string, url: string, accept = "text/plain", timeoutMs = 5_000): Promise<string> {
+  let res: Response;
+  try {
+    res = await fetchImpl(url, { headers: { Accept: accept, "User-Agent": userAgent() }, signal: AbortSignal.timeout(timeoutMs) });
+  } catch (e) {
+    throw new ProviderError(provider, (e as Error)?.name === "TimeoutError" ? "timeout" : "network");
+  }
+  if (res.status === 429) throw new ProviderError(provider, "rate_limited");
+  if (!res.ok) throw new ProviderError(provider, "http", String(res.status));
+  return res.text();
+}

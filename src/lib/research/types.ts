@@ -8,7 +8,7 @@
  * only adds provenance; it never makes anything "reviewed".
  */
 
-export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance";
+export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr";
 
 /** Stable identifier systems used for reconciliation (lower-case keys). */
 export type IdSystem =
@@ -39,7 +39,14 @@ export type IdSystem =
   | "orgname"
   | "gard"
   | "vcv"
-  | "model";
+  | "model"
+  | "isrctn"
+  | "drks"
+  | "anzctr"
+  | "ctri"
+  | "jrct"
+  | "chictr"
+  | "sponsor_protocol";
 
 export interface Provenance {
   provider: ProviderId;
@@ -106,6 +113,10 @@ export type StudyInfrastructure = "natural_history" | "registry" | "observationa
 
 export type StudyRecord = RecordBase & {
   kind: "study";
+  /** Registry the record was retrieved from (e.g. "ClinicalTrials.gov", "ISRCTN"). */
+  primary_registry: string;
+  /** Keys of other study records that look alike but share no identifier: kept separate, flagged. */
+  possible_duplicates?: string[];
   /** Raw ClinicalTrials.gov overallStatus enum, never collapsed. */
   status: string;
   status_label: string;
