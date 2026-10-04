@@ -65,6 +65,7 @@ export const HYPOTHESIS = {
     "Design the research plan",
   ],
   rarepath: ["Ranked research connection", "Reusable infrastructure", "Relevant investigators", "Counter-evidence", "Validation questions", "Research Action Brief"],
+  question: "Could RarePath reduce the discovery and planning portion by 10× when scaled across more diseases and users?",
   statement:
     "RarePath could contribute toward a 10× reduction in the discovery and planning portion of reaching this milestone, if reuse eliminates duplicated discovery and setup work.",
   assumptions: [

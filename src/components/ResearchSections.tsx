@@ -24,6 +24,37 @@ const BAND_STYLE: Record<RankedConnection["band"], string> = {
   Limited: "bg-canvas text-muted border-line",
 };
 
+export function RankingIntro() {
+  return (
+    <p className="text-sm font-medium text-ink">
+        <span className="mr-2 rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">Research connection strength</span>
+        RarePath ranks opportunities to investigate, not biological equivalence.
+    </p>
+  );
+}
+
+export function RankingFormula() {
+  return (
+      <details className="rounded-2xl border border-line bg-white px-4 py-3 text-sm">
+        <summary className="cursor-pointer font-medium">How this ranking is calculated</summary>
+        <ul className="mt-2 space-y-1 text-muted">
+          {Object.values(FACTOR_WEIGHTS).map((w) => (
+            <li key={w.label}>
+              <strong className="text-ink">+{w.points}</strong> {w.label}
+            </li>
+          ))}
+          <li>
+            Bands: Strongest ≥ {BAND_THRESHOLDS.strongest} points; Moderate ≥ {BAND_THRESHOLDS.moderate}; otherwise Limited.
+          </li>
+          <li>Only analyst-reviewed, sourced relationships count. AI-only extractions, inferred and contradicted links add no points. Counterweights are always listed.</li>
+        </ul>
+        <p className="mt-2 text-xs text-muted">
+          This ranks research paths worth investigating. It is not a measure of biological, clinical or treatment similarity.
+        </p>
+      </details>
+  );
+}
+
 /** Graph analytics: transparent research-connection ranking + research hubs. */
 export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConnection[]; hubs: ResearchHub[]; label: (id: string) => string; open: Open }) {
   const max = Math.max(...ranked.map((r) => r.score), 1);
@@ -40,10 +71,7 @@ export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConn
         </div>
       )}
 
-      <p className="text-sm font-medium text-ink">
-        <span className="mr-2 rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">Research connection strength</span>
-        RarePath ranks opportunities to investigate, not biological equivalence.
-      </p>
+      <RankingIntro />
 
       {ranked[0] && <TopConnection r={ranked[0]} label={label} open={open} />}
 
@@ -102,34 +130,18 @@ export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConn
         })}
       </ol>
 
-      <details className="rounded-2xl border border-line bg-white px-4 py-3 text-sm">
-        <summary className="cursor-pointer font-medium">How this ranking is calculated</summary>
-        <ul className="mt-2 space-y-1 text-muted">
-          {Object.values(FACTOR_WEIGHTS).map((w) => (
-            <li key={w.label}>
-              <strong className="text-ink">+{w.points}</strong> {w.label}
-            </li>
-          ))}
-          <li>
-            Bands: Strongest ≥ {BAND_THRESHOLDS.strongest} points; Moderate ≥ {BAND_THRESHOLDS.moderate}; otherwise Limited.
-          </li>
-          <li>Only analyst-reviewed, sourced relationships count. AI-only extractions, inferred and contradicted links add no points. Counterweights are always listed.</li>
-        </ul>
-        <p className="mt-2 text-xs text-muted">
-          This ranks research paths worth investigating. It is not a measure of biological, clinical or treatment similarity.
-        </p>
-      </details>
+      <RankingFormula />
     </div>
   );
 }
 
 /** The #1 connection, explained in two columns. The score is deliberately secondary to the reasons. */
-function TopConnection({ r, label, open }: { r: RankedConnection; label: (id: string) => string; open: Open }) {
+export function TopConnection({ r, label, open, rank = 1 }: { r: RankedConnection; label: (id: string) => string; open: Open; rank?: number }) {
   return (
-    <article aria-label={`Why ${label(r.disease_id)} ranked number 1`} className="overflow-hidden rounded-3xl border border-line bg-white shadow-md shadow-brand/10">
+    <article aria-label={`Why ${label(r.disease_id)} ranked number ${rank}`} className="overflow-hidden rounded-3xl border border-line bg-white shadow-md shadow-brand/10">
       <header className="flex flex-wrap items-end justify-between gap-2 border-b border-line px-5 py-4 sm:px-6">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted">Why this ranked #1</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted">Why this ranked #{rank}</p>
           <h3 className="mt-0.5 text-2xl font-semibold tracking-tight">{label(r.disease_id)}</h3>
         </div>
         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${BAND_STYLE[r.band]}`}>

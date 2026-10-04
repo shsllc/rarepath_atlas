@@ -885,3 +885,58 @@ export const ACTION_BRIEF = {
     community_edges: ["org-ifcr", "org-loulou", "ifcr-informed-sa"],
   },
 };
+
+// ---------------------------------------------------------------------------
+// Reusable-asset catalogue. Status = evidence for REUSE, never validity. Every line cites edge keys.
+export const ASSET_CATALOG = [
+  {
+    asset_id: "asset:nhs-infrastructure",
+    category: "shared_infrastructure",
+    status: "supported",
+    strongest: true,
+    what: "Multi-site Rett/Rett-related natural-history study and database (NCT02738281; RDCRN 5211; NIH U54HD061222)",
+    why_it_matters: "CDD participants were already enrolled, and the consortium's experience informed a CDD-specific severity assessment.",
+    supported: { text: "Supported: CDD enrolment and the study's contribution to the CDD severity assessment are both documented.", edges: ["cdd-in-nhs", "nhs-informed-sa"] },
+    must_validate: { text: "Validate: current access to the database; access terms are not stated in any retrieved source.", edges: ["nhs-infra"] },
+  },
+  {
+    asset_id: "asset:cdd-severity",
+    category: "outcome_measure",
+    status: "supported",
+    strongest: false,
+    what: "CDD severity assessment: 51 items covering epilepsy, motor, cognition/behaviour/vision/speech and autonomic function (PMID 31147226)",
+    why_it_matters: "A CDD-specific instrument that grew out of the shared infrastructure.",
+    supported: { text: "Supported: the instrument exists and was built from the IFCR and Natural History Study consortia's experience.", edges: ["sa-cdd", "nhs-informed-sa"] },
+    must_validate: { text: "Validate: its authors state that refinement through ongoing validation is required.", edges: ["sa-cdd"] },
+  },
+  {
+    asset_id: "asset:rtt-css",
+    category: "outcome_measure",
+    status: "potentially_adaptable",
+    strongest: false,
+    what: "RTT Clinical Severity Scale and CGI-Severity, given to CDD participants (median CSS 29)",
+    why_it_matters: "Allows direct comparison across disorders in the shared study.",
+    supported: { text: "Supported: the scale was administered to all study participants, including CDD.", edges: ["css-cdd"] },
+    must_validate: { text: "Not established: validity in CDD. Its authors note CDD's more frequent seizures may raise scores.", edges: ["css-cdd"] },
+  },
+  {
+    asset_id: "asset:biobank",
+    category: "registry_biobank",
+    status: "discovery_lead",
+    strongest: false,
+    what: "Rett and related disorders biospecimen collection (NCT02705677; DNA, RNA, plasma, cell lines)",
+    why_it_matters: "The protocol lists CDKL5 and was motivated by the lack of biomarkers.",
+    supported: { text: "Supported: CDKL5 is among the listed conditions, and sample collection was planned.", edges: ["cdd-in-biobank", "biobank-asset"] },
+    must_validate: { text: "Validate: sample availability, CDD sample numbers and access terms are not stated.", edges: ["biobank-asset"] },
+  },
+  {
+    asset_id: "asset:cds",
+    category: "outcome_measure",
+    status: "discovery_lead",
+    strongest: false,
+    what: "CDKL5 Developmental Score (CDS), used in a 67-adult CDD cohort",
+    why_it_matters: "A CDD-specific developmental measure, useful for comparison.",
+    supported: { text: "Supported: used in an adult CDD cohort. The source is a preprint (PMID 39867409).", edges: ["cds-cdd"] },
+    must_validate: { text: "Validate: the source is not peer reviewed; check for a published version.", edges: ["cds-cdd"] },
+  },
+] as const;

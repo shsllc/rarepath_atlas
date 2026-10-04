@@ -128,3 +128,33 @@ export function researchHubs(nodes: GraphNode[], allEdges: EvidenceEdge[]): Rese
     .filter((h) => h.disease_ids.length >= 2)
     .sort((a, b) => b.disease_ids.length - a.disease_ids.length);
 }
+
+/** Per-candidate navigator details. Counts come only from reviewed, supported edges; nothing is inherited. */
+export interface OpportunityDetail {
+  disease_id: string;
+  shared_asset_ids: string[]; // research assets applied to BOTH the focus disease and this candidate
+  shared_study_ids: string[];
+  study_team_ids: string[]; // researchers who investigate a shared study
+  asset_note: string;
+  next_question: string;
+}
+
+export function opportunityDetails(nodes: GraphNode[], allEdges: EvidenceEdge[], focusId: string, ranked: RankedConnection[]): OpportunityDetail[] {
+  const edges = reviewed(allEdges).filter(positive);
+  const label = new Map(nodes.map((n) => [n.id, n.label]));
+  const short = new Map(nodes.map((n) => [n.id, n.aliases[0] ? `the ${n.aliases[0]}` : n.label]));
+  return ranked.map((r) => {
+    const shared_asset_ids = r.factors.filter((f) => f.kind === "shared_asset").map((f) => edges.find((e) => f.evidence_edge_ids.includes(e.id) && e.predicate === "applied_to")?.subject_id).filter((x): x is string => !!x);
+    const shared_study_ids = r.factors.filter((f) => f.kind === "shared_study").map((f) => edges.find((e) => f.evidence_edge_ids.includes(e.id) && e.predicate === "studied_in")?.object_id).filter((x): x is string => !!x);
+    const study_team_ids = [...new Set(edges.filter((e) => e.predicate === "investigates" && shared_study_ids.includes(e.object_id)).map((e) => e.subject_id))];
+    const d = label.get(r.disease_id) ?? r.disease_id;
+    const study = shared_study_ids[0] ? label.get(shared_study_ids[0]) : "the shared study";
+    const asset_note = shared_asset_ids.length
+      ? `${shared_asset_ids.length} reusable asset${shared_asset_ids.length > 1 ? "s" : ""} verified in both communities.`
+      : "Shared study infrastructure identified; no stronger reusable-asset path is currently verified.";
+    const next_question = shared_asset_ids.length
+      ? `How does ${short.get(shared_asset_ids[0])} perform in CDD compared with ${d}, and what needs CDD-specific validation?`
+      : `Which data collected in ${study} are comparable between CDD and ${d}, and is a reusable asset worth looking for?`;
+    return { disease_id: r.disease_id, shared_asset_ids, shared_study_ids, study_team_ids, asset_note, next_question };
+  });
+}

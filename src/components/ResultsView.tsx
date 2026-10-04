@@ -11,9 +11,10 @@ import { EvidenceDrawer } from "./EvidenceDrawer";
 import { FixtureChip, STATUS_META, StatusBadge } from "./StatusBadge";
 import { GraphPlaceholder } from "./GraphPlaceholder";
 import { EvidenceKey } from "./EvidenceKey";
-import { ActionBriefPanel, CollaboratorCards, RankingPanel } from "./ResearchSections";
+import { ActionBriefPanel, CollaboratorCards, RankingFormula, RankingIntro } from "./ResearchSections";
+import { AssetCatalog, EntryBreadcrumb, OpportunityMap, OpportunityNavigator, ResultSummary } from "./DiscoverySections";
 import { ImpactPanel, JourneyStrip, ThisWeekPanel, TrustStrip } from "./ImpactSections";
-import { rankResearchConnections, researchHubs } from "@/lib/analytics";
+import { opportunityDetails, rankResearchConnections, researchHubs } from "@/lib/analytics";
 
 const EvidenceGraph = dynamic(() => import("./EvidenceGraph").then((m) => m.EvidenceGraph), {
   ssr: false,
@@ -98,6 +99,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
   const heroEdges = featured ? [...new Set(featured.story.flatMap((s) => s.evidence_edge_ids))] : [];
   const ranked = useMemo(() => rankResearchConnections(result.nodes, result.edges, result.disease.node_id), [result.nodes, result.edges, result.disease.node_id]);
   const hubs = useMemo(() => researchHubs(result.nodes, result.edges), [result.nodes, result.edges]);
+  const details = useMemo(() => opportunityDetails(result.nodes, result.edges, result.disease.node_id, ranked), [result.nodes, result.edges, result.disease.node_id, ranked]);
 
   return (
     <div>
@@ -108,6 +110,9 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
       ) : (
         <ProvenanceBar result={result} />
       )}
+
+      {!result.is_fixture && <EntryBreadcrumb result={result} label={label} />}
+      {!result.is_fixture && <ResultSummary result={result} top={ranked[0]} label={label} />}
 
       {showDemo && featured ? (
         <DemoPath
@@ -219,18 +224,32 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
           title="Research connection strength"
           subtitle="Which neighbouring communities are most useful to investigate, and why. Computed from reviewed, sourced relationships only. Not a measure of biological or clinical similarity."
         >
-          <RankingPanel ranked={ranked} hubs={hubs} label={label} open={open} />
+          <div className="space-y-4">
+            <RankingIntro />
+            <OpportunityMap ranked={ranked} details={details} label={label} focusId={result.disease.node_id} />
+            <OpportunityNavigator ranked={ranked} details={details} hubs={hubs} label={label} open={open} />
+            <RankingFormula />
+          </div>
         </Section>
       )}
 
       {/* 3. HERO: REUSABLE RESEARCH */}
       <Section id="hero" n={3} title="Reusable research" subtitle="What another community has already built that yours may be able to reuse. Every card is a hypothesis to check, never a conclusion.">
         {featured && <FeaturedCard o={featured} label={label} open={open} isFixture={isFixture} heroEdges={heroEdges} />}
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {others.map((o) => (
-            <OpportunityCard key={o.id} o={o} label={label} nodes={nodes} open={open} isFixture={isFixture} />
-          ))}
-        </div>
+        {result.asset_catalog.length > 0 && (
+          <div className="mt-6">
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">Reusable assets</h3>
+            <AssetCatalog assets={result.asset_catalog} collaboratorCount={result.collaborators.length} open={open} />
+          </div>
+        )}
+        <details className="mt-4 rounded-2xl border border-line bg-white px-4 py-3">
+          <summary className="cursor-pointer text-sm font-medium">Full reuse assessments ({others.length} more)</summary>
+          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+            {others.map((o) => (
+              <OpportunityCard key={o.id} o={o} label={label} nodes={nodes} open={open} isFixture={isFixture} />
+            ))}
+          </div>
+        </details>
       </Section>
 
       {/* 4. RESEARCH ACTION BRIEF */}

@@ -127,6 +127,19 @@ export const ActionBrief = z.object({
 });
 export type ActionBrief = z.infer<typeof ActionBrief>;
 
+/** Reusable-asset catalogue entry. Status describes evidence for reuse, never validity. */
+export const AssetEntry = z.object({
+  asset_id: z.string(),
+  category: z.enum(["shared_infrastructure", "outcome_measure", "registry_biobank"]),
+  status: z.enum(["supported", "potentially_adaptable", "discovery_lead", "not_established"]),
+  strongest: z.boolean().default(false),
+  what: z.string(),
+  why_it_matters: z.string(),
+  supported: BriefLine,
+  must_validate: BriefLine,
+});
+export type AssetEntry = z.infer<typeof AssetEntry>;
+
 /** Build provenance: which OpenAI roles ran, when, with what model. */
 export const BuildInfo = z.object({
   built_at: z.string(),
@@ -146,6 +159,7 @@ export const SearchResult = z.object({
   matched: z.object({ node_id: z.string(), label: z.string(), type: z.string(), via: z.enum(["label", "alias", "identifier"]).optional(), matched_text: z.string().optional() }),
   collaborators: z.array(Collaborator).default([]),
   action_brief: ActionBrief.optional(),
+  asset_catalog: z.array(AssetEntry).default([]),
   disease: z.object({
     node_id: z.string(),
     gene_ids: z.array(z.string()),
@@ -200,5 +214,6 @@ export const GraphBundle = z.object({
   build_info: BuildInfo.optional(),
   collaborators: z.array(Collaborator).default([]),
   action_brief: ActionBrief.optional(),
+  asset_catalog: z.array(AssetEntry).default([]),
 });
 export type GraphBundle = z.infer<typeof GraphBundle>;

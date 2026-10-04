@@ -74,6 +74,7 @@ export class GraphSearchService implements SearchService {
       matched: { node_id: matched.id, label: matched.label, type: matched.type, via: resolved?.via, matched_text: resolved?.matched_text },
       collaborators: b.collaborators,
       action_brief: b.action_brief,
+      asset_catalog: b.asset_catalog,
       disease: {
         node_id: focus.id,
         gene_ids: genes.map((n) => n.id),

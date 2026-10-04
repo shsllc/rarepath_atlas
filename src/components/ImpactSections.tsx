@@ -5,6 +5,7 @@ import type { ActionBrief, Collaborator, GraphNode, SearchResult } from "@/lib/s
 import type { RankedConnection } from "@/lib/analytics";
 import { BENCHMARK, ratio } from "@/lib/benchmark";
 import { HYPOTHESIS } from "@/lib/tenx";
+import { briefAsText } from "@/lib/brief-text";
 
 type Open = (title: string, edgeIds: string[]) => void;
 
@@ -56,41 +57,6 @@ export function JourneyStrip({ brief, top, label }: { brief: ActionBrief; top?: 
   );
 }
 
-function briefAsText(brief: ActionBrief, collaborators: Collaborator[], label: (id: string) => string) {
-  const tw = brief.this_week;
-  const L = (xs: { text: string }[]) => xs.map((x) => `- ${x.text}`).join("\n");
-  return [
-    "RESEARCH ACTION BRIEF: CDKL5 deficiency disorder (RarePath Atlas)",
-    "",
-    "OPPORTUNITY",
-    brief.opportunity.text,
-    "",
-    tw ? `WHAT CAN THIS PATIENT GROUP DO THIS WEEK?\n${tw.next_step.text}` : "",
-    "",
-    "RELEVANT DESTINATIONS TO VERIFY THIS OPPORTUNITY",
-    ...(tw?.destinations.map((d) => `- ${label(d.node_id)}: ${d.why}`) ?? []),
-    "",
-    "WHO IS RELEVANT TO THIS RESEARCH PATH (public metadata; does not indicate willingness)",
-    ...collaborators.filter((c) => brief.who_is_relevant.includes(c.node_id)).map((c) => `- ${label(c.node_id)}: ${c.role}`),
-    "",
-    "EVIDENCE TO BRING",
-    ...brief.bring_sources.map((b) => `- ${b.label}: ${b.url}`),
-    "",
-    "QUESTION TO ASK",
-    brief.question.text,
-    "",
-    "WHAT MUST BE VERIFIED",
-    L(brief.must_validate),
-    "",
-    "WHAT THIS DOES NOT MEAN",
-    L(brief.does_not_mean),
-    "",
-    "Research navigation only, not medical advice. Every statement links to its source at https://rarepathatlas.netlify.app/results?q=CDKL5",
-  ]
-    .filter((x) => x !== undefined)
-    .join("\n");
-}
-
 /** The final, unmissable action. */
 export function ThisWeekPanel({ brief, collaborators, nodes, open, label }: { brief: ActionBrief; collaborators: Collaborator[]; nodes: Map<string, GraphNode>; open: Open; label: (id: string) => string }) {
   const tw = brief.this_week;
@@ -113,31 +79,16 @@ export function ThisWeekPanel({ brief, collaborators, nodes, open, label }: { br
           <EvBtn ids={tw.next_step.evidence_edge_ids} open={open} title="This week: next step" dark />
         </div>
       </header>
-      <div className="grid gap-3 p-4 sm:p-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-line p-4">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-muted">For: CDD community</h3>
-          <p className="mt-1 text-sm">
-            {tw.community_ids.map((id) => label(id)).join(" · ")}{" "}
-            <EvBtn ids={tw.community_evidence_edge_ids} open={open} title="CDD community organizations" />
-          </p>
-        </section>
-        <section className="rounded-2xl border border-line p-4">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-muted">Relevant destinations to verify this opportunity</h3>
-          <ul className="mt-2 space-y-2 text-sm">
-            {tw.destinations.map((d) => (
-              <li key={d.node_id} className="flex items-start justify-between gap-2">
-                <span>
-                  <strong>{nodes.get(d.node_id)?.label ?? d.node_id}</strong>
-                  <span className="block text-muted">{d.why}</span>
-                </span>
-                <EvBtn ids={d.evidence_edge_ids} open={open} title={`Destination: ${nodes.get(d.node_id)?.label ?? d.node_id}`} />
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2 text-xs text-muted">No contact details are stored. Listing a destination does not indicate availability or willingness.</p>
-        </section>
-        <section className="rounded-2xl border border-line p-4">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-muted">Evidence to bring</h3>
+      <div className="px-4 pt-4 sm:px-6">
+        <p className="text-sm">
+          <span className="text-xs font-bold uppercase tracking-wide text-muted">For the CDD community: </span>
+          {tw.community_ids.map((id) => label(id)).join(" · ")} <EvBtn ids={tw.community_evidence_edge_ids} open={open} title="CDD community organizations" />
+        </p>
+      </div>
+      <ol className="grid gap-3 p-4 sm:p-6 lg:grid-cols-3" aria-label="Action workflow">
+        <li className="rounded-2xl border border-line p-4">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-teal">Step 1 · Review</p>
+          <h3 className="mt-0.5 font-semibold">Sources to bring</h3>
           <ul className="mt-2 space-y-1.5 text-sm">
             {brief.bring_sources.map((b) => (
               <li key={b.url} className="flex items-start justify-between gap-2">
@@ -148,39 +99,62 @@ export function ThisWeekPanel({ brief, collaborators, nodes, open, label }: { br
               </li>
             ))}
           </ul>
-        </section>
-        <section className="rounded-2xl bg-ink p-4 text-white">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-white/75">Question to ask</h3>
-          <p className="mt-1 font-semibold leading-snug">{brief.question.text}</p>
-        </section>
-        <section className="rounded-2xl bg-amber-wash p-4">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-unknown">What must be verified</h3>
-          <ul className="mt-2 space-y-1.5 text-sm">
-            {brief.must_validate.map((l, i) => (
-              <li key={i} className="flex items-start justify-between gap-2">
+        </li>
+        <li className="rounded-2xl border border-line p-4">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-teal">Step 2 · Verify</p>
+          <h3 className="mt-0.5 font-semibold">Relevant destinations to verify this opportunity</h3>
+          <ul className="mt-2 space-y-2 text-sm">
+            {tw.destinations.map((d) => (
+              <li key={d.node_id} className="flex items-start justify-between gap-2">
                 <span>
-                  <span aria-hidden className="mr-1">?</span>
-                  {l.text}
+                  <strong>{nodes.get(d.node_id)?.label ?? d.node_id}</strong>
+                  <span className="block text-muted">{d.why.replace(/^Relevant destination to verify (this opportunity|the validation question): /, "")}</span>
                 </span>
-                <EvBtn ids={l.evidence_edge_ids} open={open} title={l.text.slice(0, 70)} />
+                <EvBtn ids={d.evidence_edge_ids} open={open} title={`Destination: ${nodes.get(d.node_id)?.label ?? d.node_id}`} />
               </li>
             ))}
           </ul>
-        </section>
-        <section className="rounded-2xl bg-rose-wash p-4">
-          <h3 className="text-xs font-bold uppercase tracking-wide text-contradictory">What this does not mean</h3>
-          <ul className="mt-2 space-y-1.5 text-sm">
-            {brief.does_not_mean.map((l, i) => (
-              <li key={i} className="flex items-start justify-between gap-2">
-                <span>
-                  <span aria-hidden className="mr-1">▲</span>
-                  {l.text}
-                </span>
-                <EvBtn ids={l.evidence_edge_ids} open={open} title={l.text.slice(0, 70)} />
-              </li>
-            ))}
-          </ul>
-        </section>
+          <p className="mt-2 text-xs text-muted">No contact details are stored. Listing a destination does not indicate availability or willingness.</p>
+        </li>
+        <li className="rounded-2xl bg-ink p-4 text-white">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-white/75">Step 3 · Ask</p>
+          <h3 className="mt-0.5 font-semibold text-white/90">The research question</h3>
+          <p className="mt-2 font-semibold leading-snug">{brief.question.text}</p>
+          <p className="mt-2 text-xs text-white/70">A research question, not medical advice.</p>
+        </li>
+      </ol>
+      <div className="mx-4 mb-4 rounded-2xl border-2 border-amber/60 p-4 sm:mx-6 sm:mb-6">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-unknown">Before acting</p>
+        <div className="mt-2 grid gap-4 lg:grid-cols-2">
+          <section>
+            <h3 className="text-xs font-bold uppercase tracking-wide text-unknown">What must be verified</h3>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {brief.must_validate.map((l, i) => (
+                <li key={i} className="flex items-start justify-between gap-2">
+                  <span>
+                    <span aria-hidden className="mr-1">?</span>
+                    {l.text}
+                  </span>
+                  <EvBtn ids={l.evidence_edge_ids} open={open} title={l.text.slice(0, 70)} />
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section>
+            <h3 className="text-xs font-bold uppercase tracking-wide text-contradictory">What this does not mean</h3>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              {brief.does_not_mean.map((l, i) => (
+                <li key={i} className="flex items-start justify-between gap-2">
+                  <span>
+                    <span aria-hidden className="mr-1">▲</span>
+                    {l.text}
+                  </span>
+                  <EvBtn ids={l.evidence_edge_ids} open={open} title={l.text.slice(0, 70)} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </div>
       <footer className="flex flex-wrap items-center gap-3 border-t border-line px-5 py-3 sm:px-7">
         <button onClick={copy} className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-brand">
@@ -200,6 +174,30 @@ export function ImpactPanel({ result }: { result: SearchResult }) {
   const r = BENCHMARK.rarepath;
   const quotes = result.edges.reduce((n, e) => n + e.evidence.length, 0);
   return (
+    <div className="space-y-4">
+    <ol aria-label="Impact pathway" className="grid gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-stretch">
+      <li className="rounded-2xl border-2 border-teal bg-white p-4">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-supported">Measured today</p>
+        <p className="mt-1 text-2xl font-semibold">~{ratio(m.seconds, r.seconds)}×</p>
+        <p className="text-sm">Evidence discovery and assembly (one prototype run)</p>
+      </li>
+      <li aria-hidden className="flex items-center justify-center text-xl text-muted">
+        <span className="md:hidden">↓</span>
+        <span className="hidden md:inline">→</span>
+      </li>
+      <li className="rounded-2xl border border-line bg-white p-4">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-brand">Next milestone</p>
+        <p className="mt-1 text-sm font-semibold">{HYPOTHESIS.milestone}</p>
+      </li>
+      <li aria-hidden className="flex items-center justify-center text-xl text-muted">
+        <span className="md:hidden">↓</span>
+        <span className="hidden md:inline">→</span>
+      </li>
+      <li className="rounded-2xl border-2 border-dashed border-brand bg-brand-wash p-4">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-brand">10× hypothesis · not yet measured</p>
+        <p className="mt-1 text-sm font-semibold">{HYPOTHESIS.question}</p>
+      </li>
+    </ol>
     <div className="grid gap-4 lg:grid-cols-2">
       <section className="rounded-3xl border-2 border-teal bg-white p-5 sm:p-6" aria-label="Measured in this prototype">
         <p className="text-[11px] font-bold uppercase tracking-widest text-supported">Layer 1 · Measured in this prototype</p>
@@ -281,6 +279,7 @@ export function ImpactPanel({ result }: { result: SearchResult }) {
           </div>
         </div>
       </section>
+    </div>
     </div>
   );
 }

@@ -23,7 +23,7 @@ import {
   type Predicate,
   type SourceType,
 } from "../src/lib/schemas";
-import { ACTION_BRIEF, COLLABORATORS, CONNECTIONS, EDGES, GAPS, NODES, OPPORTUNITIES } from "./curation/cdd";
+import { ACTION_BRIEF, ASSET_CATALOG, COLLABORATORS, CONNECTIONS, EDGES, GAPS, NODES, OPPORTUNITIES } from "./curation/cdd";
 
 const ROOT = process.cwd();
 const REAL = path.join(ROOT, "data", "real");
@@ -304,7 +304,7 @@ const collaborators = COLLABORATORS.map(({ edges: keys, ...c }) => {
   if (!nodeIds.has(c.node_id)) throw new Error(`Collaborator ${c.node_id} is not a node`);
   return { ...c, evidence_edge_ids: keys.map(edgeId) };
 });
-const line = (l: { text: string; edges: string[] }) => ({ text: l.text, evidence_edge_ids: l.edges.map(edgeId) });
+const line = (l: { text: string; edges: readonly string[] }) => ({ text: l.text, evidence_edge_ids: l.edges.map(edgeId) });
 const action_brief = {
   opportunity: line(ACTION_BRIEF.opportunity),
   why_surfaced: ACTION_BRIEF.why_surfaced.map(line),
@@ -334,6 +334,11 @@ const action_brief = {
   },
 };
 
+const asset_catalog = ASSET_CATALOG.map((a) => {
+  if (!nodeIds.has(a.asset_id)) throw new Error(`Catalog asset ${a.asset_id} is not a node`);
+  return { ...a, supported: line(a.supported), must_validate: line(a.must_validate) };
+});
+
 const bundle = GraphBundle.parse({
   bundle_id: "cdd-real-v1",
   is_fixture: false,
@@ -347,6 +352,7 @@ const bundle = GraphBundle.parse({
   build_info,
   collaborators,
   action_brief,
+  asset_catalog,
 });
 
 const serialized = JSON.stringify(bundle, null, 2);
