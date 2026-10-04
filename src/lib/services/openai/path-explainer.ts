@@ -32,15 +32,21 @@ Return four short parts, ${WORD_LIMITS.max} words maximum IN TOTAL (aim for 120â
 Use ONLY the steps given. No hype, no medical advice. Never mention internal field names such as "stance", "qualifies", "status", "edge" or "steps"; just state the limitation in plain words.${hasFixture ? ' Steps from "demo_fixture" sources were not retrieved; say so.' : ""}
 cited_edge_ids must list only edge_id values from the input.`;
 
+    // Hosting gateways (e.g. Netlify) cut requests at ~26â€“30s, so each call is bounded:
+    // low reasoning effort (this is summarisation of supplied quotes), no SDK auto-retry, 18s ceiling.
     const run = async (extra: string): Promise<ExplanationBody> => {
-      const res = await openai.responses.parse({
-        model: openAIModel(),
-        input: [
-          { role: "system", content: system + extra },
-          { role: "user", content: JSON.stringify(steps) },
-        ],
-        text: { format: zodTextFormat(ExplanationSchema, "path_explanation") },
-      });
+      const res = await openai.responses.parse(
+        {
+          model: openAIModel(),
+          reasoning: { effort: "low" },
+          input: [
+            { role: "system", content: system + extra },
+            { role: "user", content: JSON.stringify(steps) },
+          ],
+          text: { format: zodTextFormat(ExplanationSchema, "path_explanation") },
+        },
+        { timeout: 18_000, maxRetries: 0 },
+      );
       if (!res.output_parsed) throw new Error("Path Explainer returned no parsable output.");
       return res.output_parsed;
     };
@@ -48,8 +54,8 @@ cited_edge_ids must list only edge_id values from the input.`;
     const started = Date.now();
     let out = await run("");
     let check = checkExplanation(out);
-    // One corrective retry, only if there is time left inside the serverless budget.
-    if (!check.ok && Date.now() - started < 20_000) {
+    // One corrective retry, only if the first call was quick enough to stay inside the gateway budget.
+    if (!check.ok && Date.now() - started < 7_000) {
       // One corrective retry with the specific problems listed.
       out = await run(`\nYour previous answer had these problems: ${check.issues.join("; ")}. Fix them.`);
       check = checkExplanation(out);
