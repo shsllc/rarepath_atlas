@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { DiseaseCoverage } from "@/lib/coverage";
 import { GraphNode } from "./entities";
 import { SourceRecord } from "./sources";
 import { Confidence, EvidenceEdge, EvidenceStatus } from "./evidence";
@@ -191,7 +192,23 @@ export const NotFoundResult = z.object({
 });
 export type NotFoundResult = z.infer<typeof NotFoundResult>;
 
-export type SearchResponse = SearchResult | NotFoundResult;
+/**
+ * A supported disease that is NOT the fully reviewed journey. Carries only its reviewed
+ * coverage and the reviewed edges behind it: never an action brief, ranking or score.
+ */
+export type PartialDiseaseResult = {
+  query: string;
+  found: false;
+  partial: true;
+  matched: { node_id: string; label: string; type: string; via?: "label" | "alias" | "identifier"; matched_text?: string };
+  banner: string;
+  coverage: DiseaseCoverage;
+  /** Reviewed edges referenced by `coverage` (no OpenAI-only extractions). */
+  edges: EvidenceEdge[];
+  full_journey: { label: string; query: string };
+};
+
+export type SearchResponse = SearchResult | NotFoundResult | PartialDiseaseResult;
 
 /**
  * On-disk bundle format (data/fixtures/*.json, later data/cache/*.json).

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { ResultsView } from "@/components/ResultsView";
+import { PartialDiseaseView } from "@/components/CoverageSections";
 import { getServices } from "@/lib/services/registry";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,8 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
       <SearchBox defaultValue={q} size="sm" />
       <div className="mt-6">
         {!result && <p className="text-muted">Enter a disease, gene, variant, symptom or mechanism.</p>}
-        {result && !result.found && (
+        {result && "partial" in result && <PartialDiseaseView result={result} />}
+        {result && !result.found && !("partial" in result) && (
           <div className="rounded-xl border border-dotted border-unknown bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">No supported connection found</p>
             <p className="mt-2">{result.message}</p>

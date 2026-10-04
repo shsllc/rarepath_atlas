@@ -2,10 +2,14 @@ import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
 import { BrandMark } from "@/components/BrandMark";
+import { CoverageDisclosure, NetworkPreview } from "@/components/CoverageSections";
+import { getServices } from "@/lib/services/registry";
+import { coverageCounts, diseaseCoverage } from "@/lib/coverage";
 
-const examples = ["CDKL5", "CDKL5 deficiency disorder", "STK9", "MONDO:0100039", "Seizure"];
+const examples = ["CDKL5", "CDKL5 deficiency disorder", "STK9", "MONDO:0100039", "Seizure", "Rett syndrome"];
 
 export default function Home() {
+  const bundle = getServices().graph.bundle();
   return (
     <div className="mx-auto max-w-3xl">
       <section className="relative overflow-hidden rounded-3xl border border-line bg-white px-6 py-10 text-center shadow-sm sm:px-12 sm:py-14">
@@ -69,11 +73,17 @@ export default function Home() {
           </div>
         ))}
       </div>
+      <div className="mt-10">
+        <NetworkPreview diseases={diseaseCoverage(bundle)} />
+      </div>
+      <div className="mt-4">
+        <CoverageDisclosure counts={coverageCounts(bundle)} />
+      </div>
       <div className="mt-8 flex justify-center">
         <StatusLegend />
       </div>
       <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted">
-        Prototype covering one verified journey (CDKL5 deficiency disorder), built from retrieved public sources. A research-navigation tool, not a diagnosis or treatment tool.
+        Prototype with one fully verified journey (CDKL5 deficiency disorder) and further diseases at partial-evidence depth, built from retrieved public sources. A research-navigation tool, not a diagnosis or treatment tool.
       </p>
     </div>
   );

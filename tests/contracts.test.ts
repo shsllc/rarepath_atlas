@@ -96,6 +96,6 @@ describe("search journey", () => {
   it("symptom query explains instead of guessing a disease", async () => {
     const r = await search.search("seizure");
     expect(r.found).toBe(false);
-    if (!r.found) expect(r.suggestions).toContain("Rett syndrome");
+    if (!r.found && !("partial" in r)) expect(r.suggestions).toContain("Rett syndrome");
   });
 });

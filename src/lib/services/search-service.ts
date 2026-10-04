@@ -1,4 +1,5 @@
 import { deriveEvidenceStatus, type EvidenceCoverage, type GraphNode, type SearchResponse } from "@/lib/schemas";
+import { diseaseCoverage, PARTIAL_BANNER } from "@/lib/coverage";
 import type { GraphService, ReusableAssetFinder, SearchService } from "./interfaces";
 
 /** Assembles the results-page payload from the graph + finder. Pure orchestration, no I/O. */
@@ -31,8 +32,8 @@ export class GraphSearchService implements SearchService {
       return {
         query,
         found: false,
-        message: `No supported match for "${query}". This prototype currently covers one verified journey (CDKL5 deficiency disorder); we only show connections we can trace to a retrieved source.`,
-        suggestions: [focusLabel, "CDKL5", "CDD"],
+        message: `No supported match for "${query}". RarePath currently covers one fully verified journey (${focusLabel}) plus a few diseases at partial-evidence depth; we only show connections we can trace to a retrieved source.`,
+        suggestions: [focusLabel, "CDKL5", ...diseaseCoverage(b).filter((d) => !d.is_focus).map((d) => d.label)],
       };
     }
 
@@ -47,6 +48,23 @@ export class GraphSearchService implements SearchService {
     }
 
     const focus = this.focusFor(matched);
+    // Other supported diseases resolve to their reviewed coverage only: never the focus journey's brief or ranking.
+    if (focus && focus.id !== b.focus_disease_id) {
+      const coverage = diseaseCoverage(b).find((d) => d.node_id === focus.id);
+      if (coverage) {
+        const ids = new Set(coverage.reviewed_edge_ids);
+        return {
+          query,
+          found: false,
+          partial: true,
+          matched: { node_id: matched.id, label: matched.label, type: matched.type, via: resolved?.via, matched_text: resolved?.matched_text },
+          banner: PARTIAL_BANNER,
+          coverage,
+          edges: b.edges.filter((e) => ids.has(e.id)),
+          full_journey: { label: focusLabel, query: "CDKL5" },
+        };
+      }
+    }
     if (!focus || focus.id !== b.focus_disease_id) {
       return {
         query,
