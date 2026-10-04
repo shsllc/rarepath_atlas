@@ -181,6 +181,15 @@ export const NODES: NodeSpec[] = [
   { id: "org:foxg1rf", type: "PatientOrganization", label: "FOXG1 Research Foundation", aliases: [], website: "https://www.foxg1research.org/", ids: [] },
 
   { id: "researcher:percy", type: "Researcher", label: "Alan K Percy, MD", affiliation: "University of Alabama at Birmingham", aliases: ["Percy A", "Alan Percy"], description: "Listed on ClinicalTrials.gov as principal investigator of NCT02738281.", ids: [] },
+  {
+    id: "researcher:demarest",
+    type: "Researcher",
+    label: "Demarest S (Children's Hospital Colorado)",
+    affiliation: "Children's Hospital Colorado and University of Colorado",
+    aliases: ["Demarest S"],
+    description: "First author of the CDD severity assessment (PMID 31147226); same name and institution on the 2022 CDD review (PMID 35483386).",
+    ids: [],
+  },
   { id: "researcher:neul", type: "Researcher", label: "Jeffrey L Neul, MD, PhD", affiliation: "Vanderbilt University", aliases: ["Neul JL"], description: "Listed on ClinicalTrials.gov as study director of NCT02738281.", ids: [] },
 ];
 
@@ -455,6 +464,47 @@ export const EDGES: EdgeSpec[] = [
   // ---- investigators (public registry listing only; no contact data)
   { key: "pi-percy", s: "researcher:percy", p: "investigates", o: "study:nhs", confidence: "high", evidence: [{ src: NHS, quote: "Overall official: Alan K Percy, MD, University of Alabama at Birmingham (PRINCIPAL_INVESTIGATOR)" }] },
   { key: "sd-neul", s: "researcher:neul", p: "investigates", o: "study:nhs", confidence: "high", evidence: [{ src: NHS, quote: "Overall official: Jeffrey L Neul, MD, PhD, Vanderbilt University (STUDY_DIRECTOR)" }] },
+
+  // ---- collaborator layer: public PubMed author metadata. Registry investigators are linked to a paper ONLY
+  // where name AND institution match (31147226). In PMID 32472944 the PubMed affiliations differ, so no link is made there.
+  {
+    key: "percy-authored-sa",
+    s: "researcher:percy",
+    p: "authored",
+    o: "paper:31147226",
+    confidence: "moderate",
+    evidence: [
+      { src: P4, quote: "Author: Percy AK — University of Alabama at Birmingham, Pediatrics, Neurology, Neurobiology, Genetics, and Psychology, Birmingham, Alabama" },
+      { src: NHS, quote: "Overall official: Alan K Percy, MD, University of Alabama at Birmingham (PRINCIPAL_INVESTIGATOR)" },
+    ],
+  },
+  {
+    key: "neul-authored-sa",
+    s: "researcher:neul",
+    p: "authored",
+    o: "paper:31147226",
+    confidence: "moderate",
+    evidence: [
+      { src: P4, quote: "Author: Neul JL — Vanderbilt Kennedy Center, Vanderbilt University Medical Center, Tennessee" },
+      { src: NHS, quote: "Overall official: Jeffrey L Neul, MD, PhD, Vanderbilt University (STUDY_DIRECTOR)" },
+    ],
+  },
+  {
+    key: "demarest-authored-sa",
+    s: "researcher:demarest",
+    p: "authored",
+    o: "paper:31147226",
+    confidence: "high",
+    evidence: [{ src: P4, quote: "Author: Demarest S — Children's Hospital Colorado and University of Colorado School of Medicine Aurora, Colorado" }],
+  },
+  {
+    key: "demarest-authored-review",
+    s: "researcher:demarest",
+    p: "authored",
+    o: "paper:35483386",
+    confidence: "moderate",
+    evidence: [{ src: P2, quote: "Author: Demarest S — Department of Neurology, Children's Hospital Colorado, Aurora, CO, USA" }],
+  },
 ];
 
 export interface ConnectionSpec {
@@ -725,3 +775,90 @@ export const GAPS: (Omit<KnowledgeGap, "related_edge_ids"> & { edges: string[] }
     edges: ["nhs-paper", "cdd-in-nhs"],
   },
 ];
+
+
+// ---------------------------------------------------------------------------
+// Collaborator layer: relevance to this research path only. Never implies availability or willingness.
+export interface CollaboratorSpec {
+  node_id: string;
+  role: string;
+  why_relevant: string;
+  identity_note?: string;
+  collaboration_question: string;
+  edges: string[];
+}
+
+export const COLLABORATORS: CollaboratorSpec[] = [
+  {
+    node_id: "researcher:percy",
+    role: "Principal investigator, Natural History Study NCT02738281 (registry listing); co-author of the CDD severity assessment (PMID 31147226)",
+    why_relevant: "Appears on both sides of the precedent: the shared natural-history infrastructure and the CDD-specific severity work it informed.",
+    identity_note: "Linked across sources by name and the same institution (University of Alabama at Birmingham).",
+    collaboration_question: "Which parts of the Natural History Study's protocols and data informed the CDD severity assessment, and what remains available to researchers?",
+    edges: ["pi-percy", "percy-authored-sa", "nhs-informed-sa"],
+  },
+  {
+    node_id: "researcher:neul",
+    role: "Study director, Natural History Study NCT02738281 (registry listing); co-author of the CDD severity assessment (PMID 31147226)",
+    why_relevant: "Connects the multi-site Rett/Rett-related study team with the CDD severity assessment.",
+    identity_note: "Linked across sources by name and the same institution (Vanderbilt University).",
+    collaboration_question: "How were the RTT Clinical Severity Scale and the CDD severity assessment used, and could they be compared on existing study data?",
+    edges: ["sd-neul", "neul-authored-sa", "css-cdd"],
+  },
+  {
+    node_id: "researcher:demarest",
+    role: "First author, CDD severity assessment (PMID 31147226); co-author of the 2022 CDD review (PMID 35483386)",
+    why_relevant: "Led the CDD-specific instrument whose own authors say it still needs validation.",
+    identity_note: "Same name and institution (Children's Hospital Colorado) on both papers.",
+    collaboration_question: "What validation work exists or is planned for the CDD severity assessment?",
+    edges: ["demarest-authored-sa", "demarest-authored-review", "sa-cdd"],
+  },
+  {
+    node_id: "org:ifcr",
+    role: "Patient organization; its Centers of Excellence consortium informed the CDD severity assessment",
+    why_relevant: "A CDD community organization already named in the evidence for this precedent.",
+    collaboration_question: "Is the organization already connected to the Rett/Rett-related natural-history investigators, and what data-sharing routes exist?",
+    edges: ["ifcr-informed-sa", "org-ifcr"],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Research Action Brief (featured CDD journey). Every line cites edge keys.
+export const ACTION_BRIEF = {
+  opportunity: {
+    text: "CDD has already been studied inside shared Rett/Rett-related natural-history infrastructure, and that infrastructure informed a CDD-specific severity assessment. Its methods and outcome-measure experience are worth evaluating for current CDD research.",
+    edges: ["cdd-in-nhs", "nhs-informed-sa", "css-cdd"],
+  },
+  why_surfaced: [
+    { text: "The ClinicalTrials.gov record for NCT02738281 lists CDKL5 Disorder as a condition, and its eligibility criteria name CDKL5.", edges: ["cdd-in-nhs"] },
+    { text: "A 2020 analysis compared 793 participants across Rett, CDD, FOXG1 and MECP2 duplication in that study.", edges: ["costudy-rett", "nhs-paper"] },
+    { text: "A 2019 paper says the CDD severity assessment was developed from the experience of that study's consortium and the IFCR Centers of Excellence.", edges: ["nhs-informed-sa", "ifcr-informed-sa"] },
+  ],
+  existing_assets: [
+    { asset_id: "asset:nhs-infrastructure", text: "Rett/Rett-related natural-history infrastructure: multi-site network and study database (RDCRN 5211; NIH U54HD061222)", edges: ["nhs-infra", "infra-cdd"] },
+    { asset_id: "asset:rtt-css", text: "RTT Clinical Severity Scale experience in CDD participants (median score 29)", edges: ["css-cdd"] },
+    { asset_id: "asset:cdd-severity", text: "CDD severity assessment: 51 items covering epilepsy, motor, cognition/behaviour/vision/speech and autonomic function", edges: ["sa-cdd", "sa-paper"] },
+  ],
+  who_is_relevant: ["researcher:percy", "researcher:neul", "researcher:demarest", "org:ifcr"],
+  bring_sources: [
+    { label: "NCT02738281: Natural History of Rett Syndrome & Related Disorders (registry record)", url: "https://clinicaltrials.gov/study/NCT02738281", edges: ["cdd-in-nhs"] },
+    { label: "PMID 32472944: Comparison of core features in four developmental encephalopathies in the Rett Natural History Study (2020)", url: "https://pubmed.ncbi.nlm.nih.gov/32472944/", edges: ["costudy-rett", "differs-rett"] },
+    { label: "PMID 31147226: Severity Assessment in CDKL5 Deficiency Disorder (2019)", url: "https://pubmed.ncbi.nlm.nih.gov/31147226/", edges: ["nhs-informed-sa", "sa-cdd"] },
+    { label: "PMID 35483386: CDKL5 deficiency disorder: clinical features, diagnosis, and management (2022)", url: "https://pubmed.ncbi.nlm.nih.gov/35483386/", edges: ["history", "variant-claim"] },
+  ],
+  question: {
+    text: "Which recruitment, longitudinal-data and outcome-measure components from the shared Rett/Rett-related natural-history infrastructure remain useful for current CDD research, and which require CDD-specific validation?",
+    edges: ["nhs-infra", "css-cdd", "sa-cdd"],
+  },
+  must_validate: [
+    { text: "Whether the RTT Clinical Severity Scale is valid for CDD. Its authors note CDD's more frequent seizures may raise scores.", edges: ["css-cdd"] },
+    { text: "The CDD severity assessment itself: its authors say refinement through ongoing validation is required.", edges: ["sa-cdd"] },
+    { text: "Current access to the study database and biobank. Access terms are not stated in any retrieved source.", edges: ["nhs-infra", "biobank-asset"] },
+    { text: "Population differences: CDD has the earliest seizure onset (median 2 months) and less frequent regression than Rett.", edges: ["differs-rett"] },
+  ],
+  does_not_mean: [
+    { text: "CDD and Rett syndrome are not equivalent. CDD is recognised as an independent disorder.", edges: ["variant-claim", "differs-rett"] },
+    { text: "Shared research infrastructure does not imply that any treatment transfers.", edges: ["costudy-rett"] },
+    { text: "Shared research history does not prove a shared biological mechanism. No retrieved source describes one.", edges: ["history"] },
+  ],
+};

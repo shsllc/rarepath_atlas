@@ -92,6 +92,32 @@ export const EvidenceCoverage = z.object({
 });
 export type EvidenceCoverage = z.infer<typeof EvidenceCoverage>;
 
+/** A person or organization relevant to a research path. Public metadata only; never implies willingness. */
+export const Collaborator = z.object({
+  node_id: z.string(),
+  role: z.string(),
+  why_relevant: z.string(),
+  identity_note: z.string().optional(),
+  collaboration_question: z.string(),
+  evidence_edge_ids: z.array(z.string()).min(1),
+});
+export type Collaborator = z.infer<typeof Collaborator>;
+
+const BriefLine = z.object({ text: z.string(), evidence_edge_ids: z.array(z.string()).min(1) });
+
+/** One-page output a patient-group leader can take into a research conversation. */
+export const ActionBrief = z.object({
+  opportunity: BriefLine,
+  why_surfaced: z.array(BriefLine).min(1),
+  existing_assets: z.array(z.object({ asset_id: z.string(), text: z.string(), evidence_edge_ids: z.array(z.string()).min(1) })).min(1),
+  who_is_relevant: z.array(z.string()).min(1), // collaborator node ids
+  bring_sources: z.array(z.object({ label: z.string(), url: z.string().url(), evidence_edge_ids: z.array(z.string()).min(1) })).min(3),
+  question: BriefLine,
+  must_validate: z.array(BriefLine).min(1),
+  does_not_mean: z.array(BriefLine).min(3),
+});
+export type ActionBrief = z.infer<typeof ActionBrief>;
+
 /** Build provenance: which OpenAI roles ran, when, with what model. */
 export const BuildInfo = z.object({
   built_at: z.string(),
@@ -108,7 +134,9 @@ export const SearchResult = z.object({
   is_fixture: z.boolean(),
   fixture_warning: z.string().optional(),
   /** How the query was resolved (e.g. typed "CDKL5" → matched Gene → focus Disease). */
-  matched: z.object({ node_id: z.string(), label: z.string(), type: z.string() }),
+  matched: z.object({ node_id: z.string(), label: z.string(), type: z.string(), via: z.enum(["label", "alias", "identifier"]).optional(), matched_text: z.string().optional() }),
+  collaborators: z.array(Collaborator).default([]),
+  action_brief: ActionBrief.optional(),
   disease: z.object({
     node_id: z.string(),
     gene_ids: z.array(z.string()),
@@ -161,5 +189,7 @@ export const GraphBundle = z.object({
   sources: z.array(SourceRecord).default([]),
   /** Build provenance: which OpenAI roles ran, when, with what model. */
   build_info: BuildInfo.optional(),
+  collaborators: z.array(Collaborator).default([]),
+  action_brief: ActionBrief.optional(),
 });
 export type GraphBundle = z.infer<typeof GraphBundle>;

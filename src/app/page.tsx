@@ -3,7 +3,7 @@ import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
 import { BrandMark } from "@/components/BrandMark";
 
-const examples = ["CDKL5", "CDKL5 deficiency disorder", "CDD", "Seizure", "Rett syndrome"];
+const examples = ["CDKL5", "CDKL5 deficiency disorder", "STK9", "MONDO:0100039", "Seizure"];
 
 export default function Home() {
   return (

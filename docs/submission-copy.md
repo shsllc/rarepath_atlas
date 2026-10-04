@@ -30,6 +30,8 @@ A typed, evidence-backed graph built from public sources. It surfaces connected 
 - Every relationship carries a verbatim quote; the build fails if any quote is missing from its stored source.
 - It shows what a connection does **not** mean: the contradicted "Rett variant" label, differences, and limitations.
 - Reuse is never shown as established fact. AI-only claims are labelled and hidden by default.
+- Transparent graph analytics: a visible-formula *research connection strength* ranking (Rett #1, FOXG1 and MECP2 duplication behind), with "why it ranked" and "what limits the connection". Not a similarity score.
+- A Research Action Brief naming relevant investigators (linked by name and institution across ClinicalTrials.gov and PubMed) and the exact sources to bring.
 
 **OPENAI USAGE**
 - **Evidence Extractor:** extracts claims from retrieved abstracts, PMC excerpts, registry records and grant text; a claim is kept only if its quote appears verbatim in the source (114 claims kept from 8 sources).
@@ -37,7 +39,7 @@ A typed, evidence-backed graph built from public sources. It surfaces connected 
 - **Path Explainer:** live, four-part plain-language explanation (why it matters, what the evidence shows, what it does not show, next question), 180 words maximum, validated against treatment-transfer phrasing, and limited to relationships already in the graph.
 
 **10X IMPACT**
-Milestone: identifying and evaluating an existing research asset or collaboration precedent. RarePath compresses the discovery and evidence-assembly portion of this milestone from many disconnected research steps (8 in the traditional path, across 7 source systems) into one evidence-backed workflow. The claim is about this milestone only, not about how fast treatments are developed. It is testable: measure analyst hours, databases searched, time to identify a shared asset, and time to assemble an evidence pack, with and without RarePath.
+Milestone: identifying and evaluating an existing research asset or collaboration precedent. RarePath compresses the discovery and evidence-assembly portion of this milestone from many disconnected research steps (8 in the traditional path, across 7 source systems) into one evidence-backed workflow. The claim is about this milestone only, not about how fast treatments are developed. It is testable: measure analyst hours, databases searched, time to identify a shared asset, and time to assemble an evidence pack, with and without RarePath. In one exploratory prototype benchmark (discovery and evidence assembly only), RarePath reduced time by about 4× and evidence-opening steps by 5×. That is reported as measured; it is not a 10× claim.
 
 **RESPONSIBLE AI / SAFETY**
 Research navigation only: no diagnosis, treatment recommendations or clinical-equivalence claims. Verbatim quote validation, explicit Known / AI-inferred / Contradictory / Unknown statuses, analyst-unreviewed AI edges hidden by default, a flagged preprint, and a "What we don't know" section. The OpenAI endpoint is schema-locked, rate-limited and cached, and the sourced page works even if AI fails.

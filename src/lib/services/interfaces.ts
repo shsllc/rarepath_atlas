@@ -115,6 +115,8 @@ export interface GraphService {
   edgesFor(nodeId: string): EvidenceEdge[];
   /** Resolve a free-text query to a node id via label/alias match. */
   resolve(query: string): GraphNode | undefined;
+  /** Optional: also report whether label, alias or identifier matched. */
+  resolveDetailed?(query: string): { node: GraphNode; via: "label" | "alias" | "identifier"; matched_text: string } | undefined;
   bundle(): GraphBundle;
 }
 

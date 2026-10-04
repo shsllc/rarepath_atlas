@@ -136,6 +136,7 @@ const SHORT_PREDICATE: Partial<Record<EvidenceEdge["predicate"], string>> = {
   studied_in: "enrolled in",
   applied_to: "applied in",
   informed_development_of: "informed",
+  authored: "authored",
   described_in: "described in",
   supports_community: "supports",
   produced_asset: "produced",

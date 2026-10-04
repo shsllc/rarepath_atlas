@@ -23,7 +23,7 @@ import {
   type Predicate,
   type SourceType,
 } from "../src/lib/schemas";
-import { CONNECTIONS, EDGES, GAPS, NODES, OPPORTUNITIES } from "./curation/cdd";
+import { ACTION_BRIEF, COLLABORATORS, CONNECTIONS, EDGES, GAPS, NODES, OPPORTUNITIES } from "./curation/cdd";
 
 const ROOT = process.cwd();
 const REAL = path.join(ROOT, "data", "real");
@@ -42,6 +42,7 @@ const SIGNATURE: Partial<Record<Predicate, [string[], string[]]>> = {
   studied_in: [["Disease"], ["Study"]],
   applied_to: [["ResearchAsset"], ["Disease"]],
   informed_development_of: [["Study", "PatientOrganization", "ResearchAsset"], ["ResearchAsset"]],
+  authored: [["Researcher"], ["Paper"]],
   produced_asset: [["Study"], ["ResearchAsset"]],
   investigates: [["Researcher"], ["Study"]],
   supports_community: [["PatientOrganization"], ["Disease"]],
@@ -299,6 +300,28 @@ const opportunities = OPPORTUNITIES.map((o) => {
 
 const gaps = GAPS.map(({ edges: keys, ...g }) => ({ ...g, related_edge_ids: keys.map(edgeId) }));
 
+const collaborators = COLLABORATORS.map(({ edges: keys, ...c }) => {
+  if (!nodeIds.has(c.node_id)) throw new Error(`Collaborator ${c.node_id} is not a node`);
+  return { ...c, evidence_edge_ids: keys.map(edgeId) };
+});
+const line = (l: { text: string; edges: string[] }) => ({ text: l.text, evidence_edge_ids: l.edges.map(edgeId) });
+const action_brief = {
+  opportunity: line(ACTION_BRIEF.opportunity),
+  why_surfaced: ACTION_BRIEF.why_surfaced.map(line),
+  existing_assets: ACTION_BRIEF.existing_assets.map((a) => {
+    if (!nodeIds.has(a.asset_id)) throw new Error(`Brief asset ${a.asset_id} is not a node`);
+    return { asset_id: a.asset_id, text: a.text, evidence_edge_ids: a.edges.map(edgeId) };
+  }),
+  who_is_relevant: ACTION_BRIEF.who_is_relevant.map((id) => {
+    if (!collaborators.some((c) => c.node_id === id)) throw new Error(`Brief references unknown collaborator ${id}`);
+    return id;
+  }),
+  bring_sources: ACTION_BRIEF.bring_sources.map((b) => ({ label: b.label, url: b.url, evidence_edge_ids: b.edges.map(edgeId) })),
+  question: line(ACTION_BRIEF.question),
+  must_validate: ACTION_BRIEF.must_validate.map(line),
+  does_not_mean: ACTION_BRIEF.does_not_mean.map(line),
+};
+
 const bundle = GraphBundle.parse({
   bundle_id: "cdd-real-v1",
   is_fixture: false,
@@ -310,6 +333,8 @@ const bundle = GraphBundle.parse({
   gaps,
   sources: [...sources.values()],
   build_info,
+  collaborators,
+  action_brief,
 });
 
 const serialized = JSON.stringify(bundle, null, 2);

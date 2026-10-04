@@ -72,7 +72,7 @@ ${checks.map(([name, ok, detail]) => `| ${name} | ${ok ? "PASS" : "**FAIL**"} | 
 
 ## Claim freeze
 
-**Status: ${failed.length === 0 ? "FROZEN (evidence set frozen on 2026-10-03)" : "NOT FROZEN — fix failing checks first"}.** No further source retrieval unless a factual error is found.
+**Status: ${failed.length === 0 ? "FROZEN (claims frozen 2026-10-03; on 2026-10-04 the same 22 records were re-retrieved to add public PubMed author/affiliation lines for the collaborator layer, with no new sources and no changed claims)" : "NOT FROZEN — fix failing checks first"}.** No further source retrieval unless a factual error is found.
 
 - Severity-scale statement → PMID 31147226 (methods sentence quoted verbatim)
 - Shared-infrastructure anchor → NCT02738281 (conditions + eligibility list CDKL5)

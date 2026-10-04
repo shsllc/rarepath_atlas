@@ -24,7 +24,8 @@ export class GraphSearchService implements SearchService {
   async search(query: string): Promise<SearchResponse> {
     const b = this.graph.bundle();
     const focusLabel = this.graph.getNode(b.focus_disease_id)?.label ?? "the seeded disease";
-    const matched = this.graph.resolve(query);
+    const resolved = this.graph.resolveDetailed?.(query);
+    const matched = resolved?.node ?? this.graph.resolve(query);
 
     if (!matched) {
       return {
@@ -70,7 +71,9 @@ export class GraphSearchService implements SearchService {
       found: true,
       is_fixture: b.is_fixture,
       fixture_warning: b.fixture_warning,
-      matched: { node_id: matched.id, label: matched.label, type: matched.type },
+      matched: { node_id: matched.id, label: matched.label, type: matched.type, via: resolved?.via, matched_text: resolved?.matched_text },
+      collaborators: b.collaborators,
+      action_brief: b.action_brief,
       disease: {
         node_id: focus.id,
         gene_ids: genes.map((n) => n.id),

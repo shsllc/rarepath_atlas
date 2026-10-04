@@ -6,10 +6,13 @@ import type { EvidenceEdge, GraphNode, ReusableAssetOpportunity, SearchResult, S
 import { ASSET_KIND_LABEL, CONNECTION_TYPE_LABEL, REUSE_LABEL } from "@/lib/format";
 import type { DrawerTarget } from "@/lib/graph-view";
 import { SOURCE_SYSTEM_BY_KIND, TENX } from "@/lib/tenx";
+import { BENCHMARK, ratio } from "@/lib/benchmark";
 import { EvidenceDrawer } from "./EvidenceDrawer";
 import { FixtureChip, STATUS_META, StatusBadge } from "./StatusBadge";
 import { GraphPlaceholder } from "./GraphPlaceholder";
 import { EvidenceKey } from "./EvidenceKey";
+import { ActionBriefPanel, CollaboratorCards, RankingPanel } from "./ResearchSections";
+import { rankResearchConnections, researchHubs } from "@/lib/analytics";
 
 const EvidenceGraph = dynamic(() => import("./EvidenceGraph").then((m) => m.EvidenceGraph), {
   ssr: false,
@@ -92,6 +95,8 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
   const infraConn = result.connections.find((c) => c.connection_type === "shared_research_infrastructure");
   const contradiction = result.edges.find((e) => e.predicate === "classified_as_variant_of" && e.contradiction_status !== "none");
   const heroEdges = featured ? [...new Set(featured.story.flatMap((s) => s.evidence_edge_ids))] : [];
+  const ranked = useMemo(() => rankResearchConnections(result.nodes, result.edges, result.disease.node_id), [result.nodes, result.edges, result.disease.node_id]);
+  const hubs = useMemo(() => researchHubs(result.nodes, result.edges), [result.nodes, result.edges]);
 
   return (
     <div>
@@ -109,11 +114,12 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
           steps={[
             { label: "Search CDKL5", done: true },
             { label: "Distinct from Rett, but historically linked", go: () => scrollTo("contradiction") },
+            { label: "Strongest research connection, and why it ranked", go: () => scrollTo("ranking") },
             { label: "Shared natural-history study: CDD participants enrolled", go: () => openNode("study:nhs") },
             { label: "Reusable insight: it informed a CDD-specific severity scale", go: () => scrollTo("hero") },
             { label: "The limitation: not equivalence, not treatment transfer", go: () => scrollTo("limitation") },
             { label: "Explain this connection (OpenAI)", go: () => open(featured.headline, heroEdges) },
-            { label: "The concrete next research question", go: () => scrollTo("next-question") },
+            { label: "Research Action Brief: who is relevant, what to ask", go: () => scrollTo("brief") },
             { label: "Evidence graph and citations", go: () => scrollTo("graph") },
           ]}
         />
@@ -137,6 +143,13 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
               {result.matched.node_id !== disease.id && (
                 <p className="text-sm text-muted">
                   You searched &ldquo;{result.query}&rdquo; → matched {result.matched.type} <strong>{result.matched.label}</strong>
+                  {result.matched.via === "alias" && result.matched.matched_text && <> (via alias &ldquo;{result.matched.matched_text}&rdquo;)</>}
+                  {result.matched.via === "identifier" && <> (via identifier)</>} → {disease.label}
+                </p>
+              )}
+              {result.matched.node_id === disease.id && result.matched.via && result.matched.via !== "label" && (
+                <p className="text-sm text-muted">
+                  You searched &ldquo;{result.query}&rdquo; → resolved via {result.matched.via} &ldquo;{result.matched.matched_text}&rdquo;
                 </p>
               )}
               {disease.lay_summary && <p className="mt-2">{disease.lay_summary}</p>}
@@ -193,8 +206,21 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         )}
       </Section>
 
-      {/* 2. HERO: REUSABLE RESEARCH */}
-      <Section id="hero" n={2} title="Reusable research" subtitle="What another community has already built that yours may be able to reuse. Every card is a hypothesis to check, never a conclusion.">
+      {/* 2. GRAPH ANALYTICS: RESEARCH CONNECTION STRENGTH */}
+      {ranked.length > 0 && (
+        <Section
+          id="ranking"
+          n={2}
+          tone="wash"
+          title="Research connection strength"
+          subtitle="Which neighbouring communities are most useful to investigate, and why. Computed from reviewed, sourced relationships only. Not a measure of biological or clinical similarity."
+        >
+          <RankingPanel ranked={ranked} hubs={hubs} label={label} open={open} />
+        </Section>
+      )}
+
+      {/* 3. HERO: REUSABLE RESEARCH */}
+      <Section id="hero" n={3} title="Reusable research" subtitle="What another community has already built that yours may be able to reuse. Every card is a hypothesis to check, never a conclusion.">
         {featured && <FeaturedCard o={featured} label={label} open={open} isFixture={isFixture} heroEdges={heroEdges} />}
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {others.map((o) => (
@@ -203,15 +229,22 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         </div>
       </Section>
 
-      {/* 3. CONTRADICTION SPOTLIGHT */}
+      {/* 4. RESEARCH ACTION BRIEF */}
+      {result.action_brief && (
+        <Section id="brief" n={4} title="Research Action Brief" subtitle="Something a patient organization could take into a research conversation this week. Every line opens to its evidence.">
+          <ActionBriefPanel brief={result.action_brief} collaborators={result.collaborators} nodes={nodes} open={open} />
+        </Section>
+      )}
+
+      {/* 5. CONTRADICTION SPOTLIGHT */}
       {contradiction && (
-        <Section id="contradiction" n={3} title="Why searching names is not enough" subtitle="Historical labels and current evidence can disagree. RarePath shows both, with dates.">
+        <Section id="contradiction" n={5} title="Why searching names is not enough" subtitle="Historical labels and current evidence can disagree. RarePath shows both, with dates.">
           <ContradictionSpotlight edge={contradiction} sources={sources} open={open} label={label} />
         </Section>
       )}
 
-      {/* 4. CONNECTED COMMUNITIES */}
-      <Section id="communities" n={4} tone="wash" title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
+      {/* 6. CONNECTED COMMUNITIES */}
+      <Section id="communities" n={6} tone="wash" title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
         <div className="grid gap-3 md:grid-cols-2">
           {result.connections.map((c) => (
             <article key={c.id} className={`rounded-2xl border border-line bg-white p-5 ${STATUS_META[c.status].card}`}>
@@ -238,8 +271,8 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         </div>
       </Section>
 
-      {/* 5. EVIDENCE GRAPH */}
-      <Section id="graph" n={5} title="Explore the evidence graph" subtitle="Each line is a relationship with its own sources, and its style shows the evidence status.">
+      {/* 7. EVIDENCE GRAPH */}
+      <Section id="graph" n={7} title="Explore the evidence graph" subtitle="Each line is a relationship with its own sources, and its style shows the evidence status.">
         <EvidenceGraph nodes={result.nodes} edges={result.edges} focusId={disease.id} onOpen={setDrawer} />
         <details className="mt-3">
           <summary className="cursor-pointer text-sm font-medium">Table view of all relationships (accessible alternative)</summary>
@@ -249,20 +282,26 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         </details>
       </Section>
 
-      {/* 6. 10× OPPORTUNITY */}
+      {/* 8. 10× OPPORTUNITY */}
       {!result.is_fixture && (
-        <Section id="tenx" n={6} tone="wash" title="The 10× opportunity" subtitle={`Milestone: ${TENX.milestone}.`}>
+        <Section id="tenx" n={8} tone="wash" title="The 10× opportunity" subtitle={`Milestone: ${TENX.milestone}.`}>
           <TenXPanel result={result} />
         </Section>
       )}
 
-      {/* 7. PEOPLE & COMMUNITIES */}
-      <Section id="people" n={7} title="People & communities">
+      {/* 9. PEOPLE & COMMUNITIES */}
+      <Section id="people" n={9} title="People & communities">
+        {result.collaborators.length > 0 && (
+          <div className="mb-4">
+            <h3 className="mb-2 text-sm font-semibold">Relevant to this research path</h3>
+            <CollaboratorCards collaborators={result.collaborators} nodes={nodes} open={open} />
+          </div>
+        )}
         <PeopleSection result={result} nodes={nodes} label={label} open={open} openNode={openNode} />
       </Section>
 
-      {/* 8. WHAT WE DON'T KNOW */}
-      <Section id="gaps" n={8} tone="wash" title="What we don't know" subtitle="Missing evidence, disagreements and assumptions behind this page.">
+      {/* 10. WHAT WE DON'T KNOW */}
+      <Section id="gaps" n={10} tone="wash" title="What we don't know" subtitle="Missing evidence, disagreements and assumptions behind this page.">
         <ul className="space-y-2">
           {result.gaps.map((g) => (
             <li key={g.id} className="rounded-2xl border border-line bg-white p-4 text-sm leading-relaxed">
@@ -582,6 +621,45 @@ function TenXPanel({ result }: { result: SearchResult }) {
         <strong>Behind this page:</strong> {systems.length} source systems ({systems.join(", ")}), {result.sources.length} retrieved records, {quotes} verbatim evidence quotes,{" "}
         {result.edges.length} evidence-backed relationships.
       </p>
+      <div className="mt-4 rounded-2xl border border-line p-4">
+        <h4 className="text-xs font-bold uppercase tracking-wide text-muted">{BENCHMARK.label}</h4>
+        <p className="mt-1 text-sm">{BENCHMARK.task}</p>
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[420px] text-left text-sm">
+            <thead className="text-xs uppercase tracking-wide text-muted">
+              <tr>
+                <th className="py-1 pr-3">Measure</th>
+                <th className="py-1 pr-3">Manual</th>
+                <th className="py-1 pr-3">RarePath</th>
+                <th className="py-1">Ratio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(
+                [
+                  ["Elapsed time (s)", "seconds"],
+                  ["Searches", "searches"],
+                  ["Source systems touched", "sourceSystems"],
+                  ["Evidence-opening steps", "evidenceOpenings"],
+                ] as const
+              ).map(([name, k]) => (
+                <tr key={k} className="border-t border-line">
+                  <td className="py-1 pr-3">{name}</td>
+                  <td className="py-1 pr-3">{BENCHMARK.manual[k]}</td>
+                  <td className="py-1 pr-3">{BENCHMARK.rarepath[k]}</td>
+                  <td className="py-1 font-semibold">{ratio(BENCHMARK.manual[k], BENCHMARK.rarepath[k])}×</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-xs text-muted">{BENCHMARK.scope}</p>
+        <ul className="mt-1 list-disc pl-5 text-xs text-muted">
+          {BENCHMARK.caveats.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ul>
+      </div>
       <div className="mt-4">
         <h4 className="text-xs font-bold uppercase tracking-wide text-muted">What would need to be measured to prove 10×</h4>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">

@@ -51,11 +51,21 @@ export class JsonGraphService implements GraphService {
   }
 
   resolve(query: string) {
+    return this.resolveDetailed(query)?.node;
+  }
+
+  /** Exact (normalised) match on label, then alias, then stable identifier. Reports which route matched. */
+  resolveDetailed(query: string): { node: GraphNode; via: "label" | "alias" | "identifier"; matched_text: string } | undefined {
     const q = norm(query);
     if (!q) return undefined;
+    for (const n of this.nodes.values()) if (norm(n.label) === q) return { node: n, via: "label", matched_text: n.label };
     for (const n of this.nodes.values()) {
-      if (norm(n.label) === q || n.aliases.some((a) => norm(a) === q)) return n;
-      if (n.external_ids.some((x) => x.id !== "pending" && norm(x.id) === q)) return n;
+      const a = n.aliases.find((x) => norm(x) === q);
+      if (a) return { node: n, via: "alias", matched_text: a };
+    }
+    for (const n of this.nodes.values()) {
+      const x = n.external_ids.find((x) => x.id !== "pending" && norm(x.id) === q);
+      if (x) return { node: n, via: "identifier", matched_text: x.id };
     }
     return undefined;
   }

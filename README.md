@@ -10,12 +10,13 @@ Rare-disease patient organizations often have to do their own research. They sea
 
 ## What RarePath does
 
-Search a disease or gene. RarePath shows:
+Search a disease, gene, alias or identifier (e.g. `CDKL5`, `STK9`, `MONDO:0100039`). RarePath shows:
 
-1. **Connected communities:** which related disorders yours has been studied alongside, and exactly how (shared study, historical naming, clinical differences).
+1. **Research connection strength (graph analytics):** a transparent ranking of neighbouring communities. It shows why each one ranked and what limits the connection, uses reviewed evidence only, and finds research hubs (a study linking several disorder communities). It is not a similarity score.
 2. **Reusable research:** natural-history infrastructure, outcome measures and biobanks, each classified cautiously (*shared-infrastructure precedent*, *potentially adaptable*, *discovery lead*). These are never shown as established fact.
-3. **What it does not mean:** differences, contradictions and open questions, shown next to the connection.
-4. **A next question:** a concrete research or collaboration question, with the evidence behind it.
+3. **Who is relevant:** investigators and organizations tied to the evidence path, from public registry and PubMed author metadata. No contact details are stored, and relevance does not imply willingness.
+4. **Research Action Brief:** the opportunity, why it surfaced, existing assets, who is relevant, sources to bring, the question to ask, what must be validated, and what it does not mean.
+5. **What it does not mean:** differences, contradictions and open questions, shown next to every connection.
 
 Every claim opens to its **verbatim source quote**, with a link and retrieval date.
 
@@ -49,7 +50,9 @@ The sourced journey works even if OpenAI is unavailable. The explanation then sh
 - **Reviewed vs. unreviewed AI claims:** 13 OpenAI-only relationships are quote-verified but not analyst-reviewed. They are hidden by default and labelled "AI-extracted" when shown.
 - **Contradictions:** the superseded "Rett variant" classification is shown as **Contradictory**, with the historical label next to the current evidence.
 - **Uncertainty:** reuse cards are always "AI-inferred"; a "What we don't know" section lists gaps; the preprint is flagged.
-- **Audit:** [docs/final-evidence-audit.md](docs/final-evidence-audit.md) (10/10 checks pass). There are 60 automated tests.
+- **Collaborators:** registry investigators are linked to papers only where name **and** institution match the PubMed author metadata.
+- **Analytics:** the ranking formula is visible on the page, and AI-only edges, inferred links and contradicted links add no points.
+- **Audit:** [docs/final-evidence-audit.md](docs/final-evidence-audit.md) (10/10 checks pass). There are 79 automated tests. Challenge coverage: [docs/challenge-criteria-audit.md](docs/challenge-criteria-audit.md).
 
 ## Run locally
 
@@ -87,6 +90,10 @@ npx tsx scripts/build-real-bundle.ts
 - **Cytoscape.js** evidence graph. Line style encodes status: solid = Known, dashed = AI-inferred, double = Contradictory, dotted = Unknown.
 - Details: [docs/architecture.md](docs/architecture.md), [docs/data-model.md](docs/data-model.md).
 
+## Prototype benchmark
+
+In one exploratory run ([docs/benchmark.md](docs/benchmark.md)), finding the shared infrastructure, the resulting asset and their sources took **93 s, 3 searches, 3 systems and 5 evidence pages manually**, versus **22 s, 1 search and 1 click in RarePath**: about 4× in time and 5× in evidence-opening steps. This measures discovery and evidence assembly only, the manual run was done with prior knowledge, and it is **not** a 10× result.
+
 ## Limitations
 
 - One verified journey (CDKL5 deficiency disorder), not a comprehensive atlas.
@@ -110,4 +117,4 @@ Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-dete
 
 ## Submission docs
 
-[60-second script](docs/demo-script-60s.md) · [shot list](docs/demo-shot-list.md) · [technical video outline](docs/technical-video-outline.md) · [10× case](docs/10x-impact.md) · [submission checklist](docs/submission-checklist.md)
+[60-second script](docs/demo-script-60s.md) · [shot list](docs/demo-shot-list.md) · [technical video outline](docs/technical-video-outline.md) · [10× case](docs/10x-impact.md) · [benchmark](docs/benchmark.md) · [challenge-criteria audit](docs/challenge-criteria-audit.md) · [submission checklist](docs/submission-checklist.md)

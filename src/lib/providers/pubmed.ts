@@ -43,6 +43,21 @@ export class PubMedProvider implements LiteratureProvider {
         return normalizeText((label ? `${label}: ` : "") + decode(m[2]));
       });
       if (parts.length === 0) throw new Error(`No abstract for PMID ${pmid}`);
+      // Author + first affiliation lines (public PubMed metadata) so collaborator links are quote-verifiable.
+      // Contact details are stripped: no email addresses are ever stored.
+      const authorLines = [...art.matchAll(/<Author[ >][\s\S]*?<\/Author>/g)].map((m) => {
+        const a = m[0];
+        const last = /<LastName>([\s\S]*?)<\/LastName>/.exec(a)?.[1];
+        const ini = /<Initials>([\s\S]*?)<\/Initials>/.exec(a)?.[1];
+        const coll = /<CollectiveName>([\s\S]*?)<\/CollectiveName>/.exec(a)?.[1];
+        const aff = /<Affiliation>([\s\S]*?)<\/Affiliation>/.exec(a)?.[1];
+        const name = coll ? decode(coll) : `${decode(last ?? "")} ${ini ?? ""}`.trim();
+        const affClean = aff
+          ? normalizeText(decode(aff).replace(/Electronic address:\s*\S+/gi, "").replace(/\S+@\S+/g, "")).replace(/[\s;,.]+$/, "")
+          : "";
+        return `Author: ${name}${affClean ? ` — ${affClean}` : ""}`;
+      });
+      parts.push(...authorLines);
       const id = (t: string) => s.articleids.find((a) => a.idtype === t)?.value;
       return {
         id: `pubmed:${pmid}`,

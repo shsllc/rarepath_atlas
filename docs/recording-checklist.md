@@ -9,7 +9,7 @@ Use with [demo-script-60s.md](demo-script-60s.md) and [demo-shot-list.md](demo-s
 - [ ] Browser zoom at **100%**.
 - [ ] Window about **1440×900** (or 1280×800). Hide bookmarks and extensions bars if possible.
 - [ ] Load the canonical demo once: https://rarepathatlas.netlify.app/results?q=CDKL5&demo=1 and let the graph render.
-- [ ] Warm the explanation: click demo step 6 ("Explain this connection (OpenAI)"), then **Explain (OpenAI)**, and wait for the four-part answer (usually 10–20 seconds). Do this within a few minutes of recording. The cache is per server instance, so the on-camera click is usually instant but may occasionally take 10–20 seconds; trim the wait in editing if needed.
+- [ ] Warm the explanation: click demo step 7 ("Explain this connection (OpenAI)"), then **Explain (OpenAI)**, and wait for the four-part answer (usually 10–20 seconds). Do this within a few minutes of recording. The cache is per server instance, so the on-camera click is usually instant but may occasionally take 10–20 seconds; trim the wait in editing if needed.
 - [ ] Return to the home page: https://rarepathatlas.netlify.app
 - [ ] Do a test recording of a few seconds and **verify audio** level and clarity.
 
