@@ -22,6 +22,7 @@ import type { IdSystem, PaperRecord, ProviderId, ResearchLink, ResearchRecord } 
 const ID_KEYS: Partial<Record<ResearchRecord["kind"], IdSystem[]>> = {
   paper: ["doi", "pmid", "pmcid", "openalex"],
   disease: ["mondo", "efo", "orphanet", "omim"],
+  model: ["model"],
   gene: ["ensembl", "hgnc", "symbol"],
   person: ["orcid", "openalex"],
   institution: ["ror"],
@@ -97,7 +98,14 @@ function mergeGroup(group: ResearchRecord[]): ResearchRecord {
     merged.roles = uniq(ps.flatMap((p) => p.roles));
   }
   if (merged.kind === "outcome_measure") merged.roles = uniq((group as Extract<ResearchRecord, { kind: "outcome_measure" }>[]).flatMap((o) => o.roles));
-  if (merged.kind === "disease") merged.synonyms = uniq((group as Extract<ResearchRecord, { kind: "disease" }>[]).flatMap((d) => d.synonyms));
+  if (merged.kind === "disease") {
+    const ds = group as Extract<ResearchRecord, { kind: "disease" }>[];
+    merged.synonyms = uniq(ds.flatMap((d) => d.synonyms));
+    merged.description = ds.find((d) => d.description)?.description;
+    merged.epidemiology = ds.find((d) => d.epidemiology?.length)?.epidemiology;
+    merged.natural_history = ds.find((d) => d.natural_history)?.natural_history;
+    merged.mapping_basis = ds.find((d) => d.mapping_basis)?.mapping_basis;
+  }
   return merged;
 }
 
@@ -162,12 +170,16 @@ export function reconcile(records: ResearchRecord[], links: ResearchLink[], opts
   for (const l of links) {
     const from = keyMap.get(l.from) ?? l.from;
     const to = keyMap.get(l.to) ?? l.to;
-    const key = `${from}|${l.relation}|${to}`;
+    // Classification statements from different source records (ClinVar RCV vs VCV, ClinGen VCEP) stay separate statements.
+    const key = `${from}|${l.relation}|${to}${l.relation === "variant_classified_for" ? `|${l.provenance[0]?.source_id}` : ""}`;
     const prev = linkMap.get(key);
     if (!prev) linkMap.set(key, { ...l, from, to, key });
     else {
       prev.provenance = [...prev.provenance, ...l.provenance].filter((p, i, a) => a.findIndex((q) => q.provider === p.provider && q.source_id === p.source_id) === i);
       prev.discovery_lead = prev.discovery_lead && l.discovery_lead;
+      // Keep every source's qualifiers (frequency, onset, review status…); the first source to state a key wins.
+      if (l.qualifiers) prev.qualifiers = { ...l.qualifiers, ...(prev.qualifiers ?? {}) };
+      prev.source_score ??= l.source_score;
     }
   }
   return { records: out, links: [...linkMap.values()], merges };
@@ -178,7 +190,7 @@ function keyRank(k: string): number {
   if (/^paper:pmid:/.test(k)) return 1;
   if (/^person:orcid:/.test(k)) return 0;
   if (/^(institution:ror|study:nct|gene:ensembl|drug:chembl|variant:rsid):/.test(k)) return 0;
-  if (/^(organization|outcome):/.test(k)) return 0;
+  if (/^(organization|outcome|model):/.test(k)) return 0;
   if (/^disease:(MONDO|EFO)/.test(k)) return 0;
   return 5;
 }

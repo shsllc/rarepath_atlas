@@ -10,10 +10,17 @@ import { GwasProvider } from "./providers/gwas";
 import { OpenAlexProvider } from "./providers/openalex";
 import { OpenTargetsProvider } from "./providers/opentargets";
 import { TrialPublicationsProvider } from "./providers/trialpubs";
+import { MonarchProvider } from "./providers/monarch";
+import { OrphadataProvider } from "./providers/orphadata";
+import { HpoProvider } from "./providers/hpo";
+import { ClinGenProvider } from "./providers/clingen";
+import { ClinVarProvider } from "./providers/clinvar";
+import { AllianceProvider } from "./providers/alliance";
 import type { ResearchProvider } from "./types";
 
 export function liveProviders(): ResearchProvider[] {
-  return [new OpenTargetsProvider(), new GwasProvider(), new ClinicalTrialsProvider(), new EuropePmcProvider(), new DataCiteProvider(), new OpenAlexProvider(), new CrossrefProvider(), new TrialPublicationsProvider()];
+  return [new OpenTargetsProvider(), new GwasProvider(), new ClinicalTrialsProvider(), new EuropePmcProvider(), new DataCiteProvider(), new OpenAlexProvider(), new CrossrefProvider(), new TrialPublicationsProvider(),
+    new MonarchProvider(), new OrphadataProvider(), new HpoProvider(), new ClinGenProvider(), new ClinVarProvider(), new AllianceProvider()];
 }
 
 export type SourceUse = "discovery" | "metadata" | "reviewed_ingestion";
@@ -34,6 +41,7 @@ const OFFLINE: SourceEntry[] = [
   { name: "ClinicalTrials.gov (registry records)", data_types: ["Full study records for reviewed studies"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://clinicaltrials.gov", note: "The two reviewed CDD studies were retrieved offline; live search uses the same API for discovery." },
   { name: "WHO ICTRP", data_types: ["International trial registrations"], mode: "not_integrated", uses: [], homepage: "https://trialsearch.who.int", note: "Programmatic access requires a WHO web-service subscription; the search portal is not scraped. Trial records already carry EudraCT/CTIS/UTN secondary ids so ICTRP records can be deduplicated when access is granted." },
   { name: "EMA CTIS", data_types: ["EU/EEA trials"], mode: "not_integrated", uses: [], homepage: "https://euclinicaltrials.eu", note: "No documented, versioned public API with reuse terms was found; the portal's internal endpoints are not scraped. EudraCT/CTIS numbers from ClinicalTrials.gov records are kept for future reconciliation." },
+  { name: "DisGeNET", data_types: ["Gene-disease associations"], mode: "not_integrated", uses: [], homepage: "https://www.disgenet.com", note: "Requires a registered account and licence tier; not used." },
   { name: "MONDO / HPO (EBI OLS4) and HGNC", data_types: ["Disease, phenotype and gene identity"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://www.ebi.ac.uk/ols4", note: "Identity verification for reviewed nodes." },
   { name: "NIH RePORTER", data_types: ["Funded projects"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://reporter.nih.gov", note: "Funding record for the shared natural-history infrastructure." },
   { name: "Patient-organization websites", data_types: ["Mission statements (title/description only)"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://rarepathatlas.netlify.app/atlas", note: "Homepage title and description only; no crawling." },

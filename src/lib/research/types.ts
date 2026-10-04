@@ -8,7 +8,7 @@
  * only adds provenance; it never makes anything "reviewed".
  */
 
-export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs";
+export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance";
 
 /** Stable identifier systems used for reconciliation (lower-case keys). */
 export type IdSystem =
@@ -36,7 +36,10 @@ export type IdSystem =
   | "eudract"
   | "ctis"
   | "utn"
-  | "orgname";
+  | "orgname"
+  | "gard"
+  | "vcv"
+  | "model";
 
 export interface Provenance {
   provider: ProviderId;
@@ -61,8 +64,18 @@ interface RecordBase {
 
 export type PublicationStatus = "peer_reviewed" | "preprint" | "unknown";
 
-export type DiseaseRecord = RecordBase & { kind: "disease"; synonyms: string[]; description?: string };
-export type GeneRecord = RecordBase & { kind: "gene"; name?: string };
+export type DiseaseRecord = RecordBase & {
+  kind: "disease";
+  synonyms: string[];
+  description?: string;
+  /** Orphanet epidemiology, verbatim classes; never interpreted further. */
+  epidemiology?: { type: string; class?: string; geographic?: string; qualification?: string; validation?: string }[];
+  /** Orphanet natural-history fields, verbatim. */
+  natural_history?: { onset: string[]; inheritance: string[] };
+  /** How an Orphanet record was tied to the MONDO disease (shared exact-mapped identifier), or why it was not. */
+  mapping_basis?: string;
+};
+export type GeneRecord = RecordBase & { kind: "gene"; name?: string; taxon?: string };
 export type VariantRecord = RecordBase & { kind: "variant" };
 export type PhenotypeRecord = RecordBase & { kind: "phenotype" };
 export type PaperRecord = RecordBase & {
@@ -132,6 +145,8 @@ export type StudyRecord = RecordBase & {
   infrastructure: { flag: StudyInfrastructure; basis: string }[];
 };
 export type OrganizationRecord = RecordBase & { kind: "organization"; org_class?: string };
+/** A model-organism or experimental model. Preclinical: never implies human clinical relevance. */
+export type ModelRecord = RecordBase & { kind: "model"; species: string; model_type: string; disease_context?: string };
 export type OutcomeMeasureRecord = RecordBase & {
   kind: "outcome_measure";
   /** Source-native wording; RarePath does not reclassify it as biomarker / PRO unless a source says so. */
@@ -155,7 +170,8 @@ export type ResearchRecord =
   | DatasetRecord
   | DrugRecord
   | OrganizationRecord
-  | OutcomeMeasureRecord;
+  | OutcomeMeasureRecord
+  | ModelRecord;
 export type RecordKind = ResearchRecord["kind"];
 
 export type LinkRelation =
@@ -179,7 +195,13 @@ export type LinkRelation =
   | "uses_outcome_measure" // registered study lists this outcome measure
   | "trial_publication" // ClinicalTrials.gov lists the paper as a RESULT or DERIVED reference
   | "trial_background_reference" // ClinicalTrials.gov lists the paper as BACKGROUND (not a result)
-  | "paper_mentions_trial"; // Europe PMC text-mining finds the NCT id in the paper (a lead)
+  | "paper_mentions_trial" // Europe PMC text-mining finds the NCT id in the paper (a lead)
+  | "causal_gene" // a curated source states the gene causes the disease (Monarch / Orphanet), kept with its knowledge source
+  | "clingen_validity" // ClinGen expert-curated gene-disease validity classification (source-native)
+  | "dosage_sensitivity" // ClinGen dosage-sensitivity curation for a gene
+  | "phenotype_excluded" // a curated NOT annotation: the feature is documented as absent
+  | "ortholog_of" // Alliance orthology
+  | "model_of"; // preclinical model of a disease context (not human clinical relevance)
 
 export interface ResearchLink {
   key: string;
@@ -192,6 +214,8 @@ export interface ResearchLink {
   discovery_lead: boolean;
   /** A provider's own score, kept verbatim and labelled. Never a RarePath score. */
   source_score?: { name: string; value: number };
+  /** Source-native qualifiers (frequency, onset, sex, evidence code, classification, review status…), never reinterpreted. */
+  qualifiers?: Record<string, string>;
   provenance: Provenance[];
   review_status: "machine_assembled";
   eligible_for_ranking: false;

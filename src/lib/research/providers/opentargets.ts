@@ -111,7 +111,8 @@ export class OpenTargetsProvider implements ResearchProvider {
           to: dKey,
           relation: "variant_classified_for",
           native_evidence_type: `clinvar:${sig}`,
-          statement: `ClinVar record ${v.studyId ?? ""} classifies this ${v.target?.approvedSymbol ?? ""} variant for ${d.name} as: ${sig} (ClinVar review status: ${v.confidence ?? "not stated"}).`.replace(/\s+/g, " "),
+          qualifiers: { classification: sig, review_status: v.confidence ?? "not stated" },
+          statement: `ClinVar record ${v.studyId ?? ""} classifies this ${v.target?.approvedSymbol ?? ""} variant for ${d.name} as: ${sig} (ClinVar review status: ${v.confidence ?? "not stated"}). A database classification, not a personal interpretation or diagnosis.`.replace(/\s+/g, " "),
           provenance: [{ ...p(v.studyId ?? vid, url, "eva"), provider: "opentargets" }],
         }),
       );

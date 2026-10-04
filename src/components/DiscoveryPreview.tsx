@@ -185,6 +185,7 @@ export function Study({ s }: { s: StudyView }) {
 export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
   const p = result.preview;
   const lit = p.literature;
+  const r = p.rare;
   const counts: [string, number][] = [
     ["Papers (Europe PMC)", lit.total],
     ["Clinical studies", p.clinical.total],
@@ -277,6 +278,32 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
           Totals are what each source reports for this disease; RarePath shows a small, linked sample. {p.merges} duplicate records from different sources were merged by stable identifiers (DOI, PMID, ORCID, ROR, NCT…), keeping every source&apos;s provenance.
         </p>
       </section>
+
+      <Section title="Rare-disease identity and natural history" note="Orphanet (Orphadata, CC BY 4.0) and Monarch. Epidemiology and natural-history fields are shown exactly as Orphanet records them and are not interpreted further.">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+          {r.mappings.map((m) => (
+            <span key={m.id} className="font-mono text-muted">
+              {m.id}
+            </span>
+          ))}
+        </div>
+        {r.mapping_basis && <p className="mt-1 text-[11px] text-muted">Orphanet link: {r.mapping_basis}. Diseases are never merged on a name alone.</p>}
+        {r.natural_history && (
+          <p className="mt-2 text-sm">
+            <span className="font-semibold">Age of onset (Orphanet):</span> {r.natural_history.onset.join(", ") || "not stated"} · <span className="font-semibold">Inheritance:</span> {r.natural_history.inheritance.join(", ") || "not stated"}
+          </p>
+        )}
+        {r.epidemiology.length > 0 && (
+          <ul className="mt-2 space-y-0.5 text-[11px] text-muted">
+            {r.epidemiology.slice(0, 5).map((e, i) => (
+              <li key={i}>
+                {e.type}: {e.class ?? "class not stated"} {e.geographic && `(${e.geographic})`} {e.validation && `· ${e.validation}`}
+              </li>
+            ))}
+          </ul>
+        )}
+        {!r.mappings.length && !r.natural_history && <Empty>No Orphanet record could be tied to this disease by a shared identifier.</Empty>}
+      </Section>
 
       <Section title="Literature" note="Europe PMC search results, enriched by OpenAlex and verified against Crossref where a DOI exists. Search hits and citations are navigation leads, not findings.">
         <Sub>Most relevant</Sub>
@@ -425,8 +452,50 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         )}
       </Section>
 
-      <Section title="Genetics" note="Open Targets, ClinVar (via Open Targets) and the GWAS Catalog. An association is not causation, a drug-trial target is not a genetic cause, and nothing here applies to any individual.">
-        <Sub>Associated genes and targets</Sub>
+      <Section title="Genetics" note="ClinGen, Monarch, Orphanet, ClinVar, Open Targets and the GWAS Catalog. Expert-curated validity is shown apart from gene mentions and associations. An association is not causation, a shared gene is not a shared mechanism, and nothing here applies to any individual.">
+        <Sub>Expert-curated gene-disease validity (ClinGen)</Sub>
+        {r.validity.length ? (
+          <ul className="space-y-2">
+            {r.validity.map((v) => (
+              <li key={v.gene + v.expert_panel} className="rounded-lg border-2 border-solid border-ink bg-white p-2 text-sm">
+                <span className="mr-2 rounded bg-ink px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white">EXPERT-CURATED VALIDITY</span>
+                <span className="font-semibold">{v.gene}</span>: <span className="font-semibold">{v.classification}</span>
+                <span className="block text-[11px] text-muted">
+                  {v.expert_panel} · {v.mode_of_inheritance} · released {v.released} · ClinGen&apos;s own classification, not a RarePath score <Ext href={v.url}>ClinGen</Ext>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty>No ClinGen gene-disease validity curation for this disease.</Empty>
+        )}
+        {r.dosage.length > 0 && (
+          <ul className="mt-2 space-y-1 text-[11px] text-muted">
+            {r.dosage.map((d) => (
+              <li key={d.gene}>
+                ClinGen dosage sensitivity, {d.gene}: haploinsufficiency — {d.haploinsufficiency}; triplosensitivity — {d.triplosensitivity} <Ext href={d.url}>curation</Ext>
+              </li>
+            ))}
+          </ul>
+        )}
+        {r.causal_genes.length > 0 && (
+          <>
+            <Sub>Curated causal genes (Monarch / Orphanet)</Sub>
+            <ul className="flex flex-wrap gap-2 text-xs">
+              {r.causal_genes.map((c, i) => (
+                <li key={i} className="rounded border border-line px-2 py-0.5" title={c.detail}>
+                  <span className="font-semibold">{c.gene}</span> <span className="text-muted">· {c.source}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {r.other_gene_associations.length > 0 && (
+          <p className="mt-2 text-[11px] text-muted">
+            Other Orphanet gene relationships (modifiers, susceptibility factors; not causal): {r.other_gene_associations.slice(0, 12).map((g) => `${g.gene} (${g.detail.split(" (")[0]})`).join("; ")}
+          </p>
+        )}
+        <Sub>Gene mentions and associations (Open Targets): not validity classifications</Sub>
         {p.genetics.genes.length ? (
           <ul className="divide-y divide-line">
             {p.genetics.genes.slice(0, 10).map((t) => (
@@ -448,9 +517,26 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         ) : (
           <Empty>No associated targets returned.</Empty>
         )}
+        <Sub>Variant classifications (ClinVar and ClinGen expert panels)</Sub>
+        <p className="text-[11px] text-muted">Database classifications with their review strength. Not a personal interpretation, a diagnosis or a statement about any individual. {r.clinvar_total ? `${n(r.clinvar_total)} ClinVar records match this disease and gene.` : ""}</p>
+        {r.clinvar.length ? (
+          <ul className="mt-1 space-y-1 text-xs">
+            {r.clinvar.map((v, i) => (
+              <li key={i}>
+                <span className="mr-1 inline-block w-10 font-mono text-amber" aria-label={`${v.stars} of 4 review stars`}>
+                  {"★".repeat(v.stars)}
+                  {"☆".repeat(4 - v.stars)}
+                </span>
+                <span className="font-semibold">{v.classification}</span> · {v.review_status} · <span className="break-all">{v.label}</span> <span className="text-muted">[{v.source}]</span> <Ext href={v.url}>record</Ext>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty>No ClinVar records returned.</Empty>
+        )}
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Sub>Variant records (ClinVar)</Sub>
+            <Sub>ClinVar evidence via Open Targets</Sub>
             {p.genetics.variants.length ? (
               <ul className="space-y-2 text-xs">
                 {p.genetics.variants.map((v) => (
@@ -480,6 +566,55 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
             )}
           </div>
         </div>
+      </Section>
+
+      <Section title="Phenotypes (HPO annotations)" note="From HPO disease annotations and Orphanet, with frequency, onset, sex and references as the sources state them. Features documented as absent are listed separately. A shared feature does not mean a shared disease, and phenotypes are never compared by simply counting shared terms.">
+        {p.phenotypes.annotated.length ? (
+          <ul className="grid gap-x-4 gap-y-1 text-xs sm:grid-cols-2">
+            {p.phenotypes.annotated.slice(0, 24).map((h) => (
+              <li key={h.hpo}>
+                <a href={h.url} target="_blank" rel="noreferrer" className="font-medium hover:text-brand hover:underline">
+                  {h.name}
+                </a>{" "}
+                <span className="text-muted">
+                  {[h.frequency, h.onset, h.sex].filter(Boolean).join(" · ") || "frequency not stated"} · {h.sources.join("+")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty>No HPO annotations returned.</Empty>
+        )}
+        {p.phenotypes.annotated.length > 24 && <p className="mt-1 text-[11px] text-muted">+{p.phenotypes.annotated.length - 24} more annotated features.</p>}
+        <Sub>Documented as absent (NOT / excluded)</Sub>
+        {p.phenotypes.excluded.length ? (
+          <ul className="flex flex-wrap gap-2 text-xs">
+            {p.phenotypes.excluded.map((h) => (
+              <li key={h.hpo} className="rounded border-2 border-double border-contradictory px-2 py-0.5 text-contradictory">
+                ✕ {h.name} <span className="text-muted">({h.sources.join("+")})</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty>No excluded features recorded by these sources.</Empty>
+        )}
+      </Section>
+
+      <Section title="Models (preclinical / model-organism discovery)" note="Model-organism genotypes and experimental models from Monarch and the Alliance of Genome Resources. Preclinical evidence only: a model does not establish human clinical relevance.">
+        {r.models.length ? (
+          <ul className="space-y-1 text-xs">
+            {r.models.map((m) => (
+              <li key={m.id}>
+                <span className="mr-1 rounded border border-dashed border-teal px-1 text-[10px] font-bold text-teal">PRECLINICAL</span>
+                <span className="font-medium italic">{m.species}</span> · {m.label}
+                {m.disease_context && <span className="text-muted"> · {m.disease_context}</span>} <span className="text-muted">[{m.source}]</span> <Ext href={m.url}>{m.id}</Ext>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Empty>No model-organism models returned.</Empty>
+        )}
+        {r.orthologs.length > 0 && <p className="mt-2 text-[11px] text-muted">Orthologs (Alliance): {r.orthologs.map((o) => `${o.symbol} (${o.species}${o.confidence ? `, ${o.confidence}` : ""})`).join("; ")}</p>}
       </Section>
 
       <Section title="Research assets" note="DOI-registered datasets and collections (DataCite), plus natural-history, registry, cohort and biobank studies flagged from registry fields, each with its status. These can reveal reusable recruitment infrastructure, outcome measures, longitudinal-data models, investigators and sites. Reuse terms must be checked with each repository or sponsor.">

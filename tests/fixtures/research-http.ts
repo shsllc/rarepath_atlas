@@ -5,7 +5,7 @@
  */
 import { vi } from "vitest";
 
-export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite", "down" | "http500" | "timeout">>;
+export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance", "down" | "http500" | "timeout">>;
 // Note: trial-publication links use the Europe PMC host, so a europepmc failure also fails them.
 
 const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
@@ -18,7 +18,7 @@ const OT_DISEASE = {
       id: "MONDO_0100135",
       name: "Dravet syndrome",
       description: "A channelopathy with epilepsy.",
-      dbXRefs: ["OMIM:607208", "Orphanet:33069", "GARD:0010430"],
+      dbXRefs: ["GARD:0010430", "UMLS:C0751122"], // as in the live record: no Orphanet or OMIM xref on MONDO:0100135
       synonyms: [{ relation: "hasExactSynonym", terms: ["Dravet", "severe myoclonic epilepsy of infancy"] }],
       therapeuticAreas: [{ id: "MONDO_0005071", name: "nervous system disorder" }],
       parents: [{ id: "MONDO_0100062", name: "genetic developmental and epileptic encephalopathy" }],
@@ -117,10 +117,53 @@ const CROSSREF = (doi: string) => ({ message: { DOI: doi.toUpperCase(), title: [
 
 const DATACITE = { meta: { total: 63 }, data: [{ id: "10.5061/dryad.x1", attributes: { doi: "10.5061/dryad.x1", titles: [{ title: "Dravet syndrome mouse EEG dataset" }], publisher: "Dryad", publicationYear: 2023, types: { resourceTypeGeneral: "Dataset" }, descriptions: [{ descriptionType: "Abstract", description: "EEG recordings." }], subjects: [{ subject: "Neuroscience" }], creators: [{ name: "Smith, Jane", nameIdentifiers: [{ nameIdentifierScheme: "ORCID", nameIdentifier: "https://orcid.org/0000-0001-2345-6789" }], affiliation: [{ name: "Hospital A", affiliationIdentifier: "https://ror.org/000000001", affiliationIdentifierScheme: "ROR" }] }], fundingReferences: [] } }] };
 
+
+// ---- Rare-disease sources (shapes of Monarch v3, Orphadata, JAX HPO, ClinGen, NCBI E-utilities, Alliance) ----
+const MONARCH_ENTITY = { id: "MONDO:0100135", name: "Dravet syndrome", description: "A channelopathy with epilepsy.", xref: ["GARD:0010430", "MEDGEN:148243"], exact_synonym: ["Dravet"], association_counts: [{ label: "Variant to Disease", count: 261 }] };
+const MONARCH_CAUSAL = { total: 1, items: [{ id: "uuid:1", subject: "HGNC:10585", subject_label: "SCN1A", predicate: "biolink:causes", primary_knowledge_source: "infores:clingen" }] };
+const MONARCH_MODELS = { total: 1, items: [{ id: "uuid:2", subject: "ZFIN:ZDB-FISH-161012-5", subject_label: "scn1lab<sup>s552/s552</sup>", subject_taxon_label: "Danio rerio", predicate: "biolink:model_of", primary_knowledge_source: "infores:zfin", publications: ["PMID:34664432"] }] };
+const orpha = (results: unknown) => ({ data: { __licence: { identifier: "CC-BY-4.0" }, results } });
+const ORPHA_XREF = orpha({
+  ORPHAcode: 33069,
+  "Preferred term": "Dravet syndrome",
+  Synonym: ["SMEI", "Severe myoclonic epilepsy of infancy"],
+  SummaryInformation: [{ Definition: "A rare, genetic developmental and epileptic encephalopathy." }],
+  ExternalReference: [
+    { Source: "GARD", Reference: "10430", DisorderMappingRelation: "E (Exact mapping: the two concepts are equivalent)", DisorderMappingValidationStatus: "Validated" },
+    { Source: "OMIM", Reference: "607208", DisorderMappingRelation: "E (Exact mapping: the two concepts are equivalent)", DisorderMappingValidationStatus: "Validated" },
+    { Source: "ICD-10", Reference: "G40.4", DisorderMappingRelation: "NTBT (ORPHAcode is narrower than the targeted code used to represent it)", DisorderMappingValidationStatus: "Validated" },
+  ],
+});
+const ORPHA_PHENO = orpha({ Disorder: { HPODisorderAssociation: [
+  { HPO: { HPOId: "HP:0002376", HPOTerm: "Developmental regression" }, HPOFrequency: "Very frequent (99-80%)", DiagnosticCriteria: null },
+  { HPO: { HPOId: "HP:0001250", HPOTerm: "Seizure" }, HPOFrequency: "Obligate (100%)", DiagnosticCriteria: "Diagnostic criterion" },
+  { HPO: { HPOId: "HP:0000256", HPOTerm: "Macrocephaly" }, HPOFrequency: "Excluded (0%)", DiagnosticCriteria: null },
+] } });
+const ORPHA_GENES = orpha({ DisorderGeneAssociation: [
+  { DisorderGeneAssociationType: "Disease-causing germline mutation(s) in", DisorderGeneAssociationStatus: "Assessed", Gene: { Symbol: "SCN1A", Name: "sodium voltage-gated channel alpha subunit 1", ExternalReference: [{ Source: "Ensembl", Reference: "ENSG00000144285" }, { Source: "HGNC", Reference: "10585" }] } },
+  { DisorderGeneAssociationType: "Modifying germline mutation in", DisorderGeneAssociationStatus: "Assessed", Gene: { Symbol: "SCN9A", Name: "sodium voltage-gated channel alpha subunit 9", ExternalReference: [{ Source: "Ensembl", Reference: "ENSG00000169432" }] } },
+] });
+const ORPHA_EPI = orpha({ Prevalence: [{ PrevalenceType: "Prevalence at birth", PrevalenceClass: "1-9 / 100 000", PrevalenceGeographic: "Europe", PrevalenceQualification: "Value and class", PrevalenceValidationStatus: "Validated" }] });
+const ORPHA_NH = orpha({ AverageAgeOfOnset: ["Infancy", "Neonatal"], TypeOfInheritance: ["Autosomal dominant"] });
+const JAX = (id: string) => ({ disease: { id }, categories: id.startsWith("OMIM") ? { "Nervous System": [{ id: "HP:0032794", name: "Myoclonic seizure", metadata: { sex: "", onset: "HP:0011463", frequency: "HP:0040282", sources: ["PMID:17347258"] } }, { id: "HP:0002376", name: "Developmental regression", metadata: { sex: "", onset: "", frequency: "", sources: ["OMIM:607208"] } }] } : { "Nervous System": [{ id: "HP:0001250", name: "Seizure", metadata: { sex: "", onset: "", frequency: "HP:0040280", sources: ["ORPHA:33069"] } }] } });
+const CLINGEN_VALIDITY = { rows: [
+  { symbol: "SCN1A", hgnc_id: "HGNC:10585", ep: "Epilepsy Gene Curation Expert Panel", disease_name: "Dravet syndrome  ", mondo: "MONDO:0100135", moi: "AD", classification: "Definitive", report_id: "r1", released: "09/06/2019", date: "2019-09-06", animal_model_only: 0 },
+  { symbol: "SCN1A", hgnc_id: "HGNC:10585", ep: "Epilepsy Gene Curation Expert Panel", disease_name: "generalized epilepsy with febrile seizures plus", mondo: "MONDO:0018214", moi: "AD", classification: "Definitive", report_id: "r2", released: "09/06/2019", date: "2019-09-06", animal_model_only: 0 },
+] };
+const CLINGEN_DOSAGE = { rows: [{ symbol: "SCN1A", hgnc_id: "HGNC:10585", haplo_assertion: 3, triplo_assertion: 0, haplo_disease: "developmental and epileptic encephalopathy, 6" }] };
+const CLINGEN_EREPO = { variantInterpretations: [{ uuid: "u1", caid: "CAR:CA303333", hgvs: ["NM_001165963.4:c.2303C>T"], condition: { "@id": "MONDO:0100135", label: "Dravet syndrome" }, guidelines: [{ outcome: { label: "Likely Pathogenic" } }], publishedDate: "2024-05-07" }] };
+const CLINVAR_SEARCH = { esearchresult: { count: "1506", idlist: ["68000"] } };
+const CLINVAR_SUMMARY = { result: { uids: ["68000"], "68000": { uid: "68000", accession: "VCV000068000", title: "NM_001165963.4(SCN1A):c.5536_5539del", germline_classification: { description: "Pathogenic", review_status: "criteria provided, multiple submitters, no conflicts", last_evaluated: "2024/01/01", trait_set: [{ trait_name: "Severe myoclonic epilepsy in infancy" }] }, variation_set: [{ variation_xrefs: [{ db_source: "dbSNP", db_id: "796053029" }] }] } } };
+const ALLIANCE_ORTH = { total: 2, results: [
+  { geneToGeneOrthologyGenerated: { objectGene: { primaryExternalId: "MGI:98246", geneSymbol: { displayText: "Scn1a" }, taxon: { name: "Mus musculus" } }, isBestScore: { name: "Yes" }, confidence: { name: "high" } } },
+  { geneToGeneOrthologyGenerated: { objectGene: { primaryExternalId: "ZFIN:ZDB-GENE-060906-1", geneSymbol: { displayText: "scn1lab" }, taxon: { name: "Danio rerio" } }, isBestScore: { name: "Yes" }, confidence: { name: "moderate" } } },
+] };
+const ALLIANCE_MODELS = (gene: string) => ({ total: 1, results: gene.startsWith("MGI") ? [{ model: { primaryExternalId: "MGI:4950073", name: { displayText: "Scn1a<tm1Kea>/Scn1a<+>" } }, diseaseModels: [{ associationType: "IS_MODEL_OF", diseaseModel: "Dravet syndrome" }] }] : [{ model: { primaryExternalId: "ZFIN:ZDB-FISH-161012-5", name: "scn1lab<sup>s552/s552</sup>" }, diseaseModels: [{ associationType: "IS_MODEL_OF", diseaseModel: "Dravet syndrome" }] }] });
+
 export function researchRouter(fail: Failures = {}) {
   return vi.fn(async (url: string, init?: RequestInit): Promise<Response> => {
     const host = new URL(url).host;
-    const provider = host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : null;
+    const provider = host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : host.includes("monarchinitiative") ? "monarch" : host.includes("orphadata") ? "orphadata" : host.includes("ontology.jax.org") ? "hpo" : host.includes("clinicalgenome") ? "clingen" : host.includes("eutils.ncbi") ? "clinvar" : host.includes("alliancegenome") ? "alliance" : null;
     if (!provider) throw new Error(`unexpected URL ${url}`);
     const f = fail[provider];
     if (f === "down") throw new TypeError("fetch failed");
@@ -148,6 +191,20 @@ export function researchRouter(fail: Failures = {}) {
         const doi = decodeURIComponent(new URL(url).pathname.replace("/works/", ""));
         return json(CROSSREF(doi.toLowerCase()));
       }
+      case "monarch": {
+        const cat = new URL(url).searchParams.get("category") ?? "";
+        return json(url.includes("/entity/") ? MONARCH_ENTITY : cat.includes("CausalGene") ? MONARCH_CAUSAL : MONARCH_MODELS);
+      }
+      case "orphadata":
+        return json(url.includes("rd-phenotypes") ? ORPHA_PHENO : url.includes("rd-associated-genes") ? ORPHA_GENES : url.includes("rd-epidemiology") ? ORPHA_EPI : url.includes("rd-natural_history") ? ORPHA_NH : ORPHA_XREF);
+      case "hpo":
+        return json(JAX(decodeURIComponent(new URL(url).pathname.split("/").pop() ?? "")));
+      case "clingen":
+        return json(url.includes("/api/validity") ? CLINGEN_VALIDITY : url.includes("/api/dosage") ? CLINGEN_DOSAGE : CLINGEN_EREPO);
+      case "clinvar":
+        return json(url.includes("esearch") ? CLINVAR_SEARCH : CLINVAR_SUMMARY);
+      case "alliance":
+        return json(url.includes("/orthologs") ? ALLIANCE_ORTH : ALLIANCE_MODELS(decodeURIComponent(new URL(url).pathname.split("/")[3] ?? "")));
       case "datacite":
         return json(DATACITE);
     }

@@ -130,6 +130,28 @@ query ──▶ reviewed graph (always first; reviewed matches never call an API
 - **Organizations and people stay separate.** Sponsors and collaborators are organization records with explicit relations, not investigators. Listed officials are people, merged only under the strict identity rules. Contact e-mails and phone numbers are never requested.
 - **Not integrated:** WHO ICTRP (its web service requires a subscription) and EMA CTIS (no documented, versioned public API). Neither portal is scraped. Trial records keep EudraCT, CTIS and UTN secondary ids so records from those registries can collapse onto the same trial later.
 
+## Rare-disease sources
+
+- **Monarch v3:** disease cross-references, causal genes with their knowledge source (e.g. ClinGen, OMIM), and cross-species genotype models.
+- **Orphadata (CC BY 4.0):**
+  - Provides the ORPHA record, synonyms, HPO frequencies, Orphanet gene-association types, epidemiology and natural history, all verbatim.
+  - The ORPHA record is tied to the MONDO disease only through a shared identifier with an Exact, validated mapping (for example GARD). A name match alone is kept as a separate, flagged record.
+  - Only "Disease-causing …" gene types count as causal; modifier and susceptibility genes stay associations.
+- **HPO annotations (JAX API):** frequency, onset, sex and references for the disease's OMIM and verified ORPHA ids.
+  - NOT / excluded annotations (Orphanet "Excluded (0%)", HPO term HP:0040285) use a separate `phenotype_excluded` relation and are never counted as present.
+  - Phenotypes are never compared by counting shared terms.
+- **ClinGen:**
+  - Gene-Disease Validity for the exact MONDO id is kept as its own `clingen_validity` relation, shown apart from ordinary gene associations as *EXPERT-CURATED VALIDITY*, and never feeds a score.
+  - Dosage-sensitivity scores are mapped to ClinGen's own wording.
+  - Expert-panel variant classifications come from the Evidence Repository.
+  - The validity and dosage endpoints return full lists, so each is downloaded once per server instance per day.
+- **ClinVar (E-utilities):** searched by disease name plus the causal gene; classification, review status and stars are kept.
+  - The same variant from ClinVar and from Open Targets is one variant entity, but each source record's classification (aggregate VCV vs condition-specific RCV) stays a separate statement.
+  - Every statement says it is not a personal interpretation.
+- **Alliance:** orthologs of the causal gene, plus models for the mouse and zebrafish orthologs, all labelled *PRECLINICAL*. A genotype seen in both Monarch and Alliance is one model.
+- **Merging:** when sources' statements merge, every source's qualifiers are kept; the first source to state a given qualifier wins.
+- **Dependency order:** Monarch and Open Targets run first; Orphadata runs after them; HPO runs after Orphadata; ClinVar and Alliance run after the gene sources. A dependent whose upstream sources all failed or returned nothing is reported as `skipped`, never as an empty result.
+
 ## Review / decision boundary
 
 ```

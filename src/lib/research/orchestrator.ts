@@ -125,8 +125,9 @@ export class DiscoveryOrchestrator {
         }
         const deps = (p.dependsOn ?? []).map((d) => this.opts.providers.find((x) => x.meta.id === d)).filter((x): x is ResearchProvider => !!x);
         const upstream = (await Promise.all(deps.map(exec))).flatMap((x) => x?.records ?? []);
-        if (deps.length && deps.every((d) => runs.get(d.meta.id)?.status === "failed")) {
-          runs.set(p.meta.id, { ...base, status: "skipped", reason: "its upstream source was unavailable", ms: 0, records: 0, totals: {} });
+        if (deps.length && !deps.some((d) => runs.get(d.meta.id)?.status === "ok")) {
+          const anyFailed = deps.some((d) => runs.get(d.meta.id)?.status === "failed");
+          runs.set(p.meta.id, { ...base, status: "skipped", reason: anyFailed ? "its upstream source was unavailable" : "its upstream sources returned nothing to build on", ms: 0, records: 0, totals: {} });
           return null;
         }
         const started = Date.now();

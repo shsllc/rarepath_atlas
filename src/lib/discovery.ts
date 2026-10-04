@@ -28,6 +28,12 @@ export const PROVIDER_NAME: Record<ProviderId, string> = {
   crossref: "Crossref",
   datacite: "DataCite",
   trialpubs: "Europe PMC (trial links)",
+  monarch: "Monarch",
+  orphadata: "Orphadata",
+  hpo: "HPO",
+  clingen: "ClinGen",
+  clinvar: "ClinVar",
+  alliance: "Alliance",
 };
 
 export type PaperView = {
@@ -60,6 +66,12 @@ export type SharedEndpointView = { measure: string; studies: { nct: string; labe
 export type PersonView = { key: string; name: string; orcid?: string; affiliations: string[]; records: number; roles: string[]; sources: string[] };
 export type GeneView = { symbol: string; name?: string; ensembl_id: string; url: string; evidence_types: string[]; source_score?: { name: string; value: number } };
 
+export type PhenotypeView = { hpo: string; name: string; url: string; frequency?: string; onset?: string; sex?: string; references?: string; diagnostic_criteria?: string; sources: string[] };
+export type ValidityView = { gene: string; hgnc?: string; classification: string; expert_panel: string; mode_of_inheritance: string; released: string; url: string };
+export type CausalGeneView = { gene: string; hgnc?: string; source: string; detail: string; url: string };
+export type ClinVarView = { label: string; classification: string; review_status: string; stars: number; conditions?: string; last_evaluated?: string; url: string; source: string };
+export type ModelView = { label: string; id: string; species: string; disease_context?: string; source: string; url: string };
+
 export type DiscoveryPreview = {
   tier: "machine_assembled";
   eligible_for_ranking: false;
@@ -81,7 +93,23 @@ export type DiscoveryPreview = {
   assets: { dataset_total: number; datasets: { label: string; doi: string; url: string; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] }[]; reuse_leads: StudyView[] };
   adjacent: { ontology: { id: string; name: string; relation: "broader" | "narrower"; url: string }[]; same_gene: { gene: string; diseases: { id: string; name: string }[] } | null };
   drugs: { total: number; items: { chembl_id: string; name: string; drug_type?: string; stage: string; url: string }[] };
-  phenotypes: { total: number; items: { id: string; name: string; url: string }[] };
+  phenotypes: { total: number; items: { id: string; name: string; url: string }[]; annotated: PhenotypeView[]; excluded: PhenotypeView[] };
+  rare: {
+    mappings: { system: string; id: string }[];
+    mapping_basis?: string;
+    natural_history?: { onset: string[]; inheritance: string[] };
+    epidemiology: { type: string; class?: string; geographic?: string; qualification?: string; validation?: string }[];
+    causal_genes: CausalGeneView[];
+    /** Orphanet modifier / susceptibility / other gene relationships, kept apart from causal genes. */
+    other_gene_associations: { gene: string; detail: string; url: string }[];
+    validity: ValidityView[];
+    dosage: { gene: string; haploinsufficiency: string; triplosensitivity: string; url: string }[];
+    clinvar: ClinVarView[];
+    clinvar_total: number;
+    models: ModelView[];
+    orthologs: { symbol: string; species: string; confidence: string; url: string }[];
+    licence_notes: string[];
+  };
   sources: ProviderRun[];
   warnings: string[];
   merges: number;
@@ -274,10 +302,59 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
     .sort((a, b) => stageRank(a.stage) - stageRank(b.stage))
     .slice(0, 10);
 
+  // Phenotypes: keep frequency / onset / evidence; NOT annotations listed separately, never counted as shared.
+  const phenoMap = new Map<string, PhenotypeView>();
+  const excludedMap = new Map<string, PhenotypeView>();
+  for (const l of g.links.filter((x) => (x.relation === "has_phenotype" || x.relation === "phenotype_excluded") && x.from === dKey)) {
+    const ph = byKey.get(l.to);
+    if (!ph || ph.kind !== "phenotype") continue;
+    const target = l.relation === "phenotype_excluded" ? excludedMap : phenoMap;
+    const prev = target.get(ph.key);
+    const q = l.qualifiers ?? {};
+    const src = [...new Set(l.provenance.map((p) => PROVIDER_NAME[p.provider]))];
+    if (prev) {
+      prev.frequency ??= q.frequency;
+      prev.onset ??= q.onset;
+      prev.sex ??= q.sex;
+      prev.references ??= q.references;
+      prev.diagnostic_criteria ??= q.diagnostic_criteria;
+      prev.sources = [...new Set([...prev.sources, ...src])];
+    } else target.set(ph.key, { hpo: ph.ids.hpo!, name: ph.label, url: `https://hpo.jax.org/browse/term/${ph.ids.hpo}`, frequency: q.frequency, onset: q.onset, sex: q.sex, references: q.references, diagnostic_criteria: q.diagnostic_criteria, sources: src });
+  }
+  // A feature both annotated and excluded by different sources stays in both lists, visibly.
+  const freqRank = (f?: string) => (!f ? 9 : /obligate|100%/i.test(f) ? 0 : /very frequent/i.test(f) ? 1 : /^frequent/i.test(f) ? 2 : /occasional/i.test(f) ? 3 : /very rare/i.test(f) ? 4 : 5);
+  const annotated = [...phenoMap.values()].sort((a, b) => freqRank(a.frequency) - freqRank(b.frequency) || a.name.localeCompare(b.name));
+  const excluded = [...excludedMap.values()];
+
+  const geneOf = (k: string) => {
+    const r = byKey.get(k);
+    return r && r.kind === "gene" ? r : undefined;
+  };
+  const causal: CausalGeneView[] = linksOf("causal_gene")
+    .filter((l) => l.to === dKey)
+    .flatMap((l) =>
+      l.provenance.map((p) => ({ gene: geneOf(l.from)?.label ?? l.from, hgnc: geneOf(l.from)?.ids.hgnc, source: PROVIDER_NAME[p.provider], detail: l.qualifiers?.association_type ? `${l.qualifiers.association_type} (${l.qualifiers.status || "status not stated"})` : `knowledge source: ${l.qualifiers?.knowledge_source ?? "not stated"}`, url: p.url })),
+    );
+  const validity: ValidityView[] = linksOf("clingen_validity")
+    .filter((l) => l.to === dKey)
+    .map((l) => ({ gene: geneOf(l.from)?.label ?? l.from, hgnc: geneOf(l.from)?.ids.hgnc, classification: l.qualifiers?.classification ?? "", expert_panel: l.qualifiers?.expert_panel ?? "", mode_of_inheritance: l.qualifiers?.mode_of_inheritance ?? "", released: l.qualifiers?.released ?? "", url: l.provenance[0].url }));
+  const dosage = linksOf("dosage_sensitivity").map((l) => ({ gene: geneOf(l.from)?.label ?? l.from, haploinsufficiency: l.qualifiers?.haploinsufficiency ?? "", triplosensitivity: l.qualifiers?.triplosensitivity ?? "", url: l.provenance[0].url }));
+  const clinvar: ClinVarView[] = linksOf("variant_classified_for")
+    .filter((l) => l.qualifiers?.review_status)
+    .map((l) => ({ label: byKey.get(l.from)?.label ?? l.from, classification: l.qualifiers!.classification ?? "", review_status: l.qualifiers!.review_status, stars: Number(l.qualifiers!.stars ?? (/expert panel/.test(l.qualifiers!.review_status) ? 3 : 0)), conditions: l.qualifiers!.conditions, last_evaluated: l.qualifiers!.last_evaluated ?? l.qualifiers!.published, url: (l.provenance.find((p) => p.provider === "clinvar" || p.provider === "clingen") ?? l.provenance[0]).url, source: [...new Set(l.provenance.map((p) => PROVIDER_NAME[p.provider]))].join(" + ") }))
+    .sort((a, b) => b.stars - a.stars);
+  const models: ModelView[] = of("model").map((m) => ({ label: m.label, id: m.ids.model ?? m.key, species: m.species, disease_context: m.disease_context, source: sourcesOf(m).join(" · "), url: m.provenance[0].url }));
+  const orthologs = linksOf("ortholog_of").map((l) => {
+    const o = geneOf(l.from);
+    return { symbol: o?.label ?? l.from, species: l.qualifiers?.species ?? o?.taxon ?? "", confidence: l.qualifiers?.confidence ?? "", url: `https://www.alliancegenome.org/gene/${l.from.replace("gene:alliance:", "")}` };
+  });
+  const dz = disease && disease.kind === "disease" ? disease : undefined;
+  const runNotes = g.runs.flatMap((r) => r.notes.filter((n) => /CC BY|licen/i.test(n)));
+
   const identifiers: { system: string; id: string }[] = disease
     ? Object.entries(disease.ids)
         .filter(([, v]) => v)
-        .map(([k, v]) => ({ system: k.toUpperCase(), id: String(v) }))
+        .map(([k, v]) => ({ system: k.toUpperCase(), id: k === "gard" ? `GARD:${v}` : String(v) }))
     : [];
 
   return {
@@ -325,7 +402,24 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       same_gene: sameGeneFrom ? { gene: sameGeneFrom.label, diseases: sameGene.map((l) => ({ id: colon(l.to.replace("disease:", "")), name: byKey.get(l.to)?.label ?? l.to })) } : null,
     },
     drugs: { total: g.totals.drug_candidates ?? 0, items: drugs },
-    phenotypes: { total: g.totals.phenotypes ?? 0, items: of("phenotype").map((p) => ({ id: p.ids.hpo!, name: p.label, url: p.provenance[0].url })) },
+    phenotypes: { total: g.totals.phenotypes ?? 0, items: of("phenotype").map((p) => ({ id: p.ids.hpo!, name: p.label, url: p.provenance[0].url })), annotated, excluded },
+    rare: {
+      mappings: dz ? Object.entries(dz.ids).filter(([k, v]) => v && ["mondo", "orphanet", "omim", "gard", "efo"].includes(k)).map(([k, v]) => ({ system: k.toUpperCase(), id: k === "gard" ? `GARD:${v}` : String(v) })) : [],
+      other_gene_associations: linksOf("associated_with")
+        .filter((l) => l.to === dKey && l.provenance.some((p) => p.provider === "orphadata"))
+        .map((l) => ({ gene: geneOf(l.from)?.label ?? l.from, detail: `${l.qualifiers?.association_type ?? ""} (${l.qualifiers?.status || "status not stated"})`, url: l.provenance[0].url })),
+      mapping_basis: dz?.mapping_basis,
+      natural_history: dz?.natural_history,
+      epidemiology: dz?.epidemiology ?? [],
+      causal_genes: causal,
+      validity,
+      dosage,
+      clinvar: clinvar.slice(0, 10),
+      clinvar_total: g.totals.clinvar_records ?? 0,
+      models: models.slice(0, 12),
+      orthologs: orthologs.slice(0, 8),
+      licence_notes: [...new Set(runNotes)],
+    },
     sources: g.runs,
     warnings: g.warnings,
     merges: g.merges,

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { JsonGraphService, REAL_BUNDLE } from "@/lib/services/graph-service";
 import { MultiProviderDiscoveryService, toCandidateEdge, type DiscoveryPreview } from "@/lib/discovery";
 import { setResearchFetch } from "@/lib/research/fetch";
+import { clearClinGenCache } from "@/lib/research/providers/clingen";
 import { reconcile } from "@/lib/research/reconcile";
 import { CATEGORY_GUIDANCE, normalizeStudy, statusCategory, STUDY_STATUS_LABEL } from "@/lib/research/providers/clinicaltrials";
 import type { ResearchRecord, StudyRecord } from "@/lib/research/types";
@@ -12,7 +13,10 @@ import { isReviewedEvidenceEdge } from "@/lib/graph-view";
 import { researchRouter, study } from "./fixtures/research-http";
 
 const b = JsonGraphService.fromFile(REAL_BUNDLE).bundle();
-afterEach(() => setResearchFetch(null));
+afterEach(() => {
+  setResearchFetch(null);
+  clearClinGenCache();
+});
 async function preview(): Promise<DiscoveryPreview> {
   setResearchFetch(researchRouter());
   const o = await new MultiProviderDiscoveryService({ now: () => new Date("2026-10-04T12:00:00Z") }).preview("Dravet syndrome");

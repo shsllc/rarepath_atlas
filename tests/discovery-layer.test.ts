@@ -6,6 +6,7 @@ import { CuratedReusableAssetFinder } from "@/lib/services/reusable-asset-finder
 import { GraphSearchService } from "@/lib/services/search-service";
 import { MultiProviderDiscoveryService, type DiscoveryOutcome, type DiscoveryPreview, type DiscoveryService } from "@/lib/discovery";
 import { setResearchFetch } from "@/lib/research/fetch";
+import { clearClinGenCache } from "@/lib/research/providers/clingen";
 import { reconcile } from "@/lib/research/reconcile";
 import { liveProviders, researchSources } from "@/lib/research/registry";
 import type { ResearchRecord } from "@/lib/research/types";
@@ -21,7 +22,10 @@ const finder = new CuratedReusableAssetFinder(g);
 const reviewedPapers = new Map<string, string>();
 for (const n of b.nodes) if (n.type === "Paper") for (const v of [n.pmid, n.doi]) if (v) reviewedPapers.set(v.toLowerCase(), n.id);
 
-afterEach(() => setResearchFetch(null));
+afterEach(() => {
+  setResearchFetch(null);
+  clearClinGenCache();
+});
 const service = (fail: Failures = {}) => {
   setResearchFetch(researchRouter(fail));
   return new MultiProviderDiscoveryService({ reviewedPapers, now: () => new Date("2026-10-04T12:00:00Z") });
@@ -33,9 +37,9 @@ async function preview(fail: Failures = {}, q = "Dravet syndrome"): Promise<Disc
 }
 
 describe("provider contract", () => {
-  it("eight live providers, each declaring role, mode and data types", () => {
+  it("fourteen live providers, each declaring role, mode and data types", () => {
     const ps = liveProviders();
-    expect(ps.map((p) => p.meta.id).sort()).toEqual(["clinicaltrials", "crossref", "datacite", "europepmc", "gwas", "openalex", "opentargets", "trialpubs"]);
+    expect(ps.map((p) => p.meta.id).sort()).toEqual(["alliance", "clingen", "clinicaltrials", "clinvar", "crossref", "datacite", "europepmc", "gwas", "hpo", "monarch", "openalex", "opentargets", "orphadata", "trialpubs"]);
     for (const p of ps) {
       expect(p.meta.mode).toBe("live");
       expect(["discovery", "metadata"]).toContain(p.meta.role);
@@ -46,8 +50,8 @@ describe("provider contract", () => {
 
   it("the sources view lists live and offline sources honestly", () => {
     const s = researchSources();
-    expect(s.filter((x) => x.mode === "live")).toHaveLength(8);
-    expect(s.filter((x) => x.mode === "not_integrated").map((x) => x.name)).toEqual(["WHO ICTRP", "EMA CTIS"]);
+    expect(s.filter((x) => x.mode === "live")).toHaveLength(14);
+    expect(s.filter((x) => x.mode === "not_integrated").map((x) => x.name)).toEqual(expect.arrayContaining(["WHO ICTRP", "EMA CTIS", "DisGeNET"]));
     expect(s.some((x) => x.mode === "offline" && /PubMed/.test(x.name))).toBe(true);
     expect(s.filter((x) => x.mode === "live").every((x) => !x.uses.includes("reviewed_ingestion"))).toBe(true);
   });
@@ -174,7 +178,8 @@ describe("scientific-integrity boundaries", () => {
 
   it("no unsupported treatment, equivalence or causation language", async () => {
     const p = await preview();
-    const text = [JSON.stringify(p), ...["src/components/DiscoveryPreview.tsx", "src/lib/discovery.ts", ...fs.readdirSync("src/lib/research/providers").map((f) => `src/lib/research/providers/${f}`)].map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))].join("\n");
+    // Source-native predicate identifiers (e.g. Monarch's "biolink:causes") are preserved verbatim and excluded from this wording scan.
+    const text = [JSON.stringify(p).replace(/biolink:\w+/g, ""), ...["src/components/DiscoveryPreview.tsx", "src/lib/discovery.ts", ...fs.readdirSync("src/lib/research/providers").map((f) => `src/lib/research/providers/${f}`)].map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))].join("\n");
     for (const re of [/\btreats\b/i, /\bcures?\b/i, /effective (for|in|against)/i, /recommended (for|treatment)/i, /will work/i, /\bsame disease\b/i, /\bequivalent to\b/i, /\bcauses\b/i]) expect(text, String(re)).not.toMatch(re);
   });
 });
@@ -201,7 +206,7 @@ describe("failure isolation and caching", () => {
   });
 
   it("every provider down → graceful not-found; reviewed CDD search unaffected", async () => {
-    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down" });
+    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down", monarch: "down", orphadata: "down", hpo: "down", clingen: "down", clinvar: "down", alliance: "down" });
     const search = new GraphSearchService(g, finder, svc);
     const r = await search.search("Dravet syndrome");
     expect(r.found).toBe(false);
