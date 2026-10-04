@@ -11,7 +11,7 @@ Record at 1440×900 or larger, browser zoom 100%, light theme. Pre-load the cano
 | 5 | 30–40s | "And that shared work informed a severity scale built specifically for CDD." | Featured card: **What happened** → **Why it matters** rows | Demo step 5; optionally click **Evidence (2)** on *Why it matters* to flash the PMID 31147226 quote |
 | 6 | 40–50s | "But shared infrastructure isn't shared biology. Nothing here says Rett treatments carry over." | Featured card **Important limitation** row (rose panel) | Demo step 6 |
 | 7 | 50–56s | "OpenAI pulls claims from the sources, each tied to an exact quote, then explains them plainly…" | Drawer: four-part OpenAI explanation above the quote list ("OpenAI extracted" badge visible) | Demo step 7 → **Explain (OpenAI)**. Use a pre-warmed (cached) request so it appears instantly |
-| 8 | 56–58s | "…and points to a concrete next question for researchers." | **Research Action Brief**: *Who is relevant* and *Question to ask*, then the evidence graph (double line = contradiction) | Demo steps 8 → 9 |
+| 8 | 56–58s | "…and points to a concrete next question for researchers." | **What can this patient group do this week?** (teal panel: destinations, evidence to bring, question to ask), then the measured ~4.2× vs. 10× hypothesis panel | Demo steps 9 → 10 (step 8 shows the full brief; step 11 the graph) |
 | 9 | 58–60s | "Rare shouldn't mean researching alone." | Return to the home hero, or end on the graph with the tagline overlaid | Hold |
 
 ## Backup plan
