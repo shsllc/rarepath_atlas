@@ -67,3 +67,64 @@ All three run server-side (`src/lib/services/openai/`) through the Responses API
 Shared `SAFETY_RULES`: no diagnosis, no treatment advice, no clinical-equivalence claims, no claim that a therapy transfers because of a shared pathway, and no upgrading of the source's hedges.
 
 Wiring status: the Path Explainer is live in the UI. The Extractor and Reconciler ran during Gate 2 ingestion; their run metadata is stored in `build_info.openai_runs`.
+
+## Multi-provider discovery layer (live, `src/lib/research/`)
+
+For a disease outside the reviewed slice, search falls through to a machine-assembled discovery layer:
+
+```
+query ──▶ reviewed graph (always first; reviewed matches never call an API)
+            │ no reviewed match
+            ▼
+   Open Targets search ── resolves to a MONDO/EFO id (if unavailable: text search, labelled)
+            │
+            ▼  parallel, independent deadline per provider (6 s), partial results allowed
+ Open Targets │ GWAS Catalog │ ClinicalTrials.gov │ Europe PMC │ DataCite
+            │
+            ▼  dependency-chained enrichment of Europe PMC papers (5 s)
+         OpenAlex (citations, ORCID, ROR, funders) │ Crossref (DOI verification, retraction/correction notices)
+            │
+            ▼
+   reconcile(): merge by stable identifiers only, keep every provider's provenance
+            │
+            ▼
+   DiscoveryPreview: identity, literature, people, clinical research, genetics, research assets,
+   adjacent research. Every section is labelled
+   MACHINE-ASSEMBLED DISCOVERY · NOT YET REVIEWED FOR RANKING OR ACTION
+```
+
+- **Contract** (`types.ts`): every provider returns normalized `ResearchRecord`s (disease, gene, variant, phenotype, paper, person, institution, study, grant, dataset, drug) and `ResearchLink`s.
+  - Each record and link carries `provenance[]`: provider, source id, canonical URL, retrieval timestamp and the source's own record type.
+  - Each is fixed to `review_status: "machine_assembled"`, `eligible_for_ranking: false` and `eligible_for_action: false`.
+  - Provider scores are kept as a labelled `source_score` and are never mapped onto RarePath's review status or Research Connection Strength.
+- **Adding a provider**: implement `ResearchProvider` (`meta`, optional `dependsOn` / `needsOntologyId`, `run(ctx)`) and add it to `registry.ts`. The orchestrator handles timeouts, dependencies, status and caching.
+- **Isolation** (`orchestrator.ts`):
+  - Providers run in parallel, each with its own deadline.
+  - A failed provider is reported (`failed`, with a reason) while the rest still render; providers that depend on it are `skipped`.
+  - If Open Targets cannot resolve the disease, the text-based providers still run and the preview says so.
+  - Results are cached per server instance for 1 hour, or 5 minutes when any provider failed.
+- **Reconciliation** (`reconcile.ts`):
+  - Papers merge on DOI, then PMID, then PMCID, then OpenAlex id.
+  - Diseases merge on MONDO/EFO, then Orphanet, then OMIM.
+  - Genes merge on Ensembl, then HGNC, then gene symbol.
+  - People merge on ORCID (or OpenAlex author id). Without one, they merge only on the same normalized name *and* an identical affiliation, never on name alone.
+  - Institutions merge on ROR, studies on NCT ID, datasets on DOI.
+  - Preprint status is conservative: any preprint signal wins. Papers already in the reviewed bundle are flagged, not duplicated.
+- **API etiquette**:
+  - Requests carry an identifying User-Agent, plus a `mailto` for the OpenAlex and Crossref polite pools (from `NCBI_EMAIL` when set).
+  - Each disease costs at most 3 OpenAlex calls and 5 Crossref lookups, with no retries at runtime.
+  - OpenAlex's keyless access has a small daily budget; `OPENALEX_API_KEY` is used if present.
+
+## Review / decision boundary
+
+```
+STRUCTURED PROVIDERS ─▶ NORMALIZED DISCOVERY GRAPH ─▶ (offline) OpenAI Evidence Extractor on open-access full text
+        ─▶ Entity Reconciler ─▶ MACHINE-ASSEMBLED CANDIDATE EDGES (toCandidateEdge)
+══════════════════ review boundary: an analyst, never an API or a model ══════════════════
+        ─▶ REVIEWED GRAPH (data/real) ─▶ DETERMINISTIC ANALYTICS ─▶ RESEARCH ACTION BRIEF
+```
+
+- **One gate decides eligibility:** `isReviewedEvidenceEdge()` in `src/lib/graph-view.ts`. Research Connection Strength, the coverage tiers and the brief's evidence links all pass through it, and AI-only and machine-assembled edges always fail it.
+- **Candidate edges stay machine-assembled:** `toCandidateEdge()` converts discovery links into the reviewed graph's edge format but sets `confidence: "insufficient"`, so no view can show them as Known.
+- **The extraction bridge stays outside the boundary:** `scripts/discover-candidates.ts` runs the OpenAI Evidence Extractor over a discovered open-access paper and writes `data/candidates/<disease>.json`, still machine-assembled.
+- Agreement between providers, or between a provider and the model, never makes anything reviewed.

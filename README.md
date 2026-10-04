@@ -96,23 +96,51 @@ In one exploratory run ([docs/benchmark.md](docs/benchmark.md)), finding the sha
 
 ## Limitations
 
-- One verified journey (CDKL5 deficiency disorder), not a comprehensive atlas.
+- One fully reviewed journey (CDKL5 deficiency disorder). Other diseases get a machine-assembled discovery preview whose coverage depends on what the public sources hold; it is not complete coverage of the literature or of rare diseases.
+- OpenAlex keyless access has a small daily budget shared per IP; when it runs out, the citation-network section is shown as unavailable.
 - Research navigation only: no diagnosis, no treatment recommendations, no clinical-equivalence claims.
 - The RTT Clinical Severity Scale is not established as valid in CDD; the CDD-specific assessment still needs validation.
 - PMID 39867409 is a preprint. Access terms for the study database and biobank are not stated in the sources.
 - Rate limiting and the explanation cache are in-memory per serverless instance, so they reset on cold starts. That is fine for a demo, but it is not a production gateway.
 - Live explanations are capped at about 18 seconds per OpenAI call to stay inside the hosting gateway timeout.
 
-## Data sources
+## Research sources
 
-PubMed and PubMed Central (NCBI E-utilities; PMC excerpts only where the license permits text mining), ClinicalTrials.gov API v2, NIH RePORTER, MONDO and HPO (EBI OLS4), HGNC, and official patient-organization websites. Full list: [docs/demo-path.md](docs/demo-path.md).
+RarePath has two evidence tiers:
+
+- **Reviewed evidence** (the CDKL5 journey) was retrieved offline, stored verbatim and analyst-reviewed. Only it can drive Research Connection Strength, reusable-asset recommendations and the Research Action Brief.
+- **Discovery evidence** is assembled live from structured research APIs for any disease outside the reviewed slice. It is labelled *machine-assembled* and never drives scoring or actions.
+
+| Source | Data used | Mode | Tier |
+|---|---|---|---|
+| Open Targets Platform (GraphQL v4) | Disease resolution (MONDO/EFO), genes/targets with evidence types, ClinVar variants, recorded drug candidates, ontology neighbours, HPO phenotypes | Live | Discovery |
+| GWAS Catalog (REST v2) | Trait associations, variants, mapped genes, studies | Live | Discovery |
+| ClinicalTrials.gov (API v2) | Studies, explicit status, phases, interventions, sponsors/collaborators, listed officials, countries, dates | Live (offline for the reviewed records) | Discovery / reviewed |
+| Europe PMC | Papers (PMID/PMCID/DOI), abstracts, preprint status, authors + ORCID, grants, open-access full text | Live | Discovery |
+| OpenAlex | Citing/referenced works, authors (ORCID), institutions (ROR), funders, venues | Live | Discovery |
+| Crossref | DOI metadata verification, ORCIDs, funders, retraction/correction notices | Live | Metadata only |
+| DataCite | DOI-registered datasets and collections, creators (ORCID), ROR affiliations, funders | Live | Discovery |
+| PubMed / PMC (E-utilities), MONDO/HPO (OLS4), HGNC, NIH RePORTER, patient-org sites | Sources of the reviewed CDKL5 journey | Offline | Reviewed |
+
+- **Deduplication:**
+  - Records merge only on stable identifiers: DOI, PMID, PMCID, MONDO/EFO, Ensembl/HGNC, ORCID, ROR, NCT ID or dataset DOI.
+  - People without an ORCID merge only on the same name *and* an identical affiliation, never on name alone.
+  - A merged record keeps every contributing source.
+- **Why discovery evidence cannot drive scoring or actions:**
+  - A single gate (`isReviewedEvidenceEdge`) feeds ranking, coverage and the brief, and every machine-assembled edge fails it by construction.
+  - Tests inject forged discovery edges and confirm that the ranking, tiers and opportunities don't change.
+- **Resilience:**
+  - Providers run in parallel with independent timeouts.
+  - A failing source is shown as unavailable while the rest still render.
+  - The reviewed CDKL5 journey never depends on these providers.
+- **More detail:** [docs/architecture.md](docs/architecture.md), and the `/sources` page in the product.
 
 ## Deploy
 
 Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.
 
 - **Runtime environment variables:** `OPENAI_API_KEY` and `OPENAI_MODEL` (`gpt-5-mini`), server-side only, with no `NEXT_PUBLIC_` prefix.
-- **Not needed in production:** `NCBI_API_KEY` and `NCBI_EMAIL`. They are used only by the offline ingestion scripts.
+- **Optional in production:** `NCBI_EMAIL` (contact address for the OpenAlex/Crossref polite pools) and `OPENALEX_API_KEY`. `NCBI_API_KEY` is used only by the offline ingestion scripts. Discovery needs no keys.
 - **No ingestion at deploy time:** the verified dataset (`data/real/cdd-real.json`) is committed and bundled with the server functions.
 
 ## Submission docs

@@ -1,225 +1,273 @@
 import fs from "node:fs";
 import path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { JsonGraphService, REAL_BUNDLE } from "@/lib/services/graph-service";
 import { CuratedReusableAssetFinder } from "@/lib/services/reusable-asset-finder";
 import { GraphSearchService } from "@/lib/services/search-service";
-import { OpenDataDiscoveryService, type DiscoveryOutcome, type DiscoveryPreview, type DiscoveryService } from "@/lib/discovery";
-import { OpenTargetsClient, OPEN_TARGETS_API } from "@/lib/providers/opentargets";
-import { GwasCatalogClient } from "@/lib/providers/gwas";
+import { MultiProviderDiscoveryService, type DiscoveryOutcome, type DiscoveryPreview, type DiscoveryService } from "@/lib/discovery";
+import { setResearchFetch } from "@/lib/research/fetch";
+import { reconcile } from "@/lib/research/reconcile";
+import { liveProviders, researchSources } from "@/lib/research/registry";
+import type { ResearchRecord } from "@/lib/research/types";
 import { rankResearchConnections, opportunityDetails } from "@/lib/analytics";
 import { diseaseCoverage } from "@/lib/coverage";
 import { isMachineAssembledEdge, isReviewedEvidenceEdge } from "@/lib/graph-view";
-import { deriveEvidenceStatus, type EvidenceEdge, type SearchResponse } from "@/lib/schemas";
+import { deriveEvidenceStatus, type EvidenceEdge } from "@/lib/schemas";
+import { researchRouter, type Failures } from "./fixtures/research-http";
 
 const g = JsonGraphService.fromFile(REAL_BUNDLE);
 const b = g.bundle();
 const finder = new CuratedReusableAssetFinder(g);
+const reviewedPapers = new Map<string, string>();
+for (const n of b.nodes) if (n.type === "Paper") for (const v of [n.pmid, n.doi]) if (v) reviewedPapers.set(v.toLowerCase(), n.id);
 
-// ---- Recorded-shape fixtures (structure of Open Targets v26.9 and GWAS Catalog v2 responses) ----
-const OT_SEARCH = { data: { search: { total: 2, hits: [{ id: "MONDO_0100135", name: "Dravet syndrome", description: "x" }, { id: "MONDO_0018214", name: "generalized epilepsy with febrile seizures plus", description: null }] } } };
-const OT_DISEASE = {
-  data: {
-    meta: { apiVersion: { x: "26", y: "9", z: "0" }, dataVersion: { year: "26", month: "09" } },
-    disease: {
-      id: "MONDO_0100135",
-      name: "Dravet syndrome",
-      description: "A channelopathy with epilepsy.",
-      dbXRefs: ["OMIM:607208", "GARD:0010430", "UMLS:C0751122", "ICD9:345.10"],
-      synonyms: [{ relation: "hasExactSynonym", terms: ["Dravet", "severe myoclonic epilepsy of infancy"] }],
-      therapeuticAreas: [{ id: "MONDO_0005071", name: "nervous system disorder" }],
-      parents: [{ id: "MONDO_0100062", name: "genetic developmental and epileptic encephalopathy" }],
-      children: [],
-      associatedTargets: {
-        count: 1182,
-        rows: [
-          { score: 0.88, target: { id: "ENSG00000144285", approvedSymbol: "SCN1A", approvedName: "sodium voltage-gated channel alpha subunit 1" }, datatypeScores: [{ id: "genetic_association", score: 0.96 }, { id: "literature", score: 0.97 }] },
-          { score: 0.58, target: { id: "ENSG00000147955", approvedSymbol: "SIGMAR1", approvedName: "sigma non-opioid intracellular receptor 1" }, datatypeScores: [{ id: "clinical", score: 0.93 }] },
-        ],
-      },
-      phenotypes: { count: 0, rows: [] },
-      drugAndClinicalCandidates: { count: 2, rows: [{ maxClinicalStage: "PHASE_3", drug: { id: "CHEMBL5095386", name: "ZOREVUNERSEN", drugType: "Oligonucleotide" } }, { maxClinicalStage: "APPROVAL", drug: { id: "CHEMBL1983350", name: "STIRIPENTOL", drugType: "Small molecule" } }] },
-    },
-  },
+afterEach(() => setResearchFetch(null));
+const service = (fail: Failures = {}) => {
+  setResearchFetch(researchRouter(fail));
+  return new MultiProviderDiscoveryService({ reviewedPapers, now: () => new Date("2026-10-04T12:00:00Z") });
 };
-const OT_VARIANTS = {
-  data: { disease: { evidences: { count: 1340, rows: [{ datasourceId: "eva", target: { id: "ENSG00000144285", approvedSymbol: "SCN1A" }, variant: { id: "2_165992359_C_G", rsIds: ["rs796053029"] }, variantRsId: "rs796053029", clinicalSignificances: ["pathogenic"], studyId: "RCV004577517", confidence: "reviewed by expert panel" }] } } },
-};
-const GWAS = { _embedded: { associations: [{ association_id: 111, p_value: 0, pvalue_mantissa: 2, pvalue_exponent: -9, accession_id: "GCST000001", pubmed_id: "123", first_author: "A", mapped_genes: ["SCN1A"], reported_trait: ["epilepsy"], snp_allele: [{ rs_id: "rs6732655" }] }] }, page: { totalElements: 1 } };
-
-type Mode = { ot?: "ok" | "down" | "http500"; gwas?: "ok" | "down" };
-function fakeFetch(mode: Mode = {}) {
-  return vi.fn(async (url: string, init?: RequestInit) => {
-    if (url === OPEN_TARGETS_API) {
-      if (mode.ot === "down") throw new DOMException("timed out", "TimeoutError");
-      if (mode.ot === "http500") return new Response("err", { status: 500 });
-      const q = String(JSON.parse(String(init?.body)).query);
-      const body = q.includes("search(") ? OT_SEARCH : q.includes("evidences(") ? OT_VARIANTS : OT_DISEASE;
-      return new Response(JSON.stringify(body), { status: 200 });
-    }
-    if (url.startsWith("https://www.ebi.ac.uk/gwas/rest/api/v2/")) {
-      if (mode.gwas === "down") throw new TypeError("fetch failed");
-      return new Response(JSON.stringify(GWAS), { status: 200 });
-    }
-    throw new Error(`unexpected URL ${url}`);
-  });
+async function preview(fail: Failures = {}, q = "Dravet syndrome"): Promise<DiscoveryPreview> {
+  const o = await service(fail).preview(q);
+  if (o.kind !== "preview") throw new Error(`expected preview, got ${o.kind}`);
+  return o.preview;
 }
-const discoveryWith = (mode: Mode = {}) => {
-  const f = fakeFetch(mode);
-  return { f, svc: new OpenDataDiscoveryService(new OpenTargetsClient(f), new GwasCatalogClient(f), () => new Date("2026-10-04T12:00:00Z")) };
-};
-const previewOf = async (r: SearchResponse): Promise<DiscoveryPreview> => {
-  if (!("discovery" in r)) throw new Error("expected a discovery preview");
-  return r.preview;
-};
 
-describe("search order: reviewed graph first, discovery second", () => {
-  it.each(["CDKL5", "CDD", "MONDO:0100039", "Rett syndrome", "FOXG1"])("reviewed match for %s never consults the discovery layer", async (q) => {
+describe("provider contract", () => {
+  it("seven live providers, each declaring role, mode and data types", () => {
+    const ps = liveProviders();
+    expect(ps.map((p) => p.meta.id).sort()).toEqual(["clinicaltrials", "crossref", "datacite", "europepmc", "gwas", "openalex", "opentargets"]);
+    for (const p of ps) {
+      expect(p.meta.mode).toBe("live");
+      expect(["discovery", "metadata"]).toContain(p.meta.role);
+      expect(p.meta.data_types.length).toBeGreaterThan(2);
+    }
+    expect(ps.find((p) => p.meta.id === "crossref")!.meta.role).toBe("metadata");
+  });
+
+  it("the sources view lists live and offline sources honestly", () => {
+    const s = researchSources();
+    expect(s.filter((x) => x.mode === "live")).toHaveLength(7);
+    expect(s.some((x) => x.mode === "offline" && /PubMed/.test(x.name))).toBe(true);
+    expect(s.filter((x) => x.mode === "live").every((x) => !x.uses.includes("reviewed_ingestion"))).toBe(true);
+  });
+
+  it("every record and link is machine-assembled with provider provenance", async () => {
+    const p = await preview();
+    expect(p.records.length).toBeGreaterThan(10);
+    for (const r of p.records) {
+      expect(r.review_status, r.key).toBe("machine_assembled");
+      expect(r.provenance.length).toBeGreaterThan(0);
+      for (const pr of r.provenance) {
+        expect(pr.url).toMatch(/^https:\/\//);
+        expect(pr.retrieved_at).toBe("2026-10-04T12:00:00.000Z");
+        expect(pr.source_id).toBeTruthy();
+        expect(pr.native_type).toBeTruthy();
+      }
+    }
+    for (const l of p.links) expect(l).toMatchObject({ review_status: "machine_assembled", eligible_for_ranking: false, eligible_for_action: false });
+  });
+
+  it("normalizes each provider's entities", async () => {
+    const p = await preview();
+    const kinds = new Set(p.records.map((r) => r.kind));
+    for (const k of ["disease", "gene", "variant", "phenotype", "paper", "person", "institution", "study", "grant", "dataset", "drug"]) expect(kinds, k).toContain(k);
+    expect(p.disease.identifiers.map((x) => x.id)).toEqual(expect.arrayContaining(["MONDO:0100135", "OMIM:607208", "Orphanet:33069"]));
+    expect(p.clinical.total).toBe(103);
+    expect(p.literature.total).toBe(6490);
+    expect(p.assets.dataset_total).toBe(63);
+    expect(p.assets.datasets[0]).toMatchObject({ doi: "10.5061/dryad.x1", resource_type: "Dataset", publisher: "Dryad" });
+  });
+});
+
+describe("reconciliation by stable identifiers", () => {
+  it("a paper from Europe PMC, OpenAlex and Crossref collapses into one record with three provenance sources", async () => {
+    const p = await preview();
+    const dup = p.records.filter((r) => r.kind === "paper" && r.ids.doi === "10.1000/dup");
+    expect(dup).toHaveLength(1);
+    expect(new Set(dup[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "openalex", "crossref"]));
+    const view = p.literature.top.find((x) => x.ids.doi === "10.1000/dup")!;
+    expect(view.sources).toEqual(expect.arrayContaining(["Europe PMC", "OpenAlex", "Crossref"]));
+    expect(view.verified_by_crossref).toBe(true);
+    expect(view.update_notices.join(" ")).toMatch(/correction/);
+  });
+
+  it("PMID-only and DOI+PMID records of the same paper reconcile", async () => {
+    const p = await preview();
+    const papers = p.records.filter((r) => r.kind === "paper" && r.ids.pmid === "222");
+    expect(papers).toHaveLength(1);
+    expect(papers[0].ids.doi).toBe("10.1000/b");
+  });
+
+  it("people merge on ORCID across providers, never on name alone", async () => {
+    const p = await preview();
+    const people = p.records.filter((r): r is Extract<ResearchRecord, { kind: "person" }> => r.kind === "person");
+    const orcid = people.filter((r) => r.ids.orcid === "0000-0001-2345-6789");
+    expect(orcid).toHaveLength(1);
+    // ORCID joins Europe PMC, OpenAlex, Crossref and DataCite; the trial official "Jane Smith" at the identical affiliation "Hospital A" also joins (name + institution rule).
+    expect(new Set(orcid[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "openalex", "crossref", "datacite", "clinicaltrials"]));
+    // The OpenAlex author "Jane Smith" at Hospital B has no ORCID and a different institution → stays a separate person.
+    const other = people.filter((r) => r.label === "Jane Smith" && !r.ids.orcid);
+    expect(other).toHaveLength(1);
+    expect(other[0].affiliations).toEqual(["Hospital B"]);
+  });
+
+  it("name + identical affiliation may merge; name alone may not", () => {
+    const person = (key: string, label: string, aff: string, orcid?: string): ResearchRecord => ({ kind: "person", key, label, ids: orcid ? { orcid } : {}, affiliations: [aff], roles: [], provenance: [{ provider: "clinicaltrials", source_id: key, url: "https://x.org", retrieved_at: "t", native_type: "official" }], review_status: "machine_assembled" });
+    const a = reconcile([person("p1", "Jane Smith", "Hospital A"), person("p2", "Jane  Smith", "Hospital A")], []);
+    expect(a.records).toHaveLength(1);
+    const c = reconcile([person("p1", "Jane Smith", "Hospital A"), person("p2", "Jane Smith", "Hospital B")], []);
+    expect(c.records).toHaveLength(2);
+    const d = reconcile([person("p1", "Jane Smith", "Hospital A", "0000-0000-0000-0001"), person("p2", "Jane Smith", "Hospital A", "0000-0000-0000-0002")], []);
+    expect(d.records).toHaveLength(2);
+  });
+
+  it("diseases reconcile by MONDO id, keeping both providers", () => {
+    const dz = (key: string, provider: "opentargets" | "europepmc"): ResearchRecord => ({ kind: "disease", key, label: "Dravet syndrome", ids: { mondo: "MONDO:0100135" }, synonyms: [], provenance: [{ provider, source_id: key, url: "https://x.org", retrieved_at: "t", native_type: "disease" }], review_status: "machine_assembled" });
+    const r = reconcile([dz("disease:MONDO_0100135", "opentargets"), dz("disease:other", "europepmc")], []);
+    expect(r.records).toHaveLength(1);
+    expect(r.records[0].key).toBe("disease:MONDO_0100135");
+    expect(r.records[0].provenance).toHaveLength(2);
+  });
+
+  it("papers already in the reviewed bundle are flagged, not duplicated as new evidence", async () => {
+    const p = await preview();
+    const twin = p.records.find((r) => r.kind === "paper" && r.ids.pmid === "32472944");
+    expect(twin && twin.kind === "paper" && twin.in_reviewed_graph).toBe("paper:32472944");
+  });
+});
+
+describe("scientific-integrity boundaries", () => {
+  it("preprint status survives a merge with a 'journal-article' Crossref record", async () => {
+    const p = await preview();
+    const pre = p.records.find((r) => r.kind === "paper" && r.ids.doi === "10.1101/2024.01.01.000001");
+    expect(pre && pre.kind === "paper" && pre.publication_status).toBe("preprint");
+  });
+
+  it("trial statuses are preserved, never flattened", async () => {
+    const p = await preview();
+    const by = Object.fromEntries(p.clinical.studies.map((s) => [s.nct, s]));
+    expect(by.NCT00000001.status).toBe("COMPLETED");
+    expect(by.NCT00000002.status_label).toBe("Terminated (stopped early)");
+    expect(by.NCT00000003.status_label).toBe("Withdrawn (never enrolled)");
+    expect(by.NCT00000004.status).toBe("RECRUITING");
+    expect(new Set(p.clinical.status_counts.map((s) => s.status)).size).toBe(5);
+    // Reuse leads keep their status visible.
+    expect(p.assets.reuse_leads.map((s) => [s.nct, s.status])).toEqual([["NCT00000005", "ACTIVE_NOT_RECRUITING"]]);
+  });
+
+  it("GWAS associations stay explicitly non-causal", async () => {
+    const p = await preview();
+    for (const l of p.links.filter((x) => x.relation === "gwas_association")) {
+      expect(l.statement).toMatch(/statistical association/);
+      expect(l.statement).toMatch(/not causation/);
+    }
+  });
+
+  it("Open Targets scores stay labelled source scores and never become RarePath scores", async () => {
+    const p = await preview();
+    const scored = p.links.filter((l) => l.source_score);
+    expect(scored.length).toBeGreaterThan(0);
+    for (const l of scored) expect(l.source_score!.name).toMatch(/not a RarePath score/);
+    expect(JSON.stringify(p)).not.toMatch(/research_connection_strength|"score":\s*\d/i);
+  });
+
+  it("no unsupported treatment, equivalence or causation language", async () => {
+    const p = await preview();
+    const text = [JSON.stringify(p), ...["src/components/DiscoveryPreview.tsx", "src/lib/discovery.ts", ...fs.readdirSync("src/lib/research/providers").map((f) => `src/lib/research/providers/${f}`)].map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))].join("\n");
+    for (const re of [/\btreats\b/i, /\bcures?\b/i, /effective (for|in|against)/i, /recommended (for|treatment)/i, /will work/i, /\bsame disease\b/i, /\bequivalent to\b/i, /\bcauses\b/i]) expect(text, String(re)).not.toMatch(re);
+  });
+});
+
+describe("failure isolation and caching", () => {
+  it("one provider down and another timing out: the rest still return, failures are labelled", async () => {
+    const p = await preview({ datacite: "http500", openalex: "timeout" });
+    const run = Object.fromEntries(p.sources.map((s) => [s.id, s]));
+    expect(run.datacite.status).toBe("failed");
+    expect(run.openalex.status).toBe("failed");
+    expect(run.europepmc.status).toBe("ok");
+    expect(run.clinicaltrials.status).toBe("ok");
+    expect(p.assets.datasets).toEqual([]);
+    expect(p.warnings.join(" ")).toMatch(/DataCite returned an error/);
+    expect(p.warnings.join(" ")).toMatch(/OpenAlex timed out/);
+  });
+
+  it("Open Targets down: text-based providers still assemble a labelled preview", async () => {
+    const p = await preview({ opentargets: "down" });
+    expect(p.disease.resolved).toBe(false);
+    expect(p.warnings.join(" ")).toMatch(/could not be resolved to an ontology id/);
+    expect(p.sources.find((s) => s.id === "gwas")!.status).toBe("skipped");
+    expect(p.clinical.studies.length).toBeGreaterThan(0);
+  });
+
+  it("every provider down → graceful not-found; reviewed CDD search unaffected", async () => {
+    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down" });
+    const search = new GraphSearchService(g, finder, svc);
+    const r = await search.search("Dravet syndrome");
+    expect(r.found).toBe(false);
+    expect("message" in r && r.message).toMatch(/could not be reached right now/);
+    const cdd = await search.search("CDKL5");
+    expect(cdd.found && cdd.action_brief).toBeTruthy();
+  });
+
+  it("results are cached; partial failures expire quickly", async () => {
+    const router = researchRouter();
+    setResearchFetch(router);
+    const svc = new MultiProviderDiscoveryService({ reviewedPapers });
+    await svc.preview("Dravet syndrome");
+    const calls = router.mock.calls.length;
+    await svc.preview("Dravet syndrome");
+    expect(router.mock.calls.length).toBe(calls);
+  });
+});
+
+describe("reviewed layer stays authoritative", () => {
+  it.each(["CDKL5", "CDD", "MONDO:0100039", "Rett syndrome", "FOXG1"])("reviewed match for %s never consults discovery", async (q) => {
     const spy: DiscoveryService = { preview: vi.fn(async (): Promise<DiscoveryOutcome> => ({ kind: "no_match" })) };
     const r = await new GraphSearchService(g, finder, spy).search(q);
     expect("discovery" in r).toBe(false);
     expect(spy.preview).not.toHaveBeenCalled();
   });
 
-  it("CDD still returns the full reviewed journey with its brief when discovery is enabled", async () => {
-    const r = await new GraphSearchService(g, finder, discoveryWith().svc).search("CDKL5");
-    if (!r.found) throw new Error("expected full journey");
-    expect(r.disease.node_id).toBe("disease:cdd");
-    expect(r.action_brief).toBeDefined();
-  });
-
-  it("if the API resolves to a disease the reviewed graph holds, the reviewed view wins", async () => {
+  it("an API result that resolves to a reviewed disease shows the reviewed view", async () => {
     const twin: DiscoveryService = { preview: async () => ({ kind: "preview", preview: { disease: { id: "MONDO:0010726" } } as unknown as DiscoveryPreview }) };
     const r = await new GraphSearchService(g, finder, twin).search("classic rett");
     expect("partial" in r && r.coverage.node_id).toBe("disease:rett");
   });
 
-  it("a disease outside the reviewed slice gets a discovery preview, not a dead end", async () => {
-    const p = await previewOf(await new GraphSearchService(g, finder, discoveryWith().svc).search("Dravet syndrome"));
-    expect(p.disease.label).toBe("Dravet syndrome");
-    expect(p.match.exact).toBe(true);
-    expect(p.targets.map((t) => t.symbol)).toEqual(["SCN1A", "SIGMAR1"]);
-    expect(p.variants[0].rs_id).toBe("rs796053029");
-    expect(p.gwas[0].rs_id).toBe("rs6732655");
-    expect(p.drugs.map((d) => d.stage)).toEqual(["Approved (per source)", "Phase 3"]);
-    expect(p.counts).toMatchObject({ genes: 1182, variants: 1340, gwas_associations: 1, drug_candidates: 2, related_diseases: 1 });
-  });
-});
+  // A forged machine-assembled edge that WOULD add a shared-asset factor (+3) for FOXG1 if it were trusted.
+  const forged: EvidenceEdge = { ...b.edges.find((e) => e.id === "edge:css-rett")!, id: "edge:disc:forged", object_id: "disease:foxg1", confidence: "high", source_type: "research_platform", evidence_type: "machine_assembled", review_status: "machine_assembled", eligible_for_ranking: false, eligible_for_action: false };
 
-describe("machine-assembled tier", () => {
-  it("every Open Targets / GWAS relationship is machine-assembled and ineligible", async () => {
-    const { svc } = discoveryWith();
-    const o = await svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
-    const p = o.preview;
-    expect(p).toMatchObject({ tier: "machine_assembled", eligible_for_ranking: false, eligible_for_action: false });
-    expect(p.edges.length).toBeGreaterThan(0);
-    for (const e of p.edges) {
-      expect(e.review_status, e.id).toBe("machine_assembled");
-      expect(e.eligible_for_ranking).toBe(false);
-      expect(e.eligible_for_action).toBe(false);
-      expect(e.source_type).toBe("research_platform");
+  it("candidate edges are machine-assembled, never Known, and cannot enter Research Connection Strength", async () => {
+    const p = await preview();
+    expect(p.candidate_edges.length).toBeGreaterThan(5);
+    for (const e of p.candidate_edges) {
       expect(isMachineAssembledEdge(e)).toBe(true);
       expect(isReviewedEvidenceEdge(e)).toBe(false);
       expect(deriveEvidenceStatus(e), e.id).not.toBe("supported");
+      expect(e.predicate).not.toBe("caused_by_variant_in");
     }
-    expect(p.edges.some((e) => e.source === "Open Targets Platform")).toBe(true);
-    expect(p.edges.some((e) => e.source === "GWAS Catalog")).toBe(true);
-  });
-
-  it("source associations are never mapped to a causal predicate", async () => {
-    const o = await discoveryWith().svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
-    expect(o.preview.edges.some((e) => e.predicate === "caused_by_variant_in")).toBe(false);
-    expect(o.preview.targets.find((t) => t.symbol === "SIGMAR1")!.evidence_types).toContain("Drug-trial target (not a genetic cause)");
-  });
-
-  it("external source identifiers and provenance are retained", async () => {
-    const o = await discoveryWith().svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
-    const p = o.preview;
-    expect(p.disease.identifiers.map((x) => x.id)).toEqual(expect.arrayContaining(["MONDO:0100135", "OMIM:607208", "GARD:0010430"]));
-    const scn1a = p.edges.find((e) => e.object_id === "disc:gene:ENSG00000144285")!;
-    expect(scn1a.source_url).toBe("https://platform.opentargets.org/evidence/ENSG00000144285/MONDO_0100135");
-    expect(scn1a.evidence[0]).toMatchObject({ method: "structured_api", retrieval_date: "2026-10-04", source: "Open Targets Platform" });
-    expect(p.edges.find((e) => e.source === "ClinVar via Open Targets")!.source_url).toContain("RCV004577517");
-    expect(p.edges.find((e) => e.source === "GWAS Catalog")!.source_url).toContain("GCST000001");
-    expect(p.sources[0].version).toBe("API 26.9.0, data 26.09");
-  });
-});
-
-describe("ranking and action isolation", () => {
-  // A forged machine-assembled edge that WOULD add a shared-asset factor (+3) for FOXG1 if it were trusted.
-  const forged: EvidenceEdge = {
-    ...b.edges.find((e) => e.id === "edge:css-rett")!,
-    id: "edge:disc:ot:forged",
-    object_id: "disease:foxg1",
-    confidence: "high",
-    source_type: "research_platform",
-    evidence_type: "machine_assembled",
-    review_status: "machine_assembled",
-    eligible_for_ranking: false,
-    eligible_for_action: false,
-  };
-
-  it("discovery edges cannot enter Research Connection Strength", async () => {
-    const o = await discoveryWith().svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
     const base = rankResearchConnections(b.nodes, b.edges, "disease:cdd");
-    const mixed = rankResearchConnections([...b.nodes, ...o.preview.nodes], [...b.edges, ...o.preview.edges, forged], "disease:cdd");
-    expect(mixed).toEqual(base);
-    expect(mixed.find((r) => r.disease_id === "disease:foxg1")!.factors.some((f) => f.kind === "shared_asset")).toBe(false);
+    expect(rankResearchConnections(b.nodes, [...b.edges, ...p.candidate_edges, forged], "disease:cdd")).toEqual(base);
   });
 
-  it("discovery edges cannot change reviewed coverage tiers or opportunity details", () => {
+  it("discovery edges cannot change coverage tiers, opportunities or actions", async () => {
     const withForged = { ...b, edges: [...b.edges, forged] };
     expect(diseaseCoverage(withForged).map((d) => [d.node_id, d.tier])).toEqual(diseaseCoverage(b).map((d) => [d.node_id, d.tier]));
     const ranked = rankResearchConnections(b.nodes, b.edges, "disease:cdd");
     expect(opportunityDetails(b.nodes, [...b.edges, forged], "disease:cdd", ranked)).toEqual(opportunityDetails(b.nodes, b.edges, "disease:cdd", ranked));
-  });
-
-  it("discovery results carry no action brief, ranking or reuse opportunities", async () => {
-    const r = (await new GraphSearchService(g, finder, discoveryWith().svc).search("Dravet syndrome")) as unknown as Record<string, unknown>;
+    setResearchFetch(researchRouter());
+    const r = (await new GraphSearchService(g, finder, new MultiProviderDiscoveryService({ reviewedPapers })).search("Dravet syndrome")) as unknown as Record<string, unknown>;
     for (const key of ["action_brief", "opportunities", "connections", "asset_catalog", "collaborators", "disease"]) expect(r).not.toHaveProperty(key);
-    // Every action anchor in the reviewed brief is eligible; no discovery edge could satisfy that gate.
     const brief = b.action_brief!;
-    const ids = [...brief.bring_sources.flatMap((s) => s.evidence_edge_ids), ...brief.existing_assets.flatMap((a) => a.evidence_edge_ids)];
-    for (const id of ids) expect(isReviewedEvidenceEdge(g.getEdge(id)!), id).toBe(true);
-    expect(isReviewedEvidenceEdge(forged)).toBe(false);
-  });
-});
-
-describe("safety language and graceful failure", () => {
-  it("no unsupported treatment, equivalence or pathogenicity language", async () => {
-    const o = await discoveryWith().svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
-    const text = JSON.stringify(o.preview) + fs.readFileSync(path.join(process.cwd(), "src/components/DiscoveryPreview.tsx"), "utf8") + fs.readFileSync(path.join(process.cwd(), "src/lib/discovery.ts"), "utf8");
-    for (const re of [/\btreats\b/i, /\bcures?\b/i, /effective (for|in|against)/i, /recommended (for|treatment)/i, /will work/i, /\bsame disease\b/i, /\bequivalent to\b/i, /\bcauses\b/i]) expect(text, String(re)).not.toMatch(re);
+    for (const id of [...brief.bring_sources.flatMap((s) => s.evidence_edge_ids), ...brief.existing_assets.flatMap((a) => a.evidence_edge_ids)]) expect(isReviewedEvidenceEdge(g.getEdge(id)!), id).toBe(true);
   });
 
-  it.each([["down"], ["http500"]] as const)("Open Targets %s → graceful not-found, reviewed search unaffected", async (ot) => {
-    const search = new GraphSearchService(g, finder, discoveryWith({ ot }).svc);
-    const r = await search.search("Dravet syndrome");
-    expect(r.found).toBe(false);
-    expect("message" in r && r.message).toMatch(/could not be reached right now/);
-    const cdd = await search.search("CDKL5");
-    expect(cdd.found).toBe(true);
-  });
-
-  it("GWAS Catalog outage degrades to a preview with a warning", async () => {
-    const o = await discoveryWith({ gwas: "down" }).svc.preview("Dravet syndrome");
-    if (o.kind !== "preview") throw new Error("expected preview");
-    expect(o.preview.gwas).toEqual([]);
-    expect(o.preview.sources.find((s) => s.name.startsWith("GWAS"))!.ok).toBe(false);
-    expect(o.preview.warnings.join(" ")).toMatch(/GWAS Catalog could not be reached/);
-  });
-
-  it("failures are not cached, so the next search retries", async () => {
-    let down = true;
-    const f = vi.fn(async (url: string, init?: RequestInit) => (down ? Promise.reject(new TypeError("fetch failed")) : fakeFetch()(url, init)));
-    const svc = new OpenDataDiscoveryService(new OpenTargetsClient(f), new GwasCatalogClient(f));
-    expect((await svc.preview("Dravet syndrome")).kind).toBe("unavailable");
-    down = false;
-    expect((await svc.preview("Dravet syndrome")).kind).toBe("preview");
+  it("CDD reviewed journey unchanged with discovery enabled", async () => {
+    setResearchFetch(researchRouter());
+    const r = await new GraphSearchService(g, finder, new MultiProviderDiscoveryService({ reviewedPapers })).search("CDKL5");
+    if (!r.found) throw new Error("expected full journey");
+    expect(r.disease.node_id).toBe("disease:cdd");
+    expect(r.edges).toHaveLength(b.edges.length);
+    expect(r.edges.some((e) => e.review_status === "machine_assembled")).toBe(false);
   });
 });

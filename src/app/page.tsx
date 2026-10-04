@@ -3,7 +3,8 @@ import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
 import { BrandMark } from "@/components/BrandMark";
 import { CoverageDisclosure, NetworkPreview } from "@/components/CoverageSections";
-import { BeyondTheDemo } from "@/components/DiscoveryPreview";
+import { BroadDiscovery } from "@/components/DiscoveryPreview";
+import { researchSources } from "@/lib/research/registry";
 import { getServices } from "@/lib/services/registry";
 import { coverageCounts, diseaseCoverage } from "@/lib/coverage";
 
@@ -81,7 +82,7 @@ export default function Home() {
         <CoverageDisclosure counts={coverageCounts(bundle)} />
       </div>
       <div className="mt-4">
-        <BeyondTheDemo />
+        <BroadDiscovery sources={researchSources()} />
       </div>
       <div className="mt-8 flex justify-center">
         <StatusLegend />

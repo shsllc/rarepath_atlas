@@ -1,0 +1,124 @@
+/**
+ * Fake HTTP router for the discovery providers. Response bodies follow the real shapes of
+ * Open Targets v26.9, GWAS Catalog v2, ClinicalTrials.gov v2, Europe PMC, OpenAlex, Crossref and DataCite,
+ * trimmed to the fields RarePath reads. Used only by tests; production never sees these values.
+ */
+import { vi } from "vitest";
+
+export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite", "down" | "http500" | "timeout">>;
+
+const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
+
+const OT_SEARCH = { data: { search: { total: 2, hits: [{ id: "MONDO_0100135", name: "Dravet syndrome", description: "x" }, { id: "MONDO_0018214", name: "generalized epilepsy with febrile seizures plus", description: null }] } } };
+const OT_DISEASE = {
+  data: {
+    meta: { apiVersion: { x: "26", y: "9", z: "0" }, dataVersion: { year: "26", month: "09" } },
+    disease: {
+      id: "MONDO_0100135",
+      name: "Dravet syndrome",
+      description: "A channelopathy with epilepsy.",
+      dbXRefs: ["OMIM:607208", "Orphanet:33069", "GARD:0010430"],
+      synonyms: [{ relation: "hasExactSynonym", terms: ["Dravet", "severe myoclonic epilepsy of infancy"] }],
+      therapeuticAreas: [{ id: "MONDO_0005071", name: "nervous system disorder" }],
+      parents: [{ id: "MONDO_0100062", name: "genetic developmental and epileptic encephalopathy" }],
+      children: [],
+      associatedTargets: {
+        count: 1182,
+        rows: [
+          { score: 0.88, target: { id: "ENSG00000144285", approvedSymbol: "SCN1A", approvedName: "sodium voltage-gated channel alpha subunit 1" }, datatypeScores: [{ id: "genetic_association", score: 0.96 }, { id: "literature", score: 0.97 }] },
+          { score: 0.58, target: { id: "ENSG00000147955", approvedSymbol: "SIGMAR1", approvedName: "sigma non-opioid intracellular receptor 1" }, datatypeScores: [{ id: "clinical", score: 0.93 }] },
+        ],
+      },
+      phenotypes: { count: 1, rows: [{ phenotypeHPO: { id: "HP_0001250", name: "Seizure" } }] },
+      drugAndClinicalCandidates: { count: 2, rows: [{ maxClinicalStage: "PHASE_3", drug: { id: "CHEMBL5095386", name: "ZOREVUNERSEN", drugType: "Oligonucleotide" } }, { maxClinicalStage: "APPROVAL", drug: { id: "CHEMBL1983350", name: "STIRIPENTOL", drugType: "Small molecule" } }] },
+    },
+  },
+};
+const OT_VARIANTS = { data: { disease: { evidences: { count: 1340, rows: [{ datasourceId: "eva", target: { id: "ENSG00000144285", approvedSymbol: "SCN1A" }, variant: { id: "2_165992359_C_G", rsIds: ["rs796053029"] }, variantRsId: "rs796053029", clinicalSignificances: ["pathogenic"], studyId: "RCV004577517", confidence: "reviewed by expert panel" }] } } } };
+const OT_OTHER = { data: { target: { associatedDiseases: { count: 3, rows: [{ score: 0.9, disease: { id: "MONDO_0100135", name: "Dravet syndrome" } }, { score: 0.7, disease: { id: "MONDO_0018214", name: "generalized epilepsy with febrile seizures plus" } }] } } } };
+
+const GWAS = { _embedded: { associations: [{ association_id: 111, p_value: 0, pvalue_mantissa: 2, pvalue_exponent: -9, accession_id: "GCST000001", pubmed_id: "123", first_author: "A", mapped_genes: ["SCN1A"], reported_trait: ["epilepsy"], snp_allele: [{ rs_id: "rs6732655" }] }] }, page: { totalElements: 1 } };
+
+const study = (nct: string, status: string, type = "INTERVENTIONAL", title = `Study ${nct}`) => ({
+  protocolSection: {
+    identificationModule: { nctId: nct, briefTitle: title },
+    statusModule: { overallStatus: status, startDateStruct: { date: "2020-01" }, completionDateStruct: { date: "2023-06" } },
+    sponsorCollaboratorsModule: { leadSponsor: { name: "Example Sponsor" }, collaborators: [{ name: "Example Collaborator" }] },
+    conditionsModule: { conditions: ["Dravet Syndrome"] },
+    designModule: { studyType: type, phases: type === "INTERVENTIONAL" ? ["PHASE3"] : [], enrollmentInfo: { count: 40 } },
+    armsInterventionsModule: { interventions: [{ name: "Investigational product" }] },
+    contactsLocationsModule: { overallOfficials: [{ name: "Jane Smith", affiliation: "Hospital A", role: "PRINCIPAL_INVESTIGATOR" }], locations: [{ country: "United States" }, { country: "France" }] },
+  },
+});
+const CTGOV = {
+  totalCount: 103,
+  studies: [study("NCT00000001", "COMPLETED"), study("NCT00000002", "TERMINATED"), study("NCT00000003", "WITHDRAWN"), study("NCT00000004", "RECRUITING"), study("NCT00000005", "ACTIVE_NOT_RECRUITING", "OBSERVATIONAL", "Natural History Study of Dravet Syndrome")],
+};
+
+const author = (fullName: string, orcid?: string, affiliation?: string) => ({ fullName, ...(orcid ? { authorId: { type: "ORCID", value: orcid } } : {}), ...(affiliation ? { authorAffiliationDetailsList: { authorAffiliation: [{ affiliation }] } } : {}) });
+const EPMC_REL = {
+  hitCount: 6490,
+  resultList: {
+    result: [
+      // Same paper as OpenAlex W1 and the Crossref record (DOI match).
+      { id: "111", source: "MED", pmid: "111", doi: "10.1000/DUP", title: "Duplicate paper across providers.", pubYear: "2020", journalInfo: { journal: { title: "Epilepsia" } }, pubTypeList: { pubType: ["Journal Article"] }, isOpenAccess: "Y", inEPMC: "Y", pmcid: "PMC111", citedByCount: 50, authorList: { author: [author("Smith J", "0000-0001-2345-6789", "Hospital A")] }, grantsList: { grant: [{ agency: "NINDS NIH HHS", grantId: "R01NS000001" }] } },
+      // PMID only; OpenAlex W2 carries the same PMID plus a DOI → must merge.
+      { id: "222", source: "MED", pmid: "222", title: "PMID-only record", pubYear: "2019", pubTypeList: { pubType: ["Journal Article"] }, authorList: { author: [author("Doe A")] } },
+      // A preprint. Crossref calls it a journal-article; the merged record must stay a preprint.
+      { id: "PPR1", source: "PPR", doi: "10.1101/2024.01.01.000001", title: "A preprint about Dravet syndrome", pubYear: "2024", pubTypeList: { pubType: ["Preprint"] }, authorList: { author: [] } },
+      // Already in the reviewed CDD bundle (PMID 32472944).
+      { id: "32472944", source: "MED", pmid: "32472944", title: "Comparison of Core Features in Four Developmental Encephalopathies", pubYear: "2020", pubTypeList: { pubType: ["Journal Article"] } },
+    ],
+  },
+};
+const EPMC_CITED = { hitCount: 6490, resultList: { result: [] } };
+const EPMC_RECENT = { hitCount: 6490, resultList: { result: [{ id: "333", source: "MED", pmid: "333", title: "Recent paper", pubYear: "2026", pubTypeList: { pubType: ["Journal Article"] } }] } };
+
+const OA_WORKS = {
+  results: [
+    { id: "https://openalex.org/W1", doi: "https://doi.org/10.1000/dup", title: "Duplicate paper across providers", publication_year: 2020, ids: { pmid: "https://pubmed.ncbi.nlm.nih.gov/111" }, cited_by_count: 60, referenced_works: ["https://openalex.org/W9"], type: "article", primary_location: { source: { display_name: "Epilepsia" } }, funders: [{ id: "https://openalex.org/F1", display_name: "National Institutes of Health", ror: "https://ror.org/01cwqze88" }], authorships: [{ author: { id: "https://openalex.org/A1", display_name: "Jane Smith", orcid: "https://orcid.org/0000-0001-2345-6789" }, institutions: [{ id: "https://openalex.org/I1", display_name: "Hospital A", ror: "https://ror.org/000000001", country_code: "US" }] }, { author: { id: "https://openalex.org/A2", display_name: "Jane Smith" }, institutions: [{ id: "https://openalex.org/I2", display_name: "Hospital B", ror: "https://ror.org/000000002", country_code: "FR" }] }] },
+    { id: "https://openalex.org/W2", doi: "https://doi.org/10.1000/b", title: "PMID-only record", publication_year: 2019, ids: { pmid: "https://pubmed.ncbi.nlm.nih.gov/222" }, cited_by_count: 5, referenced_works: [], type: "article", authorships: [] },
+  ],
+};
+const OA_CITING = { meta: { count: 42 }, results: [{ id: "https://openalex.org/W5", doi: "https://doi.org/10.1000/citing", title: "A citing paper", publication_year: 2022, ids: {}, cited_by_count: 3, referenced_works: [], type: "article", authorships: [] }] };
+const OA_REFS = { results: [{ id: "https://openalex.org/W9", doi: "https://doi.org/10.1000/ref", title: "A referenced paper", publication_year: 2010, ids: {}, cited_by_count: 900, referenced_works: [], type: "article", authorships: [] }] };
+
+const CROSSREF = (doi: string) => ({ message: { DOI: doi.toUpperCase(), title: [doi === "10.1000/dup" ? "Duplicate paper across providers" : "A preprint about Dravet syndrome"], "container-title": ["Epilepsia"], published: { "date-parts": [[2020, 5, 1]] }, type: "journal-article", author: [{ given: "Jane", family: "Smith", ORCID: "https://orcid.org/0000-0001-2345-6789" }], funder: [{ name: "National Institutes of Health", DOI: "10.13039/100000002" }], "updated-by": doi === "10.1000/dup" ? [{ type: "correction", DOI: "10.1000/dup.corr" }] : [] } });
+
+const DATACITE = { meta: { total: 63 }, data: [{ id: "10.5061/dryad.x1", attributes: { doi: "10.5061/dryad.x1", titles: [{ title: "Dravet syndrome mouse EEG dataset" }], publisher: "Dryad", publicationYear: 2023, types: { resourceTypeGeneral: "Dataset" }, descriptions: [{ descriptionType: "Abstract", description: "EEG recordings." }], subjects: [{ subject: "Neuroscience" }], creators: [{ name: "Smith, Jane", nameIdentifiers: [{ nameIdentifierScheme: "ORCID", nameIdentifier: "https://orcid.org/0000-0001-2345-6789" }], affiliation: [{ name: "Hospital A", affiliationIdentifier: "https://ror.org/000000001", affiliationIdentifierScheme: "ROR" }] }], fundingReferences: [] } }] };
+
+export function researchRouter(fail: Failures = {}) {
+  return vi.fn(async (url: string, init?: RequestInit): Promise<Response> => {
+    const host = new URL(url).host;
+    const provider = host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : null;
+    if (!provider) throw new Error(`unexpected URL ${url}`);
+    const f = fail[provider];
+    if (f === "down") throw new TypeError("fetch failed");
+    if (f === "timeout") throw new DOMException("timed out", "TimeoutError");
+    if (f === "http500") return new Response("error", { status: 500 });
+    switch (provider) {
+      case "opentargets": {
+        const q = String(JSON.parse(String(init?.body)).query);
+        return json(q.includes("search(") ? OT_SEARCH : q.includes("evidences(") ? OT_VARIANTS : q.includes("target(") ? OT_OTHER : OT_DISEASE);
+      }
+      case "gwas":
+        return json(GWAS);
+      case "clinicaltrials":
+        return json(CTGOV);
+      case "europepmc": {
+        const q = decodeURIComponent(new URL(url).searchParams.get("query") ?? "");
+        return json(q.includes("sort_cited") ? EPMC_CITED : q.includes("sort_date") ? EPMC_RECENT : EPMC_REL);
+      }
+      case "openalex": {
+        const filter = new URL(url).searchParams.get("filter") ?? "";
+        return json(filter.startsWith("cites:") ? OA_CITING : filter.startsWith("openalex:") ? OA_REFS : OA_WORKS);
+      }
+      case "crossref": {
+        const doi = decodeURIComponent(new URL(url).pathname.replace("/works/", ""));
+        return json(CROSSREF(doi.toLowerCase()));
+      }
+      case "datacite":
+        return json(DATACITE);
+    }
+  });
+}

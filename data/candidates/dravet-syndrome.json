@@ -1,0 +1,357 @@
+{
+ "disease": {
+  "id": "MONDO:0100135",
+  "source_id": "MONDO_0100135",
+  "label": "Dravet syndrome",
+  "description": "Dravet syndrome is a channelopathy with epilepsy of with onset during the first year of life, typically 4-5 months, characterized by status epilepticus and a variety of drug-resistant seizures often induced by fever, presenting in previously healthy children, and which frequently leads to cognitive and motor impairment. Dravet differs from other channelopathies usually due to a mutation in SCN1A.",
+  "url": "https://platform.opentargets.org/disease/MONDO_0100135",
+  "identifiers": [
+   {
+    "system": "MONDO",
+    "id": "MONDO:0100135"
+   }
+  ],
+  "synonyms": [
+   "DS",
+   "Dravet",
+   "Dravet syndrome",
+   "SME",
+   "SMEB",
+   "myoclonic epilepsy, severe, of infancy",
+   "severe myoclonic epilepsy of infancy"
+  ],
+  "resolved": true
+ },
+ "paper": {
+  "label": "Severe acute respiratory distress syndrome in Dravet syndrome: Clinical cases expanding the extraneurological phenotype",
+  "ids": {
+   "pmcid": "PMC13579307"
+  },
+  "provenance": [
+   {
+    "provider": "europepmc",
+    "source_id": "PMC:PMC13579307",
+    "url": "https://europepmc.org/article/PMC/PMC13579307",
+    "retrieved_at": "2026-10-04T11:12:20.175Z",
+    "native_type": "Case Reports; case-report"
+   }
+  ]
+ },
+ "extractor": {
+  "model": "gpt-5-mini",
+  "returned": 18,
+  "kept": 18,
+  "run_at": "2026-10-04T11:13:17.190Z"
+ },
+ "review_status": "machine_assembled",
+ "eligible_for_ranking": false,
+ "eligible_for_action": false,
+ "claims": [
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "caused_by_variant_in",
+   "object": {
+    "text": "SCN1A gene",
+    "type": "Gene"
+   },
+   "supporting_quote": "Pathogenic variants in the SCN1A gene, encoding the neuronal voltage-gated sodium channel Nav1.1, account for most cases [1] , [2] , [3] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "early-onset febrile seizures within the first year of life",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "It is characterized by early-onset febrile seizures within the first year of life, followed by pharmacoresistant epilepsy and progressive neurodevelopmental impairment.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "pharmacoresistant epilepsy",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "It is characterized by early-onset febrile seizures within the first year of life, followed by pharmacoresistant epilepsy and progressive neurodevelopmental impairment.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "progressive neurodevelopmental impairment",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "It is characterized by early-onset febrile seizures within the first year of life, followed by pharmacoresistant epilepsy and progressive neurodevelopmental impairment.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "autonomic dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "cardiovascular dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "respiratory dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "immune dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "motor dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "behavioral dysfunction",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although epilepsy is the defining clinical feature, increasing evidence indicates that DS is a multisystem disorder involving autonomic, cardiovascular, respiratory, immune, motor, and behavioral dysfunction [1] , [4] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "acute respiratory distress syndrome (ARDS)",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although respiratory abnormalities have been recognized as part of the DS phenotype, severe inflammatory pulmonary complications such as acute respiratory distress syndrome (ARDS) have rarely been reported [9] .",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "increased susceptibility to severe inflammatory respiratory failure during febrile illnesses",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "Although causality cannot be established from this small case series, these observations raise the possibility that children with SCN1A -related DS may have an increased susceptibility to severe inflammatory respiratory failure during febrile illnesses.",
+   "hedged": true,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "studied_in",
+   "object": {
+    "text": "this small case series",
+    "type": "Study"
+   },
+   "supporting_quote": "Although causality cannot be established from this small case series, these observations raise the possibility that children with SCN1A -related DS may have an increased susceptibility to severe inflammatory respiratory failure during febrile illnesses.",
+   "hedged": true,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "irregular breathing",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "In our patients, clinical findings including irregular breathing, apnea, hypotonia, and episodes of hemodynamic instability were observed during acute deterioration.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "apnea",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "In our patients, clinical findings including irregular breathing, apnea, hypotonia, and episodes of hemodynamic instability were observed during acute deterioration.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "hypotonia",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "In our patients, clinical findings including irregular breathing, apnea, hypotonia, and episodes of hemodynamic instability were observed during acute deterioration.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "episodes of hemodynamic instability",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "In our patients, clinical findings including irregular breathing, apnea, hypotonia, and episodes of hemodynamic instability were observed during acute deterioration.",
+   "hedged": false,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  },
+  {
+   "subject": {
+    "text": "Dravet syndrome (DS)",
+    "type": "Disease"
+   },
+   "predicate": "has_phenotype",
+   "object": {
+    "text": "a rare but potentially life-threatening respiratory complication",
+    "type": "Phenotype"
+   },
+   "supporting_quote": "The present cases highlight a rare but potentially life-threatening respiratory complication.",
+   "hedged": true,
+   "negated": false,
+   "review_status": "machine_assembled",
+   "eligible_for_ranking": false,
+   "eligible_for_action": false
+  }
+ ]
+}
