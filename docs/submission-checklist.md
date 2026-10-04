@@ -5,9 +5,9 @@ Project: **RarePath Atlas** · Tagline: **"Rare shouldn't mean researching alone
 
 ## Product
 
-- [ ] Deployed URL works: `https://<vercel-url>` (PENDING: needs Vercel import)
-- [ ] Canonical demo URL works on production: `/results?q=CDKL5&demo=1`
-- [ ] Live OpenAI explanation works on production (env vars set in Vercel)
+- [x] Deployed URL works: https://rarepathatlas.netlify.app (Netlify)
+- [x] Canonical demo URL works on production: https://rarepathatlas.netlify.app/results?q=CDKL5&demo=1
+- [x] OpenAI integration verified in production (live Path Explainer, env vars set in Netlify)
 - [x] All tests pass (60 passed; 2 live OpenAI tests skipped by default)
 - [x] Production build passes locally
 - [x] Evidence audit passes (10/10, `docs/final-evidence-audit.md`)
@@ -16,12 +16,15 @@ Project: **RarePath Atlas** · Tagline: **"Rare shouldn't mean researching alone
 ## Repository
 
 - [x] GitHub repository created: https://github.com/shsllc/rarepath_atlas (public)
-- [ ] Final commit pushed
-- [x] Repository is public
+- [x] Final commit pushed to `main`
+- [x] GitHub repository accessible (public)
 - [x] README complete (judge-first)
 - [x] OpenAI sponsor integration documented (README "Built with OpenAI")
 
 ## Submission materials
+
+Copy for portal fields: `docs/submission-copy.md`. Recording steps: `docs/recording-checklist.md`.
+
 
 - [ ] 1-minute demo video recorded (script: `docs/demo-script-60s.md`; shots: `docs/demo-shot-list.md`)
 - [ ] Technical video recorded, if required (VERIFY IN PORTAL; outline: `docs/technical-video-outline.md`)

@@ -21,8 +21,9 @@ Every claim opens to its **verbatim source quote**, with a link and retrieval da
 
 ## Demo
 
-- **Production:** `https://<vercel-url>` *(pending Vercel import; see [Deploy](#deploy))*
-- **Canonical 60-second demo:** `/results?q=CDKL5&demo=1`
+- **Production:** https://rarepathatlas.netlify.app
+- **Canonical 60-second demo:** https://rarepathatlas.netlify.app/results?q=CDKL5&demo=1
+- **Deployment:** Netlify + Next.js (OpenNext runtime)
 - **Repository:** https://github.com/shsllc/rarepath_atlas
 
 ## Why this example matters
@@ -80,7 +81,7 @@ npx tsx scripts/build-real-bundle.ts
 
 ## Architecture
 
-- **Next.js 15 + TypeScript + Tailwind**, deployed on Vercel. OpenAI is called only from server routes.
+- **Next.js 15 + TypeScript + Tailwind**, deployed on Netlify (Next.js/OpenNext runtime). OpenAI is called only from server routes.
 - **Zod** schemas for entities and evidence-bearing relationships (`src/lib/schemas`).
 - **Offline pipeline** (`scripts/`): fetch sources, then OpenAI extraction and reconciliation, then a verified build of `data/real/cdd-real.json`.
 - **Cytoscape.js** evidence graph. Line style encodes status: solid = Known, dashed = AI-inferred, double = Contradictory, dotted = Unknown.
@@ -92,7 +93,8 @@ npx tsx scripts/build-real-bundle.ts
 - Research navigation only: no diagnosis, no treatment recommendations, no clinical-equivalence claims.
 - The RTT Clinical Severity Scale is not established as valid in CDD; the CDD-specific assessment still needs validation.
 - PMID 39867409 is a preprint. Access terms for the study database and biobank are not stated in the sources.
-- Rate limiting is in-memory per server instance, which is fine for a demo but is not a production gateway.
+- Rate limiting and the explanation cache are in-memory per serverless instance, so they reset on cold starts. That is fine for a demo, but it is not a production gateway.
+- Live explanations are capped at about 18 seconds per OpenAI call to stay inside the hosting gateway timeout.
 
 ## Data sources
 
@@ -100,7 +102,11 @@ PubMed and PubMed Central (NCBI E-utilities; PMC excerpts only where the license
 
 ## Deploy
 
-On Vercel, import `shsllc/rarepath_atlas` (framework preset: Next.js, no build settings needed). Then add these **server-side** environment variables, with no `NEXT_PUBLIC_` prefix: `OPENAI_API_KEY`, `OPENAI_MODEL`, `NCBI_API_KEY`, `NCBI_EMAIL`. The verified dataset is committed, so no ingestion runs at deploy time.
+Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.
+
+- **Runtime environment variables:** `OPENAI_API_KEY` and `OPENAI_MODEL` (`gpt-5-mini`), server-side only, with no `NEXT_PUBLIC_` prefix.
+- **Not needed in production:** `NCBI_API_KEY` and `NCBI_EMAIL`. They are used only by the offline ingestion scripts.
+- **No ingestion at deploy time:** the verified dataset (`data/real/cdd-real.json`) is committed and bundled with the server functions.
 
 ## Submission docs
 

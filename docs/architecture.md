@@ -4,7 +4,7 @@
 
 | Choice | Why |
 |---|---|
-| **Next.js 15 (App Router) + TypeScript** | One process serves the UI and server-side API routes, so the OpenAI key never reaches the browser. Runs the same on Windows. Deploys to Vercel with zero config. |
+| **Next.js 15 (App Router) + TypeScript** | One process serves the UI and server-side API routes, so the OpenAI key never reaches the browser. Runs the same on Windows. Deployed on Netlify (Next.js/OpenNext runtime) with zero config. |
 | **Zod** | One schema gives runtime validation of JSON bundles, TypeScript types, *and* OpenAI Structured Outputs (`zodTextFormat`). |
 | **JSON bundles on disk** (`data/fixtures`, later `data/cache`) | No database to provision. Fixture data and live data share the `GraphBundle` format, so real data can replace fixtures incrementally. |
 | **Tailwind CSS v4** | Fast, consistent layout with no design-system overhead. |
