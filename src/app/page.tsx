@@ -21,6 +21,10 @@ export default function Home() {
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink/85">
             RarePath connects scattered disease research, patient communities, studies and reusable research infrastructure, with evidence behind every connection.
           </p>
+          <p className="mx-auto mt-3 max-w-xl rounded-xl bg-brand-wash px-4 py-2 text-sm text-ink">
+            <strong>For rare-disease patient-group leaders:</strong> find what another community has already built that you could reuse, and leave with a sourced next step.{" "}
+            <span className="text-muted">Prototype scope: one fully verified journey, CDKL5 deficiency disorder.</span>
+          </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
