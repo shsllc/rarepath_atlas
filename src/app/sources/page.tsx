@@ -46,7 +46,7 @@ export default function SourcesPage() {
         {sources.map((s) => {
           const last = s.mode === "live" ? DiscoveryOrchestrator.lastSuccess.get(LIVE_ID[s.name] as never) : lastOffline;
           return (
-            <li key={s.name} className={`rounded-2xl bg-white p-5 ${s.mode === "live" ? "border-2 border-dashed border-line" : "border-2 border-solid border-supported/40"}`}>
+            <li key={s.name} className={`rounded-2xl p-5 ${s.mode === "live" ? "border-2 border-dashed border-line bg-white" : s.mode === "offline" ? "border-2 border-solid border-supported/40 bg-white" : "border border-dotted border-muted bg-canvas"}`}>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <a href={s.homepage} target="_blank" rel="noreferrer" className="text-lg font-semibold hover:text-brand">
@@ -54,8 +54,8 @@ export default function SourcesPage() {
                   </a>
                   <p className="mt-1 text-xs text-muted">{s.data_types.join(" · ")}</p>
                 </div>
-                <span className={`rounded px-2 py-0.5 text-[11px] font-bold ${s.mode === "live" ? "border-2 border-dashed border-unknown text-unknown" : "border-2 border-solid border-supported text-supported"}`}>
-                  {s.mode === "live" ? "◌ LIVE" : "✓ OFFLINE · STORED"}
+                <span className={`rounded px-2 py-0.5 text-[11px] font-bold ${s.mode === "live" ? "border-2 border-dashed border-unknown text-unknown" : s.mode === "offline" ? "border-2 border-solid border-supported text-supported" : "border border-dotted border-muted text-muted"}`}>
+                  {s.mode === "live" ? "◌ LIVE" : s.mode === "offline" ? "✓ OFFLINE · STORED" : "– NOT INTEGRATED"}
                 </span>
               </div>
               <p className="mt-2 text-sm">
@@ -67,7 +67,7 @@ export default function SourcesPage() {
               </p>
               <p className="mt-1 text-xs text-muted">{s.note}</p>
               <p className="mt-1 text-[11px] text-muted">
-                {s.mode === "live" ? (last ? `Last successful retrieval on this server: ${last.slice(0, 16).replace("T", " ")} UTC` : "Queried live on each discovery search (not yet queried on this server instance).") : `Retrieved ${last ?? "offline"} and stored in the reviewed bundle.`}
+                {s.mode === "live" ? (last ? `Last successful retrieval on this server: ${last.slice(0, 16).replace("T", " ")} UTC` : "Queried live on each discovery search (not yet queried on this server instance).") : s.mode === "offline" ? `Retrieved ${last ?? "offline"} and stored in the reviewed bundle.` : "Investigated; documented as a future provider."}
               </p>
             </li>
           );

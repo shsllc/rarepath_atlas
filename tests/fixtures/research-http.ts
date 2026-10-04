@@ -6,6 +6,7 @@
 import { vi } from "vitest";
 
 export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite", "down" | "http500" | "timeout">>;
+// Note: trial-publication links use the Europe PMC host, so a europepmc failure also fails them.
 
 const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
 
@@ -39,21 +40,50 @@ const OT_OTHER = { data: { target: { associatedDiseases: { count: 3, rows: [{ sc
 
 const GWAS = { _embedded: { associations: [{ association_id: 111, p_value: 0, pvalue_mantissa: 2, pvalue_exponent: -9, accession_id: "GCST000001", pubmed_id: "123", first_author: "A", mapped_genes: ["SCN1A"], reported_trait: ["epilepsy"], snp_allele: [{ rs_id: "rs6732655" }] }] }, page: { totalElements: 1 } };
 
-const study = (nct: string, status: string, type = "INTERVENTIONAL", title = `Study ${nct}`) => ({
+type StudyOpts = { type?: string; title?: string; conditions?: string[]; extra?: Record<string, unknown>; design?: Record<string, unknown>; status?: Record<string, unknown>; refs?: unknown[]; outcomes?: unknown[] };
+export const study = (nct: string, status: string, o: StudyOpts = {}) => ({
+  hasResults: status === "COMPLETED",
+  ...(status === "COMPLETED" ? { documentSection: { largeDocumentModule: { largeDocs: [{ typeAbbrev: "Prot_SAP", hasProtocol: true, hasSap: true, label: "Study Protocol and Statistical Analysis Plan", filename: "Prot_SAP_000.pdf" }] } } } : {}),
   protocolSection: {
-    identificationModule: { nctId: nct, briefTitle: title },
-    statusModule: { overallStatus: status, startDateStruct: { date: "2020-01" }, completionDateStruct: { date: "2023-06" } },
-    sponsorCollaboratorsModule: { leadSponsor: { name: "Example Sponsor" }, collaborators: [{ name: "Example Collaborator" }] },
-    conditionsModule: { conditions: ["Dravet Syndrome"] },
-    designModule: { studyType: type, phases: type === "INTERVENTIONAL" ? ["PHASE3"] : [], enrollmentInfo: { count: 40 } },
-    armsInterventionsModule: { interventions: [{ name: "Investigational product" }] },
-    contactsLocationsModule: { overallOfficials: [{ name: "Jane Smith", affiliation: "Hospital A", role: "PRINCIPAL_INVESTIGATOR" }], locations: [{ country: "United States" }, { country: "France" }] },
+    identificationModule: { nctId: nct, briefTitle: o.title ?? `Study ${nct}`, officialTitle: `Official title of ${nct}`, secondaryIdInfos: nct === "NCT00000001" ? [{ id: "2019-000123-45", type: "EUDRACT_NUMBER" }] : [] },
+    statusModule: { overallStatus: status, startDateStruct: { date: "2020-01" }, primaryCompletionDateStruct: { date: "2023-01" }, completionDateStruct: { date: "2023-06" }, lastUpdatePostDateStruct: { date: "2024-02-01" }, ...(o.status ?? {}) },
+    sponsorCollaboratorsModule: { leadSponsor: { name: "Example Sponsor", class: "INDUSTRY" }, collaborators: [{ name: "Example Collaborator" }], responsibleParty: { type: "SPONSOR" } },
+    conditionsModule: { conditions: o.conditions ?? ["Dravet Syndrome"] },
+    designModule: {
+      studyType: o.type ?? "INTERVENTIONAL",
+      phases: (o.type ?? "INTERVENTIONAL") === "INTERVENTIONAL" ? ["PHASE3"] : [],
+      designInfo: (o.type ?? "INTERVENTIONAL") === "INTERVENTIONAL" ? { allocation: "RANDOMIZED", interventionModel: "PARALLEL", primaryPurpose: "TREATMENT", maskingInfo: { masking: "QUADRUPLE" } } : { observationalModel: "COHORT", timePerspective: "PROSPECTIVE" },
+      enrollmentInfo: { count: 40, type: "ACTUAL" },
+      ...(o.design ?? {}),
+    },
+    armsInterventionsModule: { interventions: [{ type: "DRUG", name: "Investigational product" }] },
+    outcomesModule: { primaryOutcomes: o.outcomes ?? [{ measure: "Change in convulsive seizure frequency", timeFrame: "14 weeks" }] },
+    eligibilityModule: { sex: "ALL", minimumAge: "2 Years", maximumAge: "18 Years", stdAges: ["CHILD", "ADULT"] },
+    contactsLocationsModule: { overallOfficials: [{ name: "Jane Smith", affiliation: "Hospital A", role: "PRINCIPAL_INVESTIGATOR" }], locations: [{ facility: "Hospital A", city: "Boston", state: "Massachusetts", country: "United States" }, { city: "Paris", country: "France" }] },
+    referencesModule: { references: o.refs ?? [] },
   },
 });
 const CTGOV = {
   totalCount: 103,
-  studies: [study("NCT00000001", "COMPLETED"), study("NCT00000002", "TERMINATED"), study("NCT00000003", "WITHDRAWN"), study("NCT00000004", "RECRUITING"), study("NCT00000005", "ACTIVE_NOT_RECRUITING", "OBSERVATIONAL", "Natural History Study of Dravet Syndrome")],
+  studies: [
+    // Shares its endpoint wording with NCT00000006, which studies a different condition set.
+    study("NCT00000001", "COMPLETED", { refs: [{ pmid: "555", type: "RESULT", citation: "Doe J. Results of the trial. N Engl J Med. 2023." }, { pmid: "556", type: "BACKGROUND", citation: "Roe R. Background review. Lancet. 2010." }, { citation: "A reference without any PMID." }] }),
+    study("NCT00000002", "TERMINATED", { status: { whyStopped: "Sponsor decision" } }),
+    study("NCT00000003", "WITHDRAWN", { status: { whyStopped: "No participants enrolled" } }),
+    study("NCT00000004", "RECRUITING"),
+    study("NCT00000005", "ACTIVE_NOT_RECRUITING", { type: "OBSERVATIONAL", title: "Natural History Study of Dravet Syndrome", outcomes: [{ measure: "Vineland Adaptive Behavior Scales", timeFrame: "5 years" }] }),
+    study("NCT00000006", "COMPLETED", { conditions: ["Lennox-Gastaut Syndrome", "Dravet Syndrome"] }),
+  ],
 };
+const CTGOV_INFRA = {
+  totalCount: 7,
+  studies: [
+    // Duplicate of a main-search study: must not appear twice.
+    study("NCT00000005", "ACTIVE_NOT_RECRUITING", { type: "OBSERVATIONAL", title: "Natural History Study of Dravet Syndrome", outcomes: [{ measure: "Vineland Adaptive Behavior Scales", timeFrame: "5 years" }] }),
+    study("NCT00000007", "TERMINATED", { type: "OBSERVATIONAL", title: "Dravet Syndrome Patient Registry", design: { patientRegistry: true }, status: { whyStopped: "Funding ended" } }),
+  ],
+};
+const EPMC_ACCESSION = { hitCount: 2, resultList: { result: [{ id: "555", source: "MED", pmid: "555", title: "Results of the trial", pubYear: "2023", pubType: "research-article; journal article", journalTitle: "N Engl J Med" }] } };
 
 const author = (fullName: string, orcid?: string, affiliation?: string) => ({ fullName, ...(orcid ? { authorId: { type: "ORCID", value: orcid } } : {}), ...(affiliation ? { authorAffiliationDetailsList: { authorAffiliation: [{ affiliation }] } } : {}) });
 const EPMC_REL = {
@@ -104,9 +134,10 @@ export function researchRouter(fail: Failures = {}) {
       case "gwas":
         return json(GWAS);
       case "clinicaltrials":
-        return json(CTGOV);
+        return json(new URL(url).searchParams.get("query.term") ? CTGOV_INFRA : CTGOV);
       case "europepmc": {
         const q = decodeURIComponent(new URL(url).searchParams.get("query") ?? "");
+        if (q.startsWith("ACCESSION_ID:")) return json(q.includes("NCT00000001") ? EPMC_ACCESSION : { hitCount: 0, resultList: { result: [] } });
         return json(q.includes("sort_cited") ? EPMC_CITED : q.includes("sort_date") ? EPMC_RECENT : EPMC_REL);
       }
       case "openalex": {

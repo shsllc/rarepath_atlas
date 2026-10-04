@@ -62,30 +62,122 @@ function Paper({ p }: { p: PaperView }) {
   );
 }
 
+const CATEGORY_STYLE: Record<StudyView["status_category"], string> = {
+  active: "border-2 border-solid border-supported bg-supported-bg text-supported",
+  completed: "border-2 border-solid border-ink bg-white text-ink",
+  caution: "border-2 border-double border-contradictory bg-contradictory-bg text-contradictory",
+  unknown: "border-2 border-dotted border-unknown bg-unknown-bg text-unknown",
+};
+const CATEGORY_ICON: Record<StudyView["status_category"], string> = { active: "●", completed: "■", caution: "▲", unknown: "?" };
+const INFRA_LABEL: Record<string, string> = { natural_history: "Natural history", registry: "Registry", observational_cohort: "Observational cohort", longitudinal: "Longitudinal", biobank: "Biobank / biospecimens" };
+const enumText = (x?: string) => (x ? x.replace(/_/g, " ").toLowerCase() : undefined);
+
 export function Study({ s }: { s: StudyView }) {
+  const d = s.design;
   return (
-    <li className="py-2 text-sm">
-      <a href={s.url} target="_blank" rel="noreferrer" className="font-medium hover:text-brand hover:underline">
-        {s.label}
-      </a>
+    <li className="py-3 text-sm">
+      <span className="flex flex-wrap items-center gap-2">
+        <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold ${CATEGORY_STYLE[s.status_category]}`}>
+          <span aria-hidden>{CATEGORY_ICON[s.status_category]} </span>
+          {s.status_label}
+        </span>
+        <a href={s.url} target="_blank" rel="noreferrer" className="font-medium hover:text-brand hover:underline">
+          {s.label}
+        </a>
+      </span>
+      <span className="mt-1 block text-[11px] font-semibold text-ink">{s.guidance}</span>
+      {s.status_category === "caution" && s.why_stopped && <span className="mt-0.5 block text-[11px] text-contradictory">Reason stated in the registry: &ldquo;{s.why_stopped}&rdquo;</span>}
       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted">
-        <span className="rounded border border-solid border-ink px-1.5 py-0.5 font-semibold text-ink">{s.status_label}</span>
         <span className="font-mono">{s.nct}</span>
-        {s.phases.length > 0 && <span>{s.phases.map((x) => x.replace("EARLY_PHASE", "Early phase ").replace("PHASE", "Phase ").replace(/^NA$/, "N/A")).join(", ")}</span>}
-        {s.study_type && <span>{s.study_type.toLowerCase()}</span>}
-        {s.enrollment != null && <span>{n(s.enrollment)} enrolled/planned</span>}
-        {(s.start_date || s.completion_date) && (
+        {s.secondary_ids.map((x) => (
+          <span key={x} className="font-mono">
+            {x}
+          </span>
+        ))}
+        {s.study_type && <span>{enumText(s.study_type)}</span>}
+        {s.phases.length > 0 && <span>{s.phases.map((x) => x.replace("EARLY_PHASE", "Early phase ").replace("PHASE", "Phase ").replace(/^NA$/, "phase N/A")).join(", ")}</span>}
+        {s.enrollment != null && (
           <span>
-            {s.start_date ?? "?"} → {s.completion_date ?? "?"}
+            {n(s.enrollment)} {s.enrollment_type === "ACTUAL" ? "enrolled" : "planned"}
           </span>
         )}
+        {s.has_results && <span className="font-semibold">results posted (not an indication of success)</span>}
+        {s.infrastructure.map((f) => (
+          <span key={f.flag} title={f.basis} className="rounded border border-dashed border-teal px-1 text-teal">
+            {INFRA_LABEL[f.flag]}
+          </span>
+        ))}
       </span>
-      <span className="mt-1 block text-[11px] text-muted">
-        {s.sponsor && <>Sponsor: {s.sponsor}</>}
-        {s.collaborators.length > 0 && <> · Collaborators: {s.collaborators.slice(0, 3).join(", ")}</>}
-        {s.countries.length > 0 && <> · {s.countries.slice(0, 4).join(", ")}</>}
-      </span>
-      {s.officials.length > 0 && <span className="mt-1 block text-[11px] text-muted">Listed officials: {s.officials.map((o) => `${o.name}${o.affiliation ? ` (${o.affiliation})` : ""}`).join("; ")}</span>}
+      <details className="mt-1 text-[11px] text-muted">
+        <summary className="cursor-pointer text-brand">Design, outcomes, people and sites</summary>
+        <dl className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-2">
+          {(
+            [
+              ["Allocation", enumText(d.allocation)],
+              ["Intervention model", enumText(d.intervention_model)],
+              ["Masking", enumText(d.masking)],
+              ["Primary purpose", enumText(d.primary_purpose)],
+              ["Observational model", enumText(d.observational_model)],
+              ["Time perspective", enumText(d.time_perspective)],
+              ["Sex", enumText(s.eligibility.sex)],
+              ["Age", [s.eligibility.minimum_age, s.eligibility.maximum_age].filter(Boolean).join(" to ") || undefined],
+              ["Dates", [s.start_date && `start ${s.start_date}`, s.primary_completion_date && `primary completion ${s.primary_completion_date}`, s.completion_date && `completion ${s.completion_date}`, s.last_update && `last update ${s.last_update}`].filter(Boolean).join(" · ") || undefined],
+              ["Lead sponsor", s.sponsor && `${s.sponsor}${s.sponsor_class ? ` (${enumText(s.sponsor_class)})` : ""}`],
+              ["Collaborators", s.collaborators.join(", ") || undefined],
+              ["Responsible party", s.responsible_party],
+            ] as [string, string | undefined][]
+          )
+            .filter(([, v]) => v)
+            .map(([k, v]) => (
+              <div key={k}>
+                <dt className="inline font-semibold">{k}: </dt>
+                <dd className="inline">{v}</dd>
+              </div>
+            ))}
+        </dl>
+        {s.intervention_details.length > 0 && <p className="mt-2">Interventions (as registered): {s.intervention_details.map((i) => `${i.name} [${enumText(i.type)}]`).join("; ")}</p>}
+        {s.outcomes.length > 0 && (
+          <div className="mt-2">
+            <p className="font-semibold">Registered outcome measures</p>
+            <ul className="list-disc pl-4">
+              {s.outcomes.slice(0, 6).map((o, i) => (
+                <li key={i}>
+                  <span className="uppercase">{o.role}</span>: {o.measure}
+                  {o.time_frame && ` (time frame: ${o.time_frame})`}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {s.officials.length > 0 && <p className="mt-2">Listed officials: {s.officials.map((o) => `${o.name}${o.affiliation ? ` (${o.affiliation})` : ""}`).join("; ")}</p>}
+        {s.locations.length > 0 && (
+          <p className="mt-2">
+            Sites ({s.locations.length}): {s.locations.slice(0, 6).map((l) => [l.facility, l.city, l.state, l.country].filter(Boolean).join(", ")).join(" · ")}
+            {s.locations.length > 6 ? " …" : ""}
+          </p>
+        )}
+        {s.documents.length > 0 && (
+          <p className="mt-2">
+            Documents:{" "}
+            {s.documents.map((x) => (
+              <a key={x.url} href={x.url} target="_blank" rel="noreferrer" className="mr-2 text-brand hover:underline">
+                {x.label} ↗
+              </a>
+            ))}
+          </p>
+        )}
+      </details>
+      {s.publications.length > 0 && (
+        <span className="mt-1 block text-[11px] text-muted">
+          Linked papers:{" "}
+          {s.publications.slice(0, 4).map((pb) => (
+            <a key={pb.url} href={pb.url} target="_blank" rel="noreferrer" className="mr-2 text-brand hover:underline" title={pb.native}>
+              {pb.pmid ? `PMID ${pb.pmid}` : pb.label.slice(0, 40)} ({pb.relation === "trial_publication" ? pb.native.replace("ctgov_reference:", "registry: ").toLowerCase() : pb.relation === "trial_background_reference" ? "registry: background" : "mentions NCT"}
+              {pb.publication_status === "preprint" ? ", preprint" : ""}) ↗
+            </a>
+          ))}
+        </span>
+      )}
     </li>
   );
 }
@@ -278,25 +370,58 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         </Section>
       </div>
 
-      <Section title="Clinical research" note="ClinicalTrials.gov studies listing this condition. Each study keeps its own status: completed, terminated, withdrawn and recruiting are never treated as equivalent.">
+      <Section title="Clinical research" note="ClinicalTrials.gov studies listing this condition, grouped by status. Completed, terminated, withdrawn and recruiting studies are never treated as equivalent, and a completed study or posted results do not mean the study succeeded.">
         {p.clinical.status_counts.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2 text-[11px]">
-            {p.clinical.status_counts.map((s) => (
-              <span key={s.status} className="rounded border border-line px-2 py-0.5">
-                {s.label}: <strong>{s.count}</strong>
+            {p.clinical.status_counts.map((x) => (
+              <span key={x.status} className="rounded border border-line px-2 py-0.5">
+                {x.label}: <strong>{x.count}</strong>
               </span>
             ))}
-            <span className="text-muted">in the {p.clinical.studies.length} most relevant of {n(p.clinical.total)} studies</span>
+            <span className="text-muted">among {p.clinical.studies.length} retrieved of {n(p.clinical.total)} registered studies</span>
           </div>
         )}
-        {p.clinical.studies.length ? (
-          <ul className="divide-y divide-line">
-            {p.clinical.studies.slice(0, 8).map((s) => (
-              <Study key={s.nct} s={s} />
-            ))}
-          </ul>
-        ) : (
-          <Empty>No ClinicalTrials.gov studies returned for this condition.</Empty>
+        {p.clinical.studies.length === 0 && <Empty>No ClinicalTrials.gov studies returned for this condition.</Empty>}
+        {(
+          [
+            ["active", "Active / recruiting: potential current research leads"],
+            ["completed", "Completed: historical evidence and reusable design leads"],
+            ["caution", "Terminated, withdrawn or suspended: cautions"],
+            ["unknown", "Status not verified recently"],
+          ] as const
+        ).map(([cat, title]) =>
+          p.clinical.groups[cat].length ? (
+            <div key={cat}>
+              <Sub>
+                {title} ({p.clinical.groups[cat].length})
+              </Sub>
+              <ul className="divide-y divide-line">
+                {p.clinical.groups[cat].slice(0, cat === "completed" ? 6 : 5).map((x) => (
+                  <Study key={x.nct} s={x} />
+                ))}
+              </ul>
+            </div>
+          ) : null,
+        )}
+        {p.clinical.shared_endpoints.length > 0 && (
+          <>
+            <Sub>Shared endpoint leads</Sub>
+            <p className="text-xs text-muted">These communities have used the same registered endpoint wording in studies of different conditions. A shared endpoint is not shared biology and does not mean any intervention transfers.</p>
+            <ul className="mt-1 space-y-2 text-xs">
+              {p.clinical.shared_endpoints.map((e) => (
+                <li key={e.measure} className="rounded-lg border border-dashed border-line p-2">
+                  <span className="font-semibold">&ldquo;{e.measure}&rdquo;</span>
+                  <ul className="mt-1 list-disc pl-4 text-muted">
+                    {e.studies.map((x) => (
+                      <li key={x.nct}>
+                        {x.nct} ({x.status_label}, {x.role}) · {x.conditions.join(", ")}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </Section>
 
@@ -357,7 +482,7 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         </div>
       </Section>
 
-      <Section title="Research assets" note="DOI-registered datasets and collections (DataCite), plus natural-history, registry or biobank studies with their status. Reuse terms must be checked with each repository or sponsor.">
+      <Section title="Research assets" note="DOI-registered datasets and collections (DataCite), plus natural-history, registry, cohort and biobank studies flagged from registry fields, each with its status. These can reveal reusable recruitment infrastructure, outcome measures, longitudinal-data models, investigators and sites. Reuse terms must be checked with each repository or sponsor.">
         <Sub>Datasets and collections</Sub>
         {p.assets.datasets.length ? (
           <ul className="divide-y divide-line">
@@ -379,7 +504,7 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         )}
         {p.assets.reuse_leads.length > 0 && (
           <>
-            <Sub>Potential reuse leads (status preserved)</Sub>
+            <Sub>Natural-history, registry, cohort and biobank studies (status preserved)</Sub>
             <ul className="divide-y divide-line">
               {p.assets.reuse_leads.map((s) => (
                 <Study key={s.nct} s={s} />
@@ -476,7 +601,7 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
 /** Verified live during implementation (2026-10-04): each resolves to an exact ontology match with literature, trials and genetics. */
 export const DISCOVERY_EXAMPLES = ["Dravet syndrome", "Angelman syndrome", "Phelan-McDermid syndrome", "cystic fibrosis"] as const;
 
-export function BroadDiscovery({ sources }: { sources: { name: string; mode: "live" | "offline" }[] }) {
+export function BroadDiscovery({ sources }: { sources: { name: string; mode: string }[] }) {
   const live = sources.filter((s) => s.mode === "live");
   return (
     <section aria-labelledby="broad-h" className="rounded-2xl border-2 border-dashed border-unknown bg-white p-5">

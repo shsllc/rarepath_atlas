@@ -33,9 +33,9 @@ async function preview(fail: Failures = {}, q = "Dravet syndrome"): Promise<Disc
 }
 
 describe("provider contract", () => {
-  it("seven live providers, each declaring role, mode and data types", () => {
+  it("eight live providers, each declaring role, mode and data types", () => {
     const ps = liveProviders();
-    expect(ps.map((p) => p.meta.id).sort()).toEqual(["clinicaltrials", "crossref", "datacite", "europepmc", "gwas", "openalex", "opentargets"]);
+    expect(ps.map((p) => p.meta.id).sort()).toEqual(["clinicaltrials", "crossref", "datacite", "europepmc", "gwas", "openalex", "opentargets", "trialpubs"]);
     for (const p of ps) {
       expect(p.meta.mode).toBe("live");
       expect(["discovery", "metadata"]).toContain(p.meta.role);
@@ -46,7 +46,8 @@ describe("provider contract", () => {
 
   it("the sources view lists live and offline sources honestly", () => {
     const s = researchSources();
-    expect(s.filter((x) => x.mode === "live")).toHaveLength(7);
+    expect(s.filter((x) => x.mode === "live")).toHaveLength(8);
+    expect(s.filter((x) => x.mode === "not_integrated").map((x) => x.name)).toEqual(["WHO ICTRP", "EMA CTIS"]);
     expect(s.some((x) => x.mode === "offline" && /PubMed/.test(x.name))).toBe(true);
     expect(s.filter((x) => x.mode === "live").every((x) => !x.uses.includes("reviewed_ingestion"))).toBe(true);
   });
@@ -148,11 +149,11 @@ describe("scientific-integrity boundaries", () => {
     const by = Object.fromEntries(p.clinical.studies.map((s) => [s.nct, s]));
     expect(by.NCT00000001.status).toBe("COMPLETED");
     expect(by.NCT00000002.status_label).toBe("Terminated (stopped early)");
-    expect(by.NCT00000003.status_label).toBe("Withdrawn (never enrolled)");
+    expect(by.NCT00000003.status_label).toBe("Withdrawn (stopped before enrolling)");
     expect(by.NCT00000004.status).toBe("RECRUITING");
     expect(new Set(p.clinical.status_counts.map((s) => s.status)).size).toBe(5);
-    // Reuse leads keep their status visible.
-    expect(p.assets.reuse_leads.map((s) => [s.nct, s.status])).toEqual([["NCT00000005", "ACTIVE_NOT_RECRUITING"]]);
+    // Reuse leads keep their status visible; the terminated registry is listed last with its caution.
+    expect(p.assets.reuse_leads.map((s) => [s.nct, s.status])).toEqual([["NCT00000005", "ACTIVE_NOT_RECRUITING"], ["NCT00000007", "TERMINATED"]]);
   });
 
   it("GWAS associations stay explicitly non-causal", async () => {

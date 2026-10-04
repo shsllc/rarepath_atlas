@@ -115,12 +115,14 @@ RarePath has two evidence tiers:
 |---|---|---|---|
 | Open Targets Platform (GraphQL v4) | Disease resolution (MONDO/EFO), genes/targets with evidence types, ClinVar variants, recorded drug candidates, ontology neighbours, HPO phenotypes | Live | Discovery |
 | GWAS Catalog (REST v2) | Trait associations, variants, mapped genes, studies | Live | Discovery |
-| ClinicalTrials.gov (API v2) | Studies, explicit status, phases, interventions, sponsors/collaborators, listed officials, countries, dates | Live (offline for the reviewed records) | Discovery / reviewed |
+| ClinicalTrials.gov (API v2) | Studies grouped by explicit status (active / completed / caution), design, typed interventions, outcome measures with time frames, sponsors vs collaborators vs listed officials, age/sex, sites, results-posted flag, protocol/SAP documents, RESULT/DERIVED/BACKGROUND references, natural-history/registry/cohort/biobank flags, shared-endpoint leads | Live (offline for the reviewed records) | Discovery / reviewed |
+| Europe PMC accession index | Papers that mention a registered NCT id (trial → paper leads) | Live | Discovery |
 | Europe PMC | Papers (PMID/PMCID/DOI), abstracts, preprint status, authors + ORCID, grants, open-access full text | Live | Discovery |
 | OpenAlex | Citing/referenced works, authors (ORCID), institutions (ROR), funders, venues | Live | Discovery |
 | Crossref | DOI metadata verification, ORCIDs, funders, retraction/correction notices | Live | Metadata only |
 | DataCite | DOI-registered datasets and collections, creators (ORCID), ROR affiliations, funders | Live | Discovery |
 | PubMed / PMC (E-utilities), MONDO/HPO (OLS4), HGNC, NIH RePORTER, patient-org sites | Sources of the reviewed CDKL5 journey | Offline | Reviewed |
+| WHO ICTRP, EMA CTIS | International / EU trial registrations | Not integrated: ICTRP's web service needs a WHO subscription; CTIS has no documented public API. Neither portal is scraped. EudraCT/CTIS/UTN ids are kept on trial records for future deduplication. | — |
 
 - **Deduplication:**
   - Records merge only on stable identifiers: DOI, PMID, PMCID, MONDO/EFO, Ensembl/HGNC, ORCID, ROR, NCT ID or dataset DOI.

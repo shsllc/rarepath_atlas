@@ -11,6 +11,7 @@ import type { EvidenceEdge, Predicate } from "@/lib/schemas";
 import { DiscoveryOrchestrator, type AssembledGraph, type ProviderRun } from "@/lib/research/orchestrator";
 import { liveProviders } from "@/lib/research/registry";
 import { stageRank } from "@/lib/research/providers/opentargets";
+import { CATEGORY_GUIDANCE } from "@/lib/research/providers/clinicaltrials";
 import type { LinkRelation, PaperRecord, ProviderId, ResearchLink, ResearchProvider, ResearchRecord, StudyRecord } from "@/lib/research/types";
 
 export const DISCOVERY_LABEL = "MACHINE-ASSEMBLED DISCOVERY";
@@ -26,6 +27,7 @@ export const PROVIDER_NAME: Record<ProviderId, string> = {
   openalex: "OpenAlex",
   crossref: "Crossref",
   datacite: "DataCite",
+  trialpubs: "Europe PMC (trial links)",
 };
 
 export type PaperView = {
@@ -45,11 +47,16 @@ export type PaperView = {
   update_notices: string[];
   in_reviewed_graph?: string;
 };
-export type StudyView = Pick<StudyRecord, "label" | "status" | "status_label" | "phases" | "study_type" | "interventions" | "sponsor" | "collaborators" | "start_date" | "completion_date" | "countries" | "enrollment"> & {
+export type StudyView = Omit<StudyRecord, "kind" | "key" | "ids" | "provenance" | "review_status"> & {
   nct: string;
   url: string;
+  secondary_ids: string[];
+  /** What this status family means for a research lead (never "enroll", never "success"). */
+  guidance: string;
   officials: { name: string; role: string; affiliation?: string }[];
+  publications: { pmid?: string; label: string; url: string; relation: "trial_publication" | "trial_background_reference" | "paper_mentions_trial"; native: string; publication_status: PaperRecord["publication_status"] }[];
 };
+export type SharedEndpointView = { measure: string; studies: { nct: string; label: string; status_label: string; conditions: string[]; role: string; time_frame?: string }[]; conditions: string[] };
 export type PersonView = { key: string; name: string; orcid?: string; affiliations: string[]; records: number; roles: string[]; sources: string[] };
 export type GeneView = { symbol: string; name?: string; ensembl_id: string; url: string; evidence_types: string[]; source_score?: { name: string; value: number } };
 
@@ -61,7 +68,15 @@ export type DiscoveryPreview = {
   match: { query: string; exact: boolean; alternatives: { id: string; name: string }[] };
   literature: { total: number; top: PaperView[]; most_cited: PaperView[]; recent: PaperView[]; citation: { seed?: PaperView; citing: PaperView[]; referenced: PaperView[]; citing_total: number } };
   people: { researchers: PersonView[]; institutions: { label: string; ror: string; country?: string; people: number }[] };
-  clinical: { total: number; studies: StudyView[]; status_counts: { status: string; label: string; count: number }[] };
+  clinical: {
+    total: number;
+    infrastructure_total: number;
+    studies: StudyView[];
+    groups: Record<StudyRecord["status_category"], StudyView[]>;
+    infrastructure: StudyView[];
+    shared_endpoints: SharedEndpointView[];
+    status_counts: { status: string; label: string; count: number }[];
+  };
   genetics: { gene_total: number; genes: GeneView[]; variant_total: number; variants: { label: string; gene?: string; statement: string; url: string }[]; gwas_total: number; gwas: { label: string; statement: string; url: string }[] };
   assets: { dataset_total: number; datasets: { label: string; doi: string; url: string; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] }[]; reuse_leads: StudyView[] };
   adjacent: { ontology: { id: string; name: string; relation: "broader" | "narrower"; url: string }[]; same_gene: { gene: string; diseases: { id: string; name: string }[] } | null };
@@ -197,25 +212,47 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       .map((l) => byKey.get(l.from))
       .filter((p): p is Extract<ResearchRecord, { kind: "person" }> => !!p && p.kind === "person")
       .map((p) => ({ name: p.label, role: p.roles[0] ?? "listed official", affiliation: p.affiliations[0] }));
-  const studies = of("study").map(
-    (s): StudyView => ({
-      nct: s.ids.nct!,
-      url: `https://clinicaltrials.gov/study/${s.ids.nct}`,
-      label: s.label,
-      status: s.status,
-      status_label: s.status_label,
-      phases: s.phases,
-      study_type: s.study_type,
-      interventions: s.interventions,
-      sponsor: s.sponsor,
-      collaborators: s.collaborators,
-      start_date: s.start_date,
-      completion_date: s.completion_date,
-      countries: s.countries,
-      enrollment: s.enrollment,
-      officials: officials(s.key),
-    }),
-  );
+  const pubsFor = (k: string): StudyView["publications"] => [
+    ...g.links
+      .filter((l) => (l.relation === "trial_publication" || l.relation === "trial_background_reference") && l.from === k)
+      .map((l) => ({ l, p: paper(l.to) })),
+    ...linksOf("paper_mentions_trial")
+      .filter((l) => l.to === k)
+      .map((l) => ({ l, p: paper(l.from) })),
+  ]
+    .filter((x): x is { l: ResearchLink; p: PaperRecord } => !!x.p)
+    .map(({ l, p }) => ({ pmid: p.ids.pmid, label: p.label, url: paperUrl(p), relation: l.relation as StudyView["publications"][number]["relation"], native: l.native_evidence_type, publication_status: p.publication_status }))
+    .filter((x, i, arr) => arr.findIndex((y) => y.url === x.url) === i);
+  const studies = of("study").map((s): StudyView => {
+    const { kind: _k, key, ids, provenance: _p, review_status: _r, ...rest } = s;
+    return {
+      ...rest,
+      nct: ids.nct!,
+      url: `https://clinicaltrials.gov/study/${ids.nct}`,
+      secondary_ids: [ids.eudract && `EudraCT ${ids.eudract}`, ids.ctis && `CTIS ${ids.ctis}`, ids.utn && `UTN ${ids.utn}`].filter((x): x is string => !!x),
+      guidance: CATEGORY_GUIDANCE[s.status_category],
+      officials: officials(key),
+      publications: pubsFor(key),
+    };
+  });
+  const groups: Record<StudyRecord["status_category"], StudyView[]> = { active: [], completed: [], caution: [], unknown: [] };
+  for (const s of studies) groups[s.status_category].push(s);
+  // Infrastructure leads: active/completed first; caution studies stay listed but always with their status and guidance.
+  const catRank = { active: 0, completed: 1, unknown: 2, caution: 3 } as const;
+  const infrastructure = studies.filter((s) => s.infrastructure.length > 0).sort((a, b) => catRank[a.status_category] - catRank[b.status_category]);
+  // Shared endpoints: identical registered measure wording used by studies of different condition sets.
+  const condKey = (cs: string[]) => cs.map((c) => c.toLowerCase().trim()).sort().join("|");
+  const sharedEndpoints: SharedEndpointView[] = of("outcome_measure")
+    .map((o) => {
+      const uses = linksOf("uses_outcome_measure").filter((l) => l.to === o.key);
+      const ss = uses
+        .map((l) => ({ l, s: studies.find((x) => `study:nct:${x.nct}` === l.from) }))
+        .filter((x): x is { l: ResearchLink; s: StudyView } => !!x.s)
+        .map(({ l, s }) => ({ nct: s.nct, label: s.label, status_label: s.status_label, conditions: s.conditions, role: l.native_evidence_type.replace("_outcome", ""), time_frame: /time frame: ([^)]+)\)/.exec(l.statement)?.[1] }));
+      return { measure: o.measure, studies: ss, conditions: [...new Set(ss.flatMap((x) => x.conditions))] };
+    })
+    .filter((e) => e.studies.length >= 2 && new Set(e.studies.map((x) => condKey(x.conditions))).size >= 2)
+    .slice(0, 6);
   const statusCounts = new Map<string, { label: string; count: number }>();
   for (const s of studies) statusCounts.set(s.status, { label: s.status_label, count: (statusCounts.get(s.status)?.count ?? 0) + 1 });
 
@@ -231,7 +268,6 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
   const sameGeneFrom = sameGene[0] ? byKey.get(sameGene[0].from) : undefined;
 
   const datasets = of("dataset").map((d) => ({ label: d.label, doi: d.ids.doi!, url: `https://doi.org/${d.ids.doi}`, resource_type: d.resource_type, publisher: d.publisher, year: d.year, description: d.description, subjects: d.subjects }));
-  const reuse = studies.filter((s) => /natural history|registry|biobank|cohort|biorepository/i.test(s.label));
 
   const drugs = of("drug")
     .map((d) => ({ chembl_id: d.ids.chembl!, name: d.label, drug_type: d.drug_type, stage: d.stage, url: d.provenance[0].url }))
@@ -261,7 +297,15 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
     match: { query: g.disease.query, exact: g.exact, alternatives: g.alternatives },
     literature: { total: g.totals.papers ?? 0, top: top.map(pv), most_cited: cited.map(pv), recent: recent.map(pv), citation: { seed: seed ? pv(seed) : undefined, citing: cites.filter((l) => l.native_evidence_type === "cites").map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p).map(pv), referenced: cites.filter((l) => l.native_evidence_type === "references").map((l) => paper(l.to)).filter((p): p is PaperRecord => !!p).map(pv), citing_total: g.totals.citing_works_of_seed ?? 0 } },
     people: { researchers, institutions },
-    clinical: { total: g.totals.studies ?? 0, studies, status_counts: [...statusCounts.entries()].map(([status, v]) => ({ status, ...v })).sort((a, b) => b.count - a.count) },
+    clinical: {
+      total: g.totals.studies ?? 0,
+      infrastructure_total: g.totals.infrastructure_studies ?? 0,
+      studies,
+      groups,
+      infrastructure,
+      shared_endpoints: sharedEndpoints,
+      status_counts: [...statusCounts.entries()].map(([status, v]) => ({ status, ...v })).sort((a, b) => b.count - a.count),
+    },
     genetics: {
       gene_total: g.totals.genes ?? 0,
       genes: genes.slice(0, 12),
@@ -270,7 +314,7 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       gwas_total: g.totals.gwas_associations ?? 0,
       gwas: linksOf("gwas_association").map((l) => ({ label: byKey.get(l.from)?.label ?? l.from, statement: l.statement, url: l.provenance[0].url })),
     },
-    assets: { dataset_total: g.totals.datasets ?? 0, datasets, reuse_leads: reuse },
+    assets: { dataset_total: g.totals.datasets ?? 0, datasets, reuse_leads: infrastructure },
     adjacent: {
       ontology: linksOf("subclass_of").map((l) => {
         const other = l.from === dKey ? l.to : l.from;

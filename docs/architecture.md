@@ -115,6 +115,21 @@ query ──▶ reviewed graph (always first; reviewed matches never call an API
   - Each disease costs at most 3 OpenAlex calls and 5 Crossref lookups, with no retries at runtime.
   - OpenAlex's keyless access has a small daily budget; `OPENALEX_API_KEY` is used if present.
 
+## Clinical-trial discovery
+
+- **Status is never flattened.** Every study keeps its raw `overallStatus`, and studies are grouped into four families, each with fixed guidance text:
+  - **Active** (recruiting, not yet recruiting, enrolling by invitation, active not recruiting): "Potential study/research lead — verify eligibility/status with the study team."
+  - **Completed**: a historical evidence or reusable-design lead. Completion does not indicate success.
+  - **Caution** (terminated, withdrawn, suspended): shown with the registry's stated reason, and never presented as a positive reuse lead.
+  - **Unknown**: the status hasn't been verified recently.
+- **Infrastructure flags come only from registry fields:** "natural history" in the title, `patientRegistry`, an observational cohort model, a prospective longitudinal design, or biospecimen retention. Each flag records its basis.
+- **Outcome measures keep the source's own wording.** A *shared endpoint lead* means the identical registered wording appears in studies of different condition sets, and it is labelled as not implying shared biology or transfer. RarePath does not classify an outcome as a biomarker or patient-reported outcome unless the source says so.
+- **Trial → paper links need a stable identifier:**
+  - a registry reference with a PMID, typed RESULT, DERIVED or BACKGROUND (BACKGROUND is labelled as not a result), or
+  - Europe PMC's text-mined NCT accession, labelled as a mention.
+- **Organizations and people stay separate.** Sponsors and collaborators are organization records with explicit relations, not investigators. Listed officials are people, merged only under the strict identity rules. Contact e-mails and phone numbers are never requested.
+- **Not integrated:** WHO ICTRP (its web service requires a subscription) and EMA CTIS (no documented, versioned public API). Neither portal is scraped. Trial records keep EudraCT, CTIS and UTN secondary ids so records from those registries can collapse onto the same trial later.
+
 ## Review / decision boundary
 
 ```

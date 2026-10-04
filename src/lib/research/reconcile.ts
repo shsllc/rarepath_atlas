@@ -8,7 +8,9 @@
  *   people        ORCID (or OpenAlex author id). Without ORCID: same normalized name AND an
  *                 identical normalized affiliation string. NEVER name alone.
  *   institutions  ROR
- *   studies       NCT
+ *   studies       NCT → EudraCT → CTIS → WHO UTN (so a future ICTRP/CTIS record collapses onto the same trial)
+ *   organizations exact normalized name (sponsors/collaborators only; never applied to people)
+ *   outcomes      identical normalized measure wording (no fuzzy matching)
  *   datasets      DOI
  *   drugs         ChEMBL;  phenotypes HPO;  variants rsID
  *
@@ -23,7 +25,8 @@ const ID_KEYS: Partial<Record<ResearchRecord["kind"], IdSystem[]>> = {
   gene: ["ensembl", "hgnc", "symbol"],
   person: ["orcid", "openalex"],
   institution: ["ror"],
-  study: ["nct"],
+  study: ["nct", "eudract", "ctis", "utn"],
+  organization: ["orgname"],
   dataset: ["doi", "datacite"],
   drug: ["chembl"],
   phenotype: ["hpo"],
@@ -93,6 +96,7 @@ function mergeGroup(group: ResearchRecord[]): ResearchRecord {
     merged.affiliations = uniq(ps.flatMap((p) => p.affiliations)).slice(0, 4);
     merged.roles = uniq(ps.flatMap((p) => p.roles));
   }
+  if (merged.kind === "outcome_measure") merged.roles = uniq((group as Extract<ResearchRecord, { kind: "outcome_measure" }>[]).flatMap((o) => o.roles));
   if (merged.kind === "disease") merged.synonyms = uniq((group as Extract<ResearchRecord, { kind: "disease" }>[]).flatMap((d) => d.synonyms));
   return merged;
 }
@@ -174,6 +178,7 @@ function keyRank(k: string): number {
   if (/^paper:pmid:/.test(k)) return 1;
   if (/^person:orcid:/.test(k)) return 0;
   if (/^(institution:ror|study:nct|gene:ensembl|drug:chembl|variant:rsid):/.test(k)) return 0;
+  if (/^(organization|outcome):/.test(k)) return 0;
   if (/^disease:(MONDO|EFO)/.test(k)) return 0;
   return 5;
 }

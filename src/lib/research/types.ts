@@ -8,7 +8,7 @@
  * only adds provenance; it never makes anything "reviewed".
  */
 
-export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite";
+export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs";
 
 /** Stable identifier systems used for reconciliation (lower-case keys). */
 export type IdSystem =
@@ -32,7 +32,11 @@ export type IdSystem =
   | "clinvar"
   | "gcst"
   | "grant"
-  | "datacite";
+  | "datacite"
+  | "eudract"
+  | "ctis"
+  | "utn"
+  | "orgname";
 
 export interface Provenance {
   provider: ProviderId;
@@ -82,21 +86,57 @@ export type PaperRecord = RecordBase & {
 };
 export type PersonRecord = RecordBase & { kind: "person"; affiliations: string[]; roles: string[] };
 export type InstitutionRecord = RecordBase & { kind: "institution"; country?: string };
+/** Status families. Never flattened into "assets": terminated and withdrawn studies are cautions. */
+export type StudyStatusCategory = "active" | "completed" | "caution" | "unknown";
+/** Infrastructure flags, each recorded only when a source field states it. */
+export type StudyInfrastructure = "natural_history" | "registry" | "observational_cohort" | "longitudinal" | "biobank";
+
 export type StudyRecord = RecordBase & {
   kind: "study";
   /** Raw ClinicalTrials.gov overallStatus enum, never collapsed. */
   status: string;
   status_label: string;
+  status_category: StudyStatusCategory;
+  why_stopped?: string;
+  official_title?: string;
   phases: string[];
   study_type?: string;
+  design: {
+    allocation?: string;
+    intervention_model?: string;
+    masking?: string;
+    primary_purpose?: string;
+    observational_model?: string;
+    time_perspective?: string;
+    patient_registry?: boolean;
+  };
   conditions: string[];
   interventions: string[];
+  intervention_details: { type: string; name: string }[];
+  outcomes: { role: "primary" | "secondary" | "other"; measure: string; time_frame?: string; description?: string }[];
   sponsor?: string;
+  sponsor_class?: string;
   collaborators: string[];
+  responsible_party?: string;
   start_date?: string;
+  primary_completion_date?: string;
   completion_date?: string;
+  last_update?: string;
   countries: string[];
+  locations: { facility?: string; city?: string; state?: string; country?: string }[];
   enrollment?: number;
+  enrollment_type?: string;
+  eligibility: { sex?: string; minimum_age?: string; maximum_age?: string; age_groups: string[] };
+  has_results: boolean;
+  documents: { label: string; url: string; protocol: boolean; sap: boolean }[];
+  infrastructure: { flag: StudyInfrastructure; basis: string }[];
+};
+export type OrganizationRecord = RecordBase & { kind: "organization"; org_class?: string };
+export type OutcomeMeasureRecord = RecordBase & {
+  kind: "outcome_measure";
+  /** Source-native wording; RarePath does not reclassify it as biomarker / PRO unless a source says so. */
+  measure: string;
+  roles: ("primary" | "secondary" | "other")[];
 };
 export type GrantRecord = RecordBase & { kind: "grant"; funder: string };
 export type DatasetRecord = RecordBase & { kind: "dataset"; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] };
@@ -113,7 +153,9 @@ export type ResearchRecord =
   | StudyRecord
   | GrantRecord
   | DatasetRecord
-  | DrugRecord;
+  | DrugRecord
+  | OrganizationRecord
+  | OutcomeMeasureRecord;
 export type RecordKind = ResearchRecord["kind"];
 
 export type LinkRelation =
@@ -133,7 +175,11 @@ export type LinkRelation =
   | "affiliated_with"
   | "cites"
   | "funded_by"
-  | "author_other_research"; // discovery lead: same identified author's other work
+  | "author_other_research" // discovery lead: same identified author's other work
+  | "uses_outcome_measure" // registered study lists this outcome measure
+  | "trial_publication" // ClinicalTrials.gov lists the paper as a RESULT or DERIVED reference
+  | "trial_background_reference" // ClinicalTrials.gov lists the paper as BACKGROUND (not a result)
+  | "paper_mentions_trial"; // Europe PMC text-mining finds the NCT id in the paper (a lead)
 
 export interface ResearchLink {
   key: string;
