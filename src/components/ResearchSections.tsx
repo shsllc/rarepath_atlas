@@ -40,8 +40,17 @@ export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConn
         </div>
       )}
 
+      <p className="text-sm font-medium text-ink">
+        <span className="mr-2 rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">Research connection strength</span>
+        RarePath ranks opportunities to investigate, not biological equivalence.
+      </p>
+
+      {ranked[0] && <TopConnection r={ranked[0]} label={label} open={open} />}
+
       <ol className="space-y-3">
-        {ranked.map((r, i) => (
+        {ranked.slice(1).map((r, idx) => {
+          const i = idx + 1;
+          return (
           <li key={r.disease_id} className="rounded-2xl border border-line bg-white p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="flex items-center gap-3 text-lg font-semibold">
@@ -89,7 +98,8 @@ export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConn
               </div>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ol>
 
       <details className="rounded-2xl border border-line bg-white px-4 py-3 text-sm">
@@ -110,6 +120,54 @@ export function RankingPanel({ ranked, hubs, label, open }: { ranked: RankedConn
         </p>
       </details>
     </div>
+  );
+}
+
+/** The #1 connection, explained in two columns. The score is deliberately secondary to the reasons. */
+function TopConnection({ r, label, open }: { r: RankedConnection; label: (id: string) => string; open: Open }) {
+  return (
+    <article aria-label={`Why ${label(r.disease_id)} ranked number 1`} className="overflow-hidden rounded-3xl border border-line bg-white shadow-md shadow-brand/10">
+      <header className="flex flex-wrap items-end justify-between gap-2 border-b border-line px-5 py-4 sm:px-6">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted">Why this ranked #1</p>
+          <h3 className="mt-0.5 text-2xl font-semibold tracking-tight">{label(r.disease_id)}</h3>
+        </div>
+        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${BAND_STYLE[r.band]}`}>
+          {r.score} — {r.band} research connection
+        </span>
+      </header>
+      <div className="grid md:grid-cols-2">
+        <div className="bg-teal-wash/70 p-5 sm:p-6">
+          <h4 className="text-xs font-bold uppercase tracking-wide text-supported">Evidence raising the connection</h4>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {r.factors.map((f, j) => (
+              <li key={j} className="flex items-start justify-between gap-2">
+                <span>
+                  <span aria-hidden className="mr-1.5 font-bold text-supported">+</span>
+                  {FACTOR_WEIGHTS[f.kind].label}
+                  <span className="block pl-4 text-xs text-muted">{f.detail}</span>
+                </span>
+                <EvBtn ids={f.evidence_edge_ids} open={open} title={`${label(r.disease_id)}: ${FACTOR_WEIGHTS[f.kind].label}`} />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="bg-rose-wash/70 p-5 sm:p-6">
+          <h4 className="text-xs font-bold uppercase tracking-wide text-contradictory">Why this does not mean the diseases are the same</h4>
+          <ul className="mt-3 space-y-2.5 text-sm">
+            {r.cautions.map((c, j) => (
+              <li key={j} className="flex items-start justify-between gap-2">
+                <span>
+                  <span aria-hidden className="mr-1.5 font-bold text-contradictory">−</span>
+                  {c.detail}
+                </span>
+                <EvBtn ids={c.evidence_edge_ids} open={open} title={`${label(r.disease_id)}: ${c.detail}`} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </article>
   );
 }
 

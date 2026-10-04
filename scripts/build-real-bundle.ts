@@ -320,6 +320,18 @@ const action_brief = {
   question: line(ACTION_BRIEF.question),
   must_validate: ACTION_BRIEF.must_validate.map(line),
   does_not_mean: ACTION_BRIEF.does_not_mean.map(line),
+  this_week: {
+    next_step: line(ACTION_BRIEF.this_week.next_step),
+    destinations: ACTION_BRIEF.this_week.destinations.map((d) => {
+      if (!nodeIds.has(d.node_id)) throw new Error(`Destination ${d.node_id} is not a node`);
+      return { node_id: d.node_id, why: d.why, evidence_edge_ids: d.edges.map(edgeId) };
+    }),
+    community_ids: ACTION_BRIEF.this_week.communities.map((id) => {
+      if (!nodeIds.has(id)) throw new Error(`Community ${id} is not a node`);
+      return id;
+    }),
+    community_evidence_edge_ids: ACTION_BRIEF.this_week.community_edges.map(edgeId),
+  },
 };
 
 const bundle = GraphBundle.parse({

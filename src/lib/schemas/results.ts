@@ -115,6 +115,15 @@ export const ActionBrief = z.object({
   question: BriefLine,
   must_validate: z.array(BriefLine).min(1),
   does_not_mean: z.array(BriefLine).min(3),
+  /** "What can this patient group do this week?" — concrete, source-linked, never implies willingness. */
+  this_week: z
+    .object({
+      next_step: BriefLine,
+      destinations: z.array(z.object({ node_id: z.string(), why: z.string(), evidence_edge_ids: z.array(z.string()).min(1) })).min(1),
+      community_ids: z.array(z.string()).min(1),
+      community_evidence_edge_ids: z.array(z.string()).min(1),
+    })
+    .optional(),
 });
 export type ActionBrief = z.infer<typeof ActionBrief>;
 

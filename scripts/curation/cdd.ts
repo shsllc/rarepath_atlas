@@ -462,7 +462,17 @@ export const EDGES: EdgeSpec[] = [
   { key: "org-foxg1rf", s: "org:foxg1rf", p: "supports_community", o: "disease:foxg1", confidence: "high", evidence: [{ src: "org:foxg1rf", quote: "Affected by the Rare Children's Disease, FOXG1 Syndrome" }] },
 
   // ---- investigators (public registry listing only; no contact data)
-  { key: "pi-percy", s: "researcher:percy", p: "investigates", o: "study:nhs", confidence: "high", evidence: [{ src: NHS, quote: "Overall official: Alan K Percy, MD, University of Alabama at Birmingham (PRINCIPAL_INVESTIGATOR)" }] },
+  {
+    key: "pi-percy",
+    s: "researcher:percy",
+    p: "investigates",
+    o: "study:nhs",
+    confidence: "high",
+    evidence: [
+      { src: NHS, quote: "Overall official: Alan K Percy, MD, University of Alabama at Birmingham (PRINCIPAL_INVESTIGATOR)" },
+      { src: NHS, quote: "Completion date: 2021-07-31", stance: "qualifies" },
+    ],
+  },
   { key: "sd-neul", s: "researcher:neul", p: "investigates", o: "study:nhs", confidence: "high", evidence: [{ src: NHS, quote: "Overall official: Jeffrey L Neul, MD, PhD, Vanderbilt University (STUDY_DIRECTOR)" }] },
 
   // ---- collaborator layer: public PubMed author metadata. Registry investigators are linked to a paper ONLY
@@ -855,10 +865,23 @@ export const ACTION_BRIEF = {
     { text: "The CDD severity assessment itself: its authors say refinement through ongoing validation is required.", edges: ["sa-cdd"] },
     { text: "Current access to the study database and biobank. Access terms are not stated in any retrieved source.", edges: ["nhs-infra", "biobank-asset"] },
     { text: "Population differences: CDD has the earliest seizure onset (median 2 months) and less frequent regression than Rett.", edges: ["differs-rett"] },
+    { text: "Whether the registry-listed investigators still hold these roles. The registry describes a study completed in July 2021.", edges: ["pi-percy", "sd-neul"] },
   ],
   does_not_mean: [
     { text: "CDD and Rett syndrome are not equivalent. CDD is recognised as an independent disorder.", edges: ["variant-claim", "differs-rett"] },
     { text: "Shared research infrastructure does not imply that any treatment transfers.", edges: ["costudy-rett"] },
     { text: "Shared research history does not prove a shared biological mechanism. No retrieved source describes one.", edges: ["history"] },
   ],
+  this_week: {
+    next_step: {
+      text: "Bring the four sources below to a research conversation and ask whether the shared Rett/Rett-related natural-history infrastructure, and the CDD severity assessment it informed, can feed a current CDD natural-history or outcome-measure plan.",
+      edges: ["cdd-in-nhs", "nhs-informed-sa", "sa-cdd"],
+    },
+    destinations: [
+      { node_id: "study:nhs", why: "Relevant destination to verify this opportunity: the study team behind the shared infrastructure (registry-listed at the University of Alabama at Birmingham and Vanderbilt University).", edges: ["cdd-in-nhs", "pi-percy", "sd-neul"] },
+      { node_id: "asset:cdd-severity", why: "Relevant destination to verify the validation question: the authors of the CDD severity assessment (first author at Children's Hospital Colorado).", edges: ["sa-cdd", "demarest-authored-sa"] },
+    ],
+    communities: ["org:ifcr", "org:loulou"],
+    community_edges: ["org-ifcr", "org-loulou", "ifcr-informed-sa"],
+  },
 };

@@ -46,3 +46,39 @@ export const SOURCE_SYSTEM_BY_KIND: Record<string, string> = {
   gene_record: "HGNC",
   org_homepage: "Organization websites",
 };
+
+/**
+ * Layer 2 of the impact story: a forward HYPOTHESIS, never presented as measured.
+ * No time estimates: there is no sourced baseline for this milestone.
+ */
+export const HYPOTHESIS = {
+  badge: "Hypothesis — not yet measured",
+  milestone: "A research-ready natural-history and outcome-measure plan for CDD",
+  traditional: [
+    "Identify related communities",
+    "Search studies",
+    "Locate reusable infrastructure",
+    "Identify researchers",
+    "Compare populations",
+    "Evaluate outcome measures",
+    "Assemble evidence",
+    "Design the research plan",
+  ],
+  rarepath: ["Ranked research connection", "Reusable infrastructure", "Relevant investigators", "Counter-evidence", "Validation questions", "Research Action Brief"],
+  statement:
+    "RarePath could contribute toward a 10× reduction in the discovery and planning portion of reaching this milestone, if reuse eliminates duplicated discovery and setup work.",
+  assumptions: [
+    "The relevant infrastructure is still accessible",
+    "Researchers and patient groups confirm it applies",
+    "The existing assets can actually be reused",
+    "Validation does not uncover disqualifying differences",
+    "Downstream institutional and regulatory timelines remain outside RarePath's control",
+  ],
+  validation: [
+    "Test with multiple patient groups",
+    "Measure the baseline time without RarePath",
+    "Measure the RarePath-assisted time",
+    "Track whether the assets and collaborators found are actually usable",
+    "Compare time to the research-ready milestone",
+  ],
+} as const;

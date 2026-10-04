@@ -21,12 +21,13 @@ export const FACTOR_WEIGHTS: Record<FactorKind, { points: number; label: string 
   historical_link: { points: 1, label: "Historical research connection (context only)" },
 };
 
-export type CautionKind = "contradicted_classification" | "clinical_differences" | "no_mechanism_evidence";
+export type CautionKind = "contradicted_classification" | "clinical_differences" | "no_mechanism_evidence" | "no_treatment_transfer_evidence";
 
 export const CAUTION_LABEL: Record<CautionKind, string> = {
   contradicted_classification: "A classification linking the two is contradicted by current evidence",
   clinical_differences: "Sources document important clinical differences",
   no_mechanism_evidence: "No retrieved source describes a shared mechanism",
+  no_treatment_transfer_evidence: "No evidence that any treatment transfers between them",
 };
 
 export interface RankFactor {
@@ -105,6 +106,8 @@ export function rankResearchConnections(nodes: GraphNode[], allEdges: EvidenceEd
     const diff = between(focusId, d, "clinically_differs_from").filter(positive);
     if (diff.length) cautions.push({ kind: "clinical_differences", detail: CAUTION_LABEL.clinical_differences, evidence_edge_ids: diff.map((e) => e.id) });
     if (!focusMechanisms) cautions.push({ kind: "no_mechanism_evidence", detail: CAUTION_LABEL.no_mechanism_evidence, evidence_edge_ids: [] });
+    // The graph has no treatment predicates at all; state that explicitly rather than leave it implied.
+    cautions.push({ kind: "no_treatment_transfer_evidence", detail: CAUTION_LABEL.no_treatment_transfer_evidence, evidence_edge_ids: [] });
 
     const score = factors.reduce((n, f) => n + f.points, 0);
     return { disease_id: d, score, band: band(score), factors, cautions };

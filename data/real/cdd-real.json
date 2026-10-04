@@ -3059,6 +3059,21 @@
           "method": "structured_api",
           "source_record_id": "ctgov:NCT02738281",
           "stance": "supports"
+        },
+        {
+          "id": "ev:pi-percy:2",
+          "source": "ClinicalTrials.gov (NCT02738281)",
+          "source_url": "https://clinicaltrials.gov/study/NCT02738281",
+          "retrieval_date": "2026-10-04",
+          "source_type": "trial_registry",
+          "evidence_type": "study_record",
+          "quoted_or_structured_evidence": "Completion date: 2021-07-31",
+          "citation": {
+            "nct": "NCT02738281"
+          },
+          "method": "structured_api",
+          "source_record_id": "ctgov:NCT02738281",
+          "stance": "qualifies"
         }
       ],
       "confidence": "high",
@@ -4863,7 +4878,7 @@
     }
   ],
   "build_info": {
-    "built_at": "2026-10-04T06:17:26.875Z",
+    "built_at": "2026-10-04T07:49:22.053Z",
     "openai_runs": [
       {
         "role": "Evidence Extractor + Entity Reconciler",
@@ -5050,6 +5065,13 @@
         "evidence_edge_ids": [
           "edge:differs-rett"
         ]
+      },
+      {
+        "text": "Whether the registry-listed investigators still hold these roles. The registry describes a study completed in July 2021.",
+        "evidence_edge_ids": [
+          "edge:pi-percy",
+          "edge:sd-neul"
+        ]
       }
     ],
     "does_not_mean": [
@@ -5072,6 +5094,44 @@
           "edge:history"
         ]
       }
-    ]
+    ],
+    "this_week": {
+      "next_step": {
+        "text": "Bring the four sources below to a research conversation and ask whether the shared Rett/Rett-related natural-history infrastructure, and the CDD severity assessment it informed, can feed a current CDD natural-history or outcome-measure plan.",
+        "evidence_edge_ids": [
+          "edge:cdd-in-nhs",
+          "edge:nhs-informed-sa",
+          "edge:sa-cdd"
+        ]
+      },
+      "destinations": [
+        {
+          "node_id": "study:nhs",
+          "why": "Relevant destination to verify this opportunity: the study team behind the shared infrastructure (registry-listed at the University of Alabama at Birmingham and Vanderbilt University).",
+          "evidence_edge_ids": [
+            "edge:cdd-in-nhs",
+            "edge:pi-percy",
+            "edge:sd-neul"
+          ]
+        },
+        {
+          "node_id": "asset:cdd-severity",
+          "why": "Relevant destination to verify the validation question: the authors of the CDD severity assessment (first author at Children's Hospital Colorado).",
+          "evidence_edge_ids": [
+            "edge:sa-cdd",
+            "edge:demarest-authored-sa"
+          ]
+        }
+      ],
+      "community_ids": [
+        "org:ifcr",
+        "org:loulou"
+      ],
+      "community_evidence_edge_ids": [
+        "edge:org-ifcr",
+        "edge:org-loulou",
+        "edge:ifcr-informed-sa"
+      ]
+    }
   }
 }

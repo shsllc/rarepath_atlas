@@ -12,6 +12,7 @@ import { FixtureChip, STATUS_META, StatusBadge } from "./StatusBadge";
 import { GraphPlaceholder } from "./GraphPlaceholder";
 import { EvidenceKey } from "./EvidenceKey";
 import { ActionBriefPanel, CollaboratorCards, RankingPanel } from "./ResearchSections";
+import { ImpactPanel, JourneyStrip, ThisWeekPanel, TrustStrip } from "./ImpactSections";
 import { rankResearchConnections, researchHubs } from "@/lib/analytics";
 
 const EvidenceGraph = dynamic(() => import("./EvidenceGraph").then((m) => m.EvidenceGraph), {
@@ -120,6 +121,8 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
             { label: "The limitation: not equivalence, not treatment transfer", go: () => scrollTo("limitation") },
             { label: "Explain this connection (OpenAI)", go: () => open(featured.headline, heroEdges) },
             { label: "Research Action Brief: who is relevant, what to ask", go: () => scrollTo("brief") },
+            { label: "What can this patient group do this week?", go: () => scrollTo("this-week") },
+            { label: "Measured 4.2× result and the 10× hypothesis", go: () => scrollTo("tenx") },
             { label: "Evidence graph and citations", go: () => scrollTo("graph") },
           ]}
         />
@@ -204,6 +207,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
             <span className="text-sm font-semibold text-supported">See what may be reusable ↓</span>
           </button>
         )}
+        {result.action_brief && <JourneyStrip brief={result.action_brief} top={ranked[0]} label={label} />}
       </Section>
 
       {/* 2. GRAPH ANALYTICS: RESEARCH CONNECTION STRENGTH */}
@@ -233,18 +237,53 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
       {result.action_brief && (
         <Section id="brief" n={4} title="Research Action Brief" subtitle="Something a patient organization could take into a research conversation this week. Every line opens to its evidence.">
           <ActionBriefPanel brief={result.action_brief} collaborators={result.collaborators} nodes={nodes} open={open} />
+          <div className="mt-5">
+            <ThisWeekPanel brief={result.action_brief} collaborators={result.collaborators} nodes={nodes} open={open} label={label} />
+          </div>
         </Section>
       )}
 
-      {/* 5. CONTRADICTION SPOTLIGHT */}
+      {/* 5. IMPACT: MEASURED RESULT, THEN HYPOTHESIS */}
+      {!result.is_fixture && (
+        <Section
+          id="tenx"
+          n={5}
+          tone="wash"
+          title="From measured acceleration to the 10× hypothesis"
+          subtitle="What was measured in this prototype, kept separate from what still has to be tested."
+        >
+          <ImpactPanel result={result} />
+          <details className="mt-4 rounded-2xl border border-line bg-white px-4 py-3 text-sm">
+            <summary className="cursor-pointer font-medium">Full 10× framing, benchmark table and what would need to be measured</summary>
+            <div className="mt-3">
+              <TenXPanel result={result} />
+            </div>
+          </details>
+        </Section>
+      )}
+
+      <TrustStrip />
+
+      {/* 6. CONTRADICTION SPOTLIGHT */}
       {contradiction && (
-        <Section id="contradiction" n={5} title="Why searching names is not enough" subtitle="Historical labels and current evidence can disagree. RarePath shows both, with dates.">
+        <Section id="contradiction" n={6} title="Why searching names is not enough" subtitle="Historical labels and current evidence can disagree. RarePath shows both, with dates.">
           <ContradictionSpotlight edge={contradiction} sources={sources} open={open} label={label} />
         </Section>
       )}
 
-      {/* 6. CONNECTED COMMUNITIES */}
-      <Section id="communities" n={6} tone="wash" title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
+      {/* 7. EVIDENCE GRAPH */}
+      <Section id="graph" n={7} title="Explore the evidence graph" subtitle="Each line is a relationship with its own sources, and its style shows the evidence status.">
+        <EvidenceGraph nodes={result.nodes} edges={result.edges} focusId={disease.id} onOpen={setDrawer} />
+        <details className="mt-3">
+          <summary className="cursor-pointer text-sm font-medium">Table view of all relationships (accessible alternative)</summary>
+          <div className="mt-2">
+            <GraphPlaceholder nodes={result.nodes} edges={result.edges} onSelectEdge={(e) => open(`${label(e.subject_id)} → ${label(e.object_id)}`, [e.id])} />
+          </div>
+        </details>
+      </Section>
+
+      {/* 8. CONNECTED COMMUNITIES */}
+      <Section id="communities" n={8} tone="wash" title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
         <div className="grid gap-3 md:grid-cols-2">
           {result.connections.map((c) => (
             <article key={c.id} className={`rounded-2xl border border-line bg-white p-5 ${STATUS_META[c.status].card}`}>
@@ -270,24 +309,6 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
           ))}
         </div>
       </Section>
-
-      {/* 7. EVIDENCE GRAPH */}
-      <Section id="graph" n={7} title="Explore the evidence graph" subtitle="Each line is a relationship with its own sources, and its style shows the evidence status.">
-        <EvidenceGraph nodes={result.nodes} edges={result.edges} focusId={disease.id} onOpen={setDrawer} />
-        <details className="mt-3">
-          <summary className="cursor-pointer text-sm font-medium">Table view of all relationships (accessible alternative)</summary>
-          <div className="mt-2">
-            <GraphPlaceholder nodes={result.nodes} edges={result.edges} onSelectEdge={(e) => open(`${label(e.subject_id)} → ${label(e.object_id)}`, [e.id])} />
-          </div>
-        </details>
-      </Section>
-
-      {/* 8. 10× OPPORTUNITY */}
-      {!result.is_fixture && (
-        <Section id="tenx" n={8} tone="wash" title="The 10× opportunity" subtitle={`Milestone: ${TENX.milestone}.`}>
-          <TenXPanel result={result} />
-        </Section>
-      )}
 
       {/* 9. PEOPLE & COMMUNITIES */}
       <Section id="people" n={9} title="People & communities">
