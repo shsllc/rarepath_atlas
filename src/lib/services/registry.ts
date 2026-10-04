@@ -6,6 +6,7 @@ import { OpenAIEvidenceExtractorImpl } from "./openai/evidence-extractor";
 import { OpenAIEntityReconcilerImpl } from "./openai/entity-reconciler";
 import { OpenAIPathExplainerImpl } from "./openai/path-explainer";
 import { getOpenAI } from "./openai/client";
+import { OpenDataDiscoveryService } from "@/lib/discovery";
 
 /**
  * Single wiring point. Loads the verified real bundle by default
@@ -17,7 +18,8 @@ function build() {
   return {
     graph,
     finder,
-    search: new GraphSearchService(graph, finder),
+    // DISCOVERY=off disables the live research-API layer (reviewed search is unaffected).
+    search: new GraphSearchService(graph, finder, process.env.DISCOVERY === "off" ? undefined : new OpenDataDiscoveryService()),
     ai: {
       configured: () => getOpenAI() !== null,
       extractor: new OpenAIEvidenceExtractorImpl(),

@@ -7,7 +7,7 @@
  * "good" or "similar" a disease is.
  */
 import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceStatus, type GraphBundle, type GraphNode } from "@/lib/schemas";
-import { isUnreviewedAiEdge } from "@/lib/graph-view";
+import { isReviewedEvidenceEdge, isUnreviewedAiEdge } from "@/lib/graph-view";
 
 export const COVERAGE_TIERS = ["full", "partial", "shared_study", "identity_only"] as const;
 export type CoverageTier = (typeof COVERAGE_TIERS)[number];
@@ -41,7 +41,7 @@ export const COVERAGE_STATEMENT =
   "RarePath currently demonstrates one fully reviewed end-to-end journey for CDKL5 deficiency disorder, with additional reviewed disease and study nodes showing how the same evidence model expands beyond a single condition.";
 
 /** Reviewed = not an OpenAI-only extraction. Positive = reviewed AND shown as directly supported. */
-export const isReviewedEdge = (e: EvidenceEdge) => !isUnreviewedAiEdge(e);
+export const isReviewedEdge = (e: EvidenceEdge) => isReviewedEvidenceEdge(e);
 const isPositive = (e: EvidenceEdge) => isReviewedEdge(e) && deriveEvidenceStatus(e) === "supported";
 
 export type ReviewedLink = { edge_id: string; node_id: string; label: string; status: EvidenceStatus };

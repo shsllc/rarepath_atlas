@@ -8,7 +8,7 @@
  * Analyst-unreviewed OpenAI-only edges are excluded by construction.
  */
 import { deriveEvidenceStatus, type EvidenceEdge, type GraphNode } from "@/lib/schemas";
-import { isUnreviewedAiEdge } from "@/lib/graph-view";
+import { isReviewedEvidenceEdge } from "@/lib/graph-view";
 
 export type FactorKind = "shared_study" | "shared_asset" | "shared_phenotype" | "phenotypic_overlap" | "historical_link";
 
@@ -57,8 +57,8 @@ export interface ResearchHub {
 export const BAND_THRESHOLDS = { strongest: 7, moderate: 3 } as const;
 const band = (score: number): RankedConnection["band"] => (score >= BAND_THRESHOLDS.strongest ? "Strongest" : score >= BAND_THRESHOLDS.moderate ? "Moderate" : "Limited");
 
-/** Only analyst-reviewed, non-contradicted, non-inferred edges can add points. */
-const reviewed = (edges: EvidenceEdge[]) => edges.filter((e) => !isUnreviewedAiEdge(e));
+/** Only analyst-reviewed, non-contradicted, non-inferred edges can add points (never AI-only or machine-assembled). */
+const reviewed = (edges: EvidenceEdge[]) => edges.filter(isReviewedEvidenceEdge);
 const positive = (e: EvidenceEdge) => deriveEvidenceStatus(e) === "supported";
 
 export function rankResearchConnections(nodes: GraphNode[], allEdges: EvidenceEdge[], focusId: string): RankedConnection[] {

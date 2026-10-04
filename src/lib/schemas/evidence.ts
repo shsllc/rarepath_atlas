@@ -21,6 +21,8 @@ export const Predicate = z.enum([
   "supports_community", // PatientOrganization -> Disease
   "investigates", // Researcher -> Disease|Study
   "described_in", // any -> Paper
+  "associated_with", // Disease|Variant -> Gene|Disease: an association reported by a source, NOT causation
+  "subclass_of", // Disease -> Disease: ontology hierarchy (MONDO/EFO), not clinical similarity
 ]);
 export type Predicate = z.infer<typeof Predicate>;
 
@@ -32,6 +34,7 @@ export const SourceType = z.enum([
   "funding_database", // NIH RePORTER
   "patient_org_site", // NORD, Global Genes, verified org sites
   "web_scrape", // Bright Data (optional)
+  "research_platform", // aggregated research databases (Open Targets, GWAS Catalog) — machine-assembled
   "model_inference", // produced by an OpenAI role, never authoritative
   "demo_fixture", // hand-entered seed data, not evidence
 ]);
@@ -45,6 +48,7 @@ export const EvidenceType = z.enum([
   "llm_extraction", // OpenAI Evidence Extractor output (requires source text)
   "llm_inference", // OpenAI suggestion with no direct supporting text
   "placeholder", // fixture stand-in awaiting real retrieval
+  "machine_assembled", // copied from a structured research API at query time; not analyst reviewed
 ]);
 export type EvidenceType = z.infer<typeof EvidenceType>;
 
@@ -110,6 +114,13 @@ export const EvidenceEdge = z.object({
   contradiction_status: ContradictionStatus,
   contradiction_notes: z.string().optional(),
   created_at: z.string(),
+  /**
+   * Evidence tier. Absent = the curated bundle's own edge (reviewed unless it is an OpenAI-only extraction).
+   * "machine_assembled" edges come from the discovery layer and can never rank or drive actions.
+   */
+  review_status: z.enum(["reviewed", "machine_assembled"]).optional(),
+  eligible_for_ranking: z.boolean().optional(),
+  eligible_for_action: z.boolean().optional(),
 });
 export type EvidenceEdge = z.infer<typeof EvidenceEdge>;
 

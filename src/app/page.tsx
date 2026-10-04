@@ -3,6 +3,7 @@ import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
 import { BrandMark } from "@/components/BrandMark";
 import { CoverageDisclosure, NetworkPreview } from "@/components/CoverageSections";
+import { BeyondTheDemo } from "@/components/DiscoveryPreview";
 import { getServices } from "@/lib/services/registry";
 import { coverageCounts, diseaseCoverage } from "@/lib/coverage";
 
@@ -78,6 +79,9 @@ export default function Home() {
       </div>
       <div className="mt-4">
         <CoverageDisclosure counts={coverageCounts(bundle)} />
+      </div>
+      <div className="mt-4">
+        <BeyondTheDemo />
       </div>
       <div className="mt-8 flex justify-center">
         <StatusLegend />

@@ -42,6 +42,11 @@ export const EDGE_STATUS_CLASS: Record<EvidenceStatus, string> = {
 
 /** Analyst-unreviewed OpenAI extractions (quote-verified, model-mapped). Hidden by default. */
 export const isUnreviewedAiEdge = (e: EvidenceEdge) => e.evidence_type === "llm_extraction" || e.id.startsWith("edge:ai:");
+/** Discovery-layer edges assembled from structured research APIs at query time. Never reviewed. */
+export const isMachineAssembledEdge = (e: EvidenceEdge) =>
+  e.review_status === "machine_assembled" || e.evidence_type === "machine_assembled" || e.source_type === "research_platform" || e.id.startsWith("edge:disc:");
+/** The single eligibility gate for ranking and actions: analyst-reviewed, not AI-only, not machine-assembled. */
+export const isReviewedEvidenceEdge = (e: EvidenceEdge) => !isUnreviewedAiEdge(e) && !isMachineAssembledEdge(e) && e.eligible_for_ranking !== false;
 
 /** Nodes shown in the default, judge-facing view (centered on the focus disease). */
 export const DEFAULT_NODE_IDS = [

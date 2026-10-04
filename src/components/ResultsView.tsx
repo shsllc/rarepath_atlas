@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { EvidenceTierChip } from "@/components/EvidenceTierChip";
 import dynamic from "next/dynamic";
 import type { EvidenceEdge, GraphNode, ReusableAssetOpportunity, SearchResult, SourceRecord } from "@/lib/schemas";
 import { ASSET_KIND_LABEL, CONNECTION_TYPE_LABEL, REUSE_LABEL } from "@/lib/format";
@@ -147,7 +148,10 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         <div className="rounded-xl border border-line bg-white p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="max-w-2xl">
-              <h3 className="text-2xl font-semibold tracking-tight">{disease.label}</h3>
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-2xl font-semibold tracking-tight">{disease.label}</h3>
+                <EvidenceTierChip tier="reviewed" />
+              </div>
               {result.matched.node_id !== disease.id && (
                 <p className="text-sm text-muted">
                   You searched &ldquo;{result.query}&rdquo; → matched {result.matched.type} <strong>{result.matched.label}</strong>

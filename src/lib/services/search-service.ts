@@ -1,12 +1,17 @@
 import { deriveEvidenceStatus, type EvidenceCoverage, type GraphNode, type SearchResponse } from "@/lib/schemas";
 import { diseaseCoverage, PARTIAL_BANNER } from "@/lib/coverage";
+import type { DiscoveryService } from "@/lib/discovery";
 import type { GraphService, ReusableAssetFinder, SearchService } from "./interfaces";
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /** Assembles the results-page payload from the graph + finder. Pure orchestration, no I/O. */
 export class GraphSearchService implements SearchService {
   constructor(
     private readonly graph: GraphService,
     private readonly finder: ReusableAssetFinder,
+    /** Optional machine-assembled discovery layer, consulted only when the reviewed graph has no match. */
+    private readonly discovery?: DiscoveryService,
   ) {}
 
   /** Disease, its causal genes, and those genes' mechanisms route to the disease page. */
@@ -29,6 +34,18 @@ export class GraphSearchService implements SearchService {
     const matched = resolved?.node ?? this.graph.resolve(query);
 
     if (!matched) {
+      if (this.discovery) {
+        const outcome = await this.discovery.preview(query);
+        if (outcome.kind === "preview") {
+          // Reviewed wins: if the API resolves to a disease the reviewed graph already holds, show the reviewed view.
+          const reviewedTwin = b.nodes.find((n) => n.type === "Disease" && n.external_ids.some((x) => x.id === outcome.preview.disease.id));
+          if (reviewedTwin && norm(reviewedTwin.label) !== norm(query)) return this.search(reviewedTwin.label);
+          return { query, found: false, discovery: true, preview: outcome.preview, full_journey: { label: focusLabel, query: "CDKL5" } };
+        }
+        if (outcome.kind === "unavailable") {
+          return { query, found: false, message: `No reviewed match for "${query}". ${outcome.message}`, suggestions: [focusLabel, "CDKL5"] };
+        }
+      }
       return {
         query,
         found: false,

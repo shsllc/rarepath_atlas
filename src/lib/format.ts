@@ -20,6 +20,8 @@ export const PREDICATE_LABEL: Record<Predicate, string> = {
   supports_community: "supports",
   investigates: "investigates",
   described_in: "is described in",
+  associated_with: "is associated (per source) with",
+  subclass_of: "is classified under",
 };
 
 export const ASSET_KIND_LABEL: Record<ResearchAssetKind, string> = {

@@ -3,6 +3,7 @@ import type { EvidenceEdge, PartialDiseaseResult } from "@/lib/schemas";
 import { COVERAGE_STATEMENT, TIER_META, type CoverageCounts, type CoverageTier, type DiseaseCoverage } from "@/lib/coverage";
 import { PREDICATE_LABEL } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
+import { EvidenceTierChip } from "@/components/EvidenceTierChip";
 
 /** Distinct fill + border style per tier, so depth reads without colour and never looks equal. */
 const TIER_STYLE: Record<CoverageTier, string> = {
@@ -218,6 +219,7 @@ export function PartialDiseaseView({ result }: { result: PartialDiseaseResult })
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">{d.label}</h1>
           <TierBadge tier={d.tier} />
+          <EvidenceTierChip tier="reviewed" />
         </div>
         <div className="mt-2">
           <Identifiers d={d} />

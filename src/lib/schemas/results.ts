@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { DiseaseCoverage } from "@/lib/coverage";
+import type { DiscoveryPreview } from "@/lib/discovery";
 import { GraphNode } from "./entities";
 import { SourceRecord } from "./sources";
 import { Confidence, EvidenceEdge, EvidenceStatus } from "./evidence";
@@ -208,7 +209,19 @@ export type PartialDiseaseResult = {
   full_journey: { label: string; query: string };
 };
 
-export type SearchResponse = SearchResult | NotFoundResult | PartialDiseaseResult;
+/**
+ * A disease outside the reviewed graph, assembled at query time from structured research APIs.
+ * Machine-assembled only: no ranking, no reuse classification, no action brief.
+ */
+export type DiscoveryResult = {
+  query: string;
+  found: false;
+  discovery: true;
+  preview: DiscoveryPreview;
+  full_journey: { label: string; query: string };
+};
+
+export type SearchResponse = SearchResult | NotFoundResult | PartialDiseaseResult | DiscoveryResult;
 
 /**
  * On-disk bundle format (data/fixtures/*.json, later data/cache/*.json).
