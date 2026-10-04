@@ -6,11 +6,12 @@ import type { EvidenceEdge, GraphNode } from "@/lib/schemas";
 import { buildGraphView, CATEGORY_LABEL, DEFAULT_FILTERS, DEFAULT_POSITIONS, drawerTargetFor, type DrawerTarget, type GraphFilters, type NodeCategory } from "@/lib/graph-view";
 
 const C = {
-  supported: "#17803d",
-  inferred: "#6d3fc0",
-  contradictory: "#b4410f",
-  unknown: "#5b6475",
-  ink: "#1c2230",
+  supported: "#168C84", // teal: constructive connection
+  inferred: "#4F46A5", // brand
+  contradictory: "#B84A62", // rose: conflict
+  unknown: "#C47A20", // amber: uncertainty
+  ink: "#182033",
+  brand: "#4F46A5",
 };
 
 const STYLE: StylesheetJson = [
@@ -27,17 +28,17 @@ const STYLE: StylesheetJson = [
       "text-margin-y": 6,
       width: 26,
       height: 26,
-      "background-color": "#cbd5e1",
+      "background-color": "#e2e0ee",
       "border-width": 1.5,
-      "border-color": "#475569",
+      "border-color": "#4f5873",
     },
   },
-  { selector: "node.cat-disease", style: { shape: "round-rectangle", "background-color": "#e0e7ff", "border-color": "#4338ca" } },
-  { selector: "node.cat-study", style: { shape: "rectangle", "background-color": "#fef3c7", "border-color": "#a16207" } },
-  { selector: "node.cat-asset", style: { shape: "diamond", "background-color": "#dcfce7", "border-color": "#15803d", width: 30, height: 30 } },
-  { selector: "node.cat-organization", style: { shape: "ellipse", "background-color": "#fce7f3", "border-color": "#be185d" } },
-  { selector: "node.cat-other", style: { shape: "ellipse", "background-color": "#f1f5f9" } },
-  { selector: "node.focus", style: { width: 48, height: 48, "background-color": C.ink, "border-color": C.ink, "font-size": 14, "font-weight": "bold" } },
+  { selector: "node.cat-disease", style: { shape: "round-rectangle", "background-color": "#ECEAF8", "border-color": "#4F46A5" } },
+  { selector: "node.cat-study", style: { shape: "rectangle", "background-color": "#FBF1E3", "border-color": "#9a5f17" } },
+  { selector: "node.cat-asset", style: { shape: "diamond", "background-color": "#E4F3F1", "border-color": "#168C84", width: 30, height: 30 } },
+  { selector: "node.cat-organization", style: { shape: "ellipse", "background-color": "#F8E9ED", "border-color": "#B84A62" } },
+  { selector: "node.cat-other", style: { shape: "ellipse", "background-color": "#F5F4FA" } },
+  { selector: "node.focus", style: { width: 50, height: 50, "background-color": C.brand, "border-color": C.ink, "border-width": 3, "font-size": 14, "font-weight": "bold" } },
   {
     selector: "edge",
     style: {
@@ -66,7 +67,8 @@ const STYLE: StylesheetJson = [
   { selector: "edge.unreviewed-ai", style: { opacity: 0.55 } },
   { selector: "edge.hover", style: { width: 4, "z-index": 10 } },
   { selector: "node.hover", style: { "border-width": 3 } },
-  { selector: ":selected", style: { "overlay-opacity": 0.12, "overlay-color": C.ink } },
+  { selector: "node:selected", style: { "border-width": 4, "border-color": C.brand, "overlay-opacity": 0.1, "overlay-color": C.brand, "overlay-padding": 6 } },
+  { selector: "edge:selected", style: { width: 5, "z-index": 20, "overlay-opacity": 0.12, "overlay-color": C.brand, "overlay-padding": 4 } },
 ];
 
 export function LineLegend() {
@@ -184,15 +186,18 @@ export function EvidenceGraph({ nodes, edges, focusId, onOpen }: Props) {
   const set = (k: keyof Omit<GraphFilters, "categories">) => setFilters((f) => ({ ...f, [k]: !f[k] }));
 
   return (
-    <div className="rounded-xl border border-line bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
-        <LineLegend />
+    <div className="overflow-hidden rounded-3xl border border-line bg-white shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-brand-wash/70 px-4 py-3 sm:px-5">
+        <div>
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-muted">Line style = evidence status</p>
+          <LineLegend />
+        </div>
         <span className="text-xs text-muted" data-testid="graph-counts">
           Showing {view.nodes.length} entities · {view.edges.length} evidence-backed relationships
         </span>
       </div>
-      <div ref={ref} className="h-[620px] w-full sm:h-[540px]" role="img" aria-label="Evidence graph. Use the table below or the cards above for the same information." />
-      <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-line px-4 py-3 text-xs">
+      <div ref={ref} className="h-[620px] w-full bg-[radial-gradient(#e2e0ee_1px,transparent_1px)] [background-size:22px_22px] sm:h-[540px]" role="img" aria-label="Evidence graph. Use the table below or the cards above for the same information." />
+      <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-line bg-canvas/60 px-4 py-3 text-xs sm:px-5">
         <fieldset className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <legend className="sr-only">Entity types</legend>
           {(Object.keys(CATEGORY_LABEL) as NodeCategory[]).map((c) => (

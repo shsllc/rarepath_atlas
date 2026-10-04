@@ -1,57 +1,74 @@
 import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { StatusLegend } from "@/components/StatusBadge";
+import { BrandMark } from "@/components/BrandMark";
 
 const examples = ["CDKL5", "CDKL5 deficiency disorder", "CDD", "Seizure", "Rett syndrome"];
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-2xl pt-8 text-center sm:pt-12">
-      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">RarePath Atlas</h1>
-      <p className="mt-2 text-xl text-muted">Rare shouldn&apos;t mean researching alone.</p>
-      <p className="mx-auto mt-5 max-w-xl text-lg">
-        RarePath connects scattered disease research, patient communities, studies and reusable research infrastructure, with evidence behind every connection.
-      </p>
+    <div className="mx-auto max-w-3xl">
+      <section className="relative overflow-hidden rounded-3xl border border-line bg-white px-6 py-10 text-center shadow-sm sm:px-12 sm:py-14">
+        {/* Subtle brand wash: two soft tinted discs, no gradients across the page */}
+        <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full bg-brand-wash" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-teal-wash" />
+        <div className="relative">
+          <BrandMark size={44} className="mx-auto" />
+          <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
+            RarePath <span className="text-brand">Atlas</span>
+          </h1>
+          <p className="mt-3 text-xl font-medium text-supported sm:text-2xl">Rare shouldn&apos;t mean researching alone.</p>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-ink/85">
+            RarePath connects scattered disease research, patient communities, studies and reusable research infrastructure, with evidence behind every connection.
+          </p>
 
-      <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <Link href="/results?q=CDKL5&demo=1" className="rounded-lg bg-ink px-5 py-3 font-semibold text-white hover:opacity-90">
-          Start the 60-second demo
-        </Link>
-        <a href="#search" className="rounded-lg border-2 border-ink px-5 py-3 font-semibold hover:bg-white">
-          Search on your own
-        </a>
-      </div>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/results?q=CDKL5&demo=1"
+              className="w-full rounded-xl bg-brand px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-brand/20 transition hover:bg-brand-deep sm:w-auto"
+            >
+              Start the 60-second demo →
+            </Link>
+            <a href="#search" className="w-full rounded-xl border border-line bg-white px-6 py-3.5 text-base font-semibold text-ink transition hover:border-brand sm:w-auto">
+              Search on your own
+            </a>
+          </div>
 
-      <p className="mt-4 text-xs text-muted">Evidence extraction, entity reconciliation and path explanations powered by OpenAI.</p>
+          <p className="mt-5 text-xs text-muted">Evidence extraction, entity reconciliation and path explanations powered by OpenAI.</p>
+        </div>
+      </section>
 
-      <div id="search" className="mt-12 scroll-mt-8">
+      <div id="search" className="mx-auto mt-10 max-w-2xl scroll-mt-8 text-center">
         <SearchBox />
         <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
           <span className="text-muted">Try:</span>
           {examples.map((e) => (
-            <Link key={e} href={`/results?q=${encodeURIComponent(e)}`} className="rounded-full border border-line bg-white px-3 py-1 hover:border-ink">
+            <Link key={e} href={`/results?q=${encodeURIComponent(e)}`} className="rounded-full border border-line bg-white px-3 py-1 hover:border-brand hover:text-brand">
               {e}
             </Link>
           ))}
         </div>
       </div>
 
-      <div className="mt-12 grid gap-3 text-left sm:grid-cols-3">
+      <div className="mt-10 grid gap-3 text-left sm:grid-cols-3">
         {[
-          ["Find shared research history", "See which other rare-disease communities your disease has already been studied alongside, and why."],
-          ["Spot what may be reusable", "Natural-history studies, outcome measures and biobanks, each classified cautiously."],
-          ["Leave with a next question", "Every claim opens to its exact source quote, with differences and uncertainty shown."],
-        ].map(([t, d]) => (
-          <div key={t} className="rounded-xl border border-line bg-white p-4">
-            <h2 className="text-sm font-semibold">{t}</h2>
-            <p className="mt-1 text-sm text-muted">{d}</p>
+          ["Find shared research history", "See which other rare-disease communities your disease has already been studied alongside, and why.", "bg-brand-wash"],
+          ["Spot what may be reusable", "Natural-history studies, outcome measures and biobanks, each classified cautiously.", "bg-teal-wash"],
+          ["Leave with a next question", "Every claim opens to its exact source quote, with differences and uncertainty shown.", "bg-amber-wash"],
+        ].map(([t, d, tint], i) => (
+          <div key={t} className="rounded-2xl border border-line bg-white p-5">
+            <span aria-hidden className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-ink ${tint}`}>
+              {i + 1}
+            </span>
+            <h2 className="mt-3 text-sm font-semibold">{t}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-muted">{d}</p>
           </div>
         ))}
       </div>
       <div className="mt-8 flex justify-center">
         <StatusLegend />
       </div>
-      <p className="mt-6 text-xs text-muted">
+      <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted">
         Prototype covering one verified journey (CDKL5 deficiency disorder), built from retrieved public sources. A research-navigation tool, not a diagnosis or treatment tool.
       </p>
     </div>

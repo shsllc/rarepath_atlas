@@ -13,25 +13,45 @@ import { EvidenceKey } from "./EvidenceKey";
 
 const EvidenceGraph = dynamic(() => import("./EvidenceGraph").then((m) => m.EvidenceGraph), {
   ssr: false,
-  loading: () => <div className="h-[440px] rounded-xl border border-line bg-white p-4 text-sm text-muted">Loading graph…</div>,
+  loading: () => <div className="h-[440px] rounded-3xl border border-line bg-white p-4 text-sm text-muted">Loading graph…</div>,
 });
 
-function Section({ id, n, title, subtitle, children }: { id: string; n: number; title: string; subtitle?: string; children: React.ReactNode }) {
+function Section({
+  id,
+  n,
+  title,
+  subtitle,
+  tone = "plain",
+  children,
+}: {
+  id: string;
+  n: number;
+  title: string;
+  subtitle?: string;
+  tone?: "plain" | "wash";
+  children: React.ReactNode;
+}) {
   return (
-    <section id={id} className="mt-12 scroll-mt-6" aria-labelledby={`${id}-h`}>
-      <h2 id={`${id}-h`} className="flex items-baseline gap-2 text-xl font-semibold tracking-tight">
-        <span className="text-sm font-medium text-muted">{n}</span>
+    <section
+      id={id}
+      className={`scroll-mt-6 ${tone === "wash" ? "mt-12 rounded-3xl bg-brand-wash/60 px-4 py-6 sm:px-7 sm:py-8" : "mt-14"}`}
+      aria-labelledby={`${id}-h`}
+    >
+      <h2 id={`${id}-h`} className="flex items-center gap-3 text-2xl font-semibold tracking-tight">
+        <span aria-hidden className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+          {n}
+        </span>
         {title}
       </h2>
-      {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
-      <div className="mt-4">{children}</div>
+      {subtitle && <p className="mt-1.5 max-w-3xl pl-10 text-sm leading-relaxed text-muted">{subtitle}</p>}
+      <div className="mt-5">{children}</div>
     </section>
   );
 }
 
 function EvidenceButton({ count, onClick, label = "View evidence" }: { count: number; onClick: () => void; label?: string }) {
   return (
-    <button onClick={onClick} className="shrink-0 rounded border border-line bg-white px-2 py-1 text-xs font-medium hover:border-ink">
+    <button onClick={onClick} className="shrink-0 rounded-lg border border-line bg-white px-2.5 py-1 text-xs font-medium text-ink transition hover:border-brand hover:text-brand">
       {label} ({count})
     </button>
   );
@@ -162,7 +182,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
         {infraConn && featured && (
           <button
             onClick={() => scrollTo("hero")}
-            className="mt-3 flex w-full flex-wrap items-center justify-between gap-2 rounded-xl border-2 border-supported bg-supported-bg px-5 py-3 text-left"
+            className="mt-3 flex w-full flex-wrap items-center justify-between gap-2 rounded-2xl border border-teal/40 border-l-4 border-l-teal bg-teal-wash px-5 py-4 text-left transition hover:border-teal"
           >
             <span>
               <span className="block text-xs font-bold uppercase tracking-wide text-supported">Shared research infrastructure found</span>
@@ -191,10 +211,10 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
       )}
 
       {/* 4. CONNECTED COMMUNITIES */}
-      <Section id="communities" n={4} title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
+      <Section id="communities" n={4} tone="wash" title="Connected communities" subtitle="Other rare-disease communities linked to yours, and exactly how.">
         <div className="grid gap-3 md:grid-cols-2">
           {result.connections.map((c) => (
-            <article key={c.id} className={`rounded-xl border border-line bg-white p-4 ${STATUS_META[c.status].card}`}>
+            <article key={c.id} className={`rounded-2xl border border-line bg-white p-5 ${STATUS_META[c.status].card}`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="font-semibold">{label(c.disease_id)}</h3>
                 <span className="flex items-center gap-1">
@@ -231,7 +251,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
 
       {/* 6. 10× OPPORTUNITY */}
       {!result.is_fixture && (
-        <Section id="tenx" n={6} title="The 10× opportunity" subtitle={`Milestone: ${TENX.milestone}.`}>
+        <Section id="tenx" n={6} tone="wash" title="The 10× opportunity" subtitle={`Milestone: ${TENX.milestone}.`}>
           <TenXPanel result={result} />
         </Section>
       )}
@@ -242,10 +262,10 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
       </Section>
 
       {/* 8. WHAT WE DON'T KNOW */}
-      <Section id="gaps" n={8} title="What we don't know" subtitle="Missing evidence, disagreements and assumptions behind this page.">
+      <Section id="gaps" n={8} tone="wash" title="What we don't know" subtitle="Missing evidence, disagreements and assumptions behind this page.">
         <ul className="space-y-2">
           {result.gaps.map((g) => (
-            <li key={g.id} className="rounded-xl border border-line bg-white p-4 text-sm">
+            <li key={g.id} className="rounded-2xl border border-line bg-white p-4 text-sm leading-relaxed">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-muted">{g.kind.replace(/_/g, " ")}</span>
                 {g.related_edge_ids.length > 0 && <EvidenceButton count={g.related_edge_ids.length} onClick={() => open(g.statement, g.related_edge_ids)} />}
@@ -268,7 +288,7 @@ export function ResultsView({ result, demo = false }: { result: SearchResult; de
 
 function ProvenanceBar({ result }: { result: SearchResult }) {
   return (
-    <div className="mb-4 rounded-lg border border-line bg-white p-3 text-sm">
+    <div className="mb-4 rounded-2xl border border-line border-l-4 border-l-teal bg-white p-4 text-sm">
       <strong>Built from {result.sources.length} retrieved public sources</strong>{" "}
       <span className="text-muted">(PubMed, PubMed Central, ClinicalTrials.gov, NIH RePORTER, MONDO/HPO, HGNC, official organization sites). Every statement opens to its verbatim source quote.</span>
       {result.build_info?.openai_runs.map((r) => (
@@ -282,9 +302,9 @@ function ProvenanceBar({ result }: { result: SearchResult }) {
 
 function DemoPath({ steps, onClose }: { steps: { label: string; done?: boolean; go?: () => void }[]; onClose: () => void }) {
   return (
-    <nav aria-label="Suggested demo path" className="mb-6 rounded-xl border-2 border-ink bg-white p-4">
+    <nav aria-label="Suggested demo path" className="mb-6 rounded-2xl border-2 border-brand bg-brand-wash/60 p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold uppercase tracking-wide">Suggested 60-second demo path</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-brand">Suggested 60-second demo path</h2>
         <button onClick={onClose} className="text-xs text-muted underline">
           Hide
         </button>
@@ -310,6 +330,29 @@ function DemoPath({ steps, onClose }: { steps: { label: string; done?: boolean; 
   );
 }
 
+/** Visual tone per story line (presentation only; labels come from the data). */
+const STORY_TONE: Record<string, string> = {
+  "What happened": "bg-canvas",
+  "Why it matters": "bg-teal-wash",
+  "Potentially adaptable asset": "bg-brand-wash",
+  "Important limitation": "bg-rose-wash border-l-4 border-rose",
+  "Next research question": "bg-ink text-white [&_button]:border-white/30",
+};
+const STORY_LABEL_TONE: Record<string, string> = {
+  "What happened": "text-muted",
+  "Why it matters": "text-supported",
+  "Potentially adaptable asset": "text-brand",
+  "Important limitation": "text-contradictory",
+  "Next research question": "text-white/80",
+};
+const STORY_ICON: Record<string, string> = {
+  "What happened": "●",
+  "Why it matters": "◆",
+  "Potentially adaptable asset": "◇",
+  "Important limitation": "▲",
+  "Next research question": "?",
+};
+
 function FeaturedCard({
   o,
   label,
@@ -324,11 +367,11 @@ function FeaturedCard({
   heroEdges: string[];
 }) {
   return (
-    <article className="rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6" aria-label="Featured reusable research">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <span className="rounded bg-ink px-2 py-1 text-xs font-bold uppercase tracking-wide text-white">{REUSE_LABEL[o.reuse_classification]}</span>
-          <h3 className="mt-3 text-2xl font-semibold tracking-tight">{o.headline}</h3>
+    <article className="overflow-hidden rounded-3xl border border-line bg-white shadow-lg shadow-brand/10" aria-label="Featured reusable research">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line bg-brand-wash px-5 py-5 sm:px-7 sm:py-6">
+        <div className="max-w-2xl">
+          <span className="inline-block rounded-md bg-brand px-2 py-1 text-xs font-bold uppercase leading-snug tracking-wide text-white">{REUSE_LABEL[o.reuse_classification]}</span>
+          <h3 className="mt-3 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">{o.headline}</h3>
           <p className="text-sm text-muted">Built by the {label(o.source_disease_id)} community. Evidence includes the registry record, the 2020 comparison paper and the NIH grant.</p>
           <p className="mt-1 text-xs text-muted">A natural-history study follows people over time to learn how a condition changes. An outcome measure is a scale used to track those changes.</p>
         </div>
@@ -341,11 +384,19 @@ function FeaturedCard({
         </div>
       </div>
 
-      <dl className="mt-5 divide-y divide-line border-y border-line">
+      <div className="px-5 pb-6 sm:px-7">
+      <dl className="mt-5 space-y-2.5">
         {o.story.map((s) => (
-          <div key={s.label} id={s.label === "Next research question" ? "next-question" : s.label === "Important limitation" ? "limitation" : undefined} className="grid scroll-mt-6 gap-2 py-3 sm:grid-cols-[180px_1fr_auto] sm:items-start">
-            <dt className={`text-xs font-bold uppercase tracking-wide ${s.label === "Important limitation" ? "text-contradictory" : s.label === "Next research question" ? "text-ink" : "text-muted"}`}>{s.label}</dt>
-            <dd className={s.label === "Next research question" ? "text-base font-semibold" : "text-sm"}>{s.text}</dd>
+          <div
+            key={s.label}
+            id={s.label === "Next research question" ? "next-question" : s.label === "Important limitation" ? "limitation" : undefined}
+            className={`grid scroll-mt-6 gap-2 rounded-2xl px-4 py-3.5 sm:grid-cols-[190px_1fr_auto] sm:items-start ${STORY_TONE[s.label] ?? "bg-canvas"}`}
+          >
+            <dt className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide ${STORY_LABEL_TONE[s.label] ?? "text-muted"}`}>
+              <span aria-hidden>{STORY_ICON[s.label] ?? "•"}</span>
+              {s.label}
+            </dt>
+            <dd className={s.label === "Next research question" ? "text-base font-semibold leading-snug" : "text-sm leading-relaxed"}>{s.text}</dd>
             <dd>
               <EvidenceButton count={s.evidence_edge_ids.length} label="Evidence" onClick={() => open(`${s.label}: ${o.headline}`, s.evidence_edge_ids)} />
             </dd>
@@ -353,14 +404,14 @@ function FeaturedCard({
         ))}
       </dl>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button onClick={() => open(o.headline, heroEdges)} className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-white">
+      <div className="mt-5 flex flex-wrap gap-2">
+        <button onClick={() => open(o.headline, heroEdges)} className="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-deep">
           Explain this connection
         </button>
         <EvidenceButton count={o.evidence_edge_ids.length} onClick={() => open(o.headline, o.evidence_edge_ids)} label="All evidence" />
       </div>
 
-      <div className="mt-4 rounded-lg bg-canvas p-3">
+      <div className="mt-5 rounded-2xl border border-line p-4">
         <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">Suggested next actions</h4>
         <ol className="mt-2 space-y-2 text-sm">
           {o.next_actions.map((a, i) => (
@@ -386,6 +437,7 @@ function FeaturedCard({
           <List title="Requires expert validation" items={o.requires_expert_validation} />
         </div>
       </details>
+      </div>
     </article>
   );
 }
@@ -406,7 +458,7 @@ function OpportunityCard({
   const asset = nodes.get(o.asset_id);
   const kind = asset?.type === "ResearchAsset" ? ASSET_KIND_LABEL[asset.asset_kind] : "Research asset";
   return (
-    <article className={`rounded-xl border border-line bg-white p-5 ${STATUS_META[o.status].card}`}>
+    <article className={`rounded-2xl border border-line bg-white p-5 ${STATUS_META[o.status].card}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           <span className="rounded bg-canvas px-1.5 py-0.5 text-ink">{REUSE_LABEL[o.reuse_classification]}</span> · {kind}
@@ -452,7 +504,7 @@ function ContradictionSpotlight({ edge, sources, open, label }: { edge: Evidence
   const historical = edge.evidence.filter((x) => x.stance === "supports");
   const current = edge.evidence.filter((x) => x.stance === "contradicts");
   const Quote = ({ q, src, srcId }: { q: string; src: string; srcId?: string }) => (
-    <li className="rounded-lg border border-line bg-white p-3 text-sm">
+    <li className="rounded-xl border border-line bg-white p-3 text-sm leading-relaxed">
       &ldquo;{q}&rdquo;
       <span className="mt-1 block text-xs text-muted">
         {src}
@@ -461,24 +513,32 @@ function ContradictionSpotlight({ edge, sources, open, label }: { edge: Evidence
     </li>
   );
   return (
-    <div className="rounded-2xl border-4 border-double border-contradictory bg-white p-5">
+    <div className="rounded-3xl border-4 border-double border-contradictory bg-white p-5 sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-semibold">
           Is {label(edge.subject_id)} a variant of {label(edge.object_id)}? <StatusBadge status="contradictory" compact />
         </p>
         <EvidenceButton count={edge.evidence.length} onClick={() => open(`${label(edge.subject_id)}: historical label vs. current evidence`, [edge.id])} />
       </div>
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wide text-muted">Historical label</h4>
+      <div className="mt-5 grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr]">
+        <div className="rounded-2xl bg-canvas p-4">
+          <h4 className="text-xs font-bold uppercase tracking-wide text-muted">
+            <span aria-hidden>◷ </span>Historical label
+          </h4>
           <ul className="mt-2 space-y-2">
             {historical.map((x) => (
               <Quote key={x.id} q={x.quoted_or_structured_evidence} src={x.source} srcId={x.source_record_id} />
             ))}
           </ul>
         </div>
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wide text-contradictory">Current evidence</h4>
+        <div aria-hidden className="flex items-center justify-center text-2xl font-bold text-contradictory md:px-1">
+          <span className="md:hidden">↓</span>
+          <span className="hidden md:inline">→</span>
+        </div>
+        <div className="rounded-2xl bg-rose-wash p-4">
+          <h4 className="text-xs font-bold uppercase tracking-wide text-contradictory">
+            <span aria-hidden>▲ </span>Current evidence
+          </h4>
           <ul className="mt-2 space-y-2">
             {current.map((x) => (
               <Quote key={x.id} q={x.quoted_or_structured_evidence} src={x.source} srcId={x.source_record_id} />
@@ -551,7 +611,7 @@ function PeopleSection({
   const evFrom = (id: string) => result.edges.filter((e) => e.subject_id === id && !e.id.startsWith("edge:ai:")).map((e) => e.id);
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      <div className="rounded-xl border border-line bg-white p-4">
+      <div className="rounded-2xl border border-line bg-white p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Patient organizations</h3>
         <ul className="mt-2 space-y-2 text-sm">
           {result.people.organization_ids.map((id) => {
@@ -573,7 +633,7 @@ function PeopleSection({
           })}
         </ul>
       </div>
-      <div className="rounded-xl border border-line bg-white p-4">
+      <div className="rounded-2xl border border-line bg-white p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Investigators (registry listing)</h3>
         <ul className="mt-2 space-y-2 text-sm">
           {result.people.researcher_ids.map((id) => {
@@ -592,7 +652,7 @@ function PeopleSection({
           })}
         </ul>
       </div>
-      <div className="rounded-xl border border-line bg-white p-4">
+      <div className="rounded-2xl border border-line bg-white p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Studies</h3>
         <ul className="mt-2 space-y-2 text-sm">
           {result.people.study_ids.map((id) => (

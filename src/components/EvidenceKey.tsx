@@ -10,7 +10,7 @@ const KEY = [
 /** "How to read this" panel shown near the top of every result. */
 export function EvidenceKey() {
   return (
-    <section aria-labelledby="key-h" className="rounded-xl border border-line bg-white p-4">
+    <section aria-labelledby="key-h" className="rounded-2xl border border-line bg-white p-4 sm:p-5">
       <h2 id="key-h" className="text-xs font-bold uppercase tracking-wide text-muted">
         How to read this
       </h2>
