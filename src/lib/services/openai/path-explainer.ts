@@ -4,6 +4,8 @@ import { checkExplanation, ExplanationSchema, WORD_LIMITS, type ExplanationBody 
 import type { OpenAIPathExplainer, PathExplanation } from "../interfaces";
 import { getOpenAI, openAIModel, OpenAINotConfiguredError, SAFETY_RULES } from "./client";
 
+const ROLE = { supports: "supporting", contradicts: "contradicting", qualifies: "limitation" } as const;
+
 /** Role 3 — Path Explainer. Concise, four-part, family-readable explanation of an evidence path. */
 export class OpenAIPathExplainerImpl implements OpenAIPathExplainer {
   async explain(path: { nodes: GraphNode[]; edges: EvidenceEdge[] }, audience: "family" | "researcher"): Promise<PathExplanation> {
@@ -17,7 +19,8 @@ export class OpenAIPathExplainerImpl implements OpenAIPathExplainer {
       status: deriveEvidenceStatus(e), // supported | inferred | contradictory | unknown
       confidence: e.confidence,
       // All quotes, so caveats ("qualifies") and counter-evidence ("contradicts") reach the explanation.
-      evidence: e.evidence.map((x) => ({ stance: x.stance, quote: x.quoted_or_structured_evidence, source: x.source })),
+      // Plain-word roles (not internal enum values) so nothing like "qualifies" can leak into family-facing text.
+      evidence: e.evidence.map((x) => ({ role: ROLE[x.stance ?? "supports"], quote: x.quoted_or_structured_evidence, source: x.source })),
       contradiction_notes: e.contradiction_notes ?? null,
     }));
     const hasFixture = path.edges.some((e) => e.source_type === "demo_fixture");
@@ -27,7 +30,7 @@ Explain this chain of evidence for ${audience === "family" ? "a parent or patien
 Return four short parts, ${WORD_LIMITS.max} words maximum IN TOTAL (aim for 120–160):
 - why_it_matters: 1–2 sentences on why this connection matters to a patient organization.
 - evidence_shows: 2–3 sentences on what the cited sources actually show. Include key numbers only if quoted.
-- does_not_show: 1–2 sentences of limitations. Always include any evidence with stance "qualifies" or "contradicts", any "contradictory" or "inferred" step, and that this is not evidence of shared biology or treatment transfer.
+- does_not_show: 1–2 sentences of limitations. Always include any evidence whose role is "limitation" or "contradicting", any "contradictory" or "inferred" step, and that this is not evidence of shared biology or treatment transfer.
 - next_question: ONE concrete question a patient organization or researcher could ask next, ending with "?".
 Use ONLY the steps given. No hype, no medical advice. Never mention internal field names such as "stance", "qualifies", "status", "edge" or "steps"; just state the limitation in plain words.${hasFixture ? ' Steps from "demo_fixture" sources were not retrieved; say so.' : ""}
 cited_edge_ids must list only edge_id values from the input.`;
