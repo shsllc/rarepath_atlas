@@ -138,21 +138,30 @@ export interface DiscoveryService {
 /** Registry display names for trial providers. */
 const REGISTRY_NAME: Partial<Record<ProviderId, string>> = { clinicaltrials: "ClinicalTrials.gov", isrctn: "ISRCTN", euctr: "EU Clinical Trials Register" };
 
-const PREDICATE: Partial<Record<LinkRelation, { p: Predicate; reverse?: boolean }>> = {
+type PredicateMap = { p: Predicate; reverse?: boolean };
+const PREDICATE: Partial<Record<LinkRelation, PredicateMap | ((l: ResearchLink) => PredicateMap | null)>> = {
+  // Source-reported associations stay associations; only curated causal sources map to a causal predicate.
   associated_with: { p: "associated_with" },
   variant_classified_for: { p: "associated_with" },
   gwas_association: { p: "associated_with" },
   gene_associated_with_other_disease: { p: "associated_with" },
+  causal_gene: { p: "caused_by_variant_in", reverse: true },
+  clingen_validity: { p: "caused_by_variant_in", reverse: true },
   subclass_of: { p: "subclass_of" },
   has_phenotype: { p: "has_phenotype" },
   studies_condition: { p: "studied_in", reverse: true },
   investigator_on: { p: "investigates" },
   authored: { p: "authored" },
+  // A paper retrieved for the disease → the disease is described in it; a dataset → applied to the disease.
+  mentions_disease: (l) => (l.from.startsWith("paper:") ? { p: "described_in", reverse: true } : l.from.startsWith("dataset:") ? { p: "applied_to" } : null),
+  // Preclinical models only when the model is tied to the disease itself (not to an ortholog gene).
+  model_of: (l) => (l.to.startsWith("disease:") ? { p: "applied_to" } : null),
 };
 
 /** Review-boundary format: an EvidenceEdge that is explicitly machine-assembled and ineligible. */
 export function toCandidateEdge(l: ResearchLink): EvidenceEdge | null {
-  const m = PREDICATE[l.relation];
+  const entry = PREDICATE[l.relation];
+  const m = typeof entry === "function" ? entry(l) : entry;
   if (!m) return null;
   const p0 = l.provenance[0];
   const day = p0.retrieved_at.slice(0, 10);

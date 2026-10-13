@@ -4,13 +4,15 @@ import { ResultsView } from "@/components/ResultsView";
 import { PartialDiseaseView } from "@/components/CoverageSections";
 import { DiscoveryPreviewView } from "@/components/DiscoveryPreview";
 import { getServices } from "@/lib/services/registry";
+import { currentReviewer } from "@/lib/review/http";
+import { ProposePanel } from "@/components/review/ProposePanel";
 
 export const dynamic = "force-dynamic";
 
 export default async function ResultsPage({ searchParams }: { searchParams: Promise<{ q?: string; demo?: string }> }) {
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
-  const result = q ? await getServices().search.search(q) : null;
+  const [result, reviewer] = await Promise.all([q ? getServices().search.search(q) : null, currentReviewer()]);
 
   return (
     <div>
@@ -19,6 +21,11 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
         {!result && <p className="text-muted">Enter a disease, gene, variant, symptom or mechanism.</p>}
         {result && "partial" in result && <PartialDiseaseView result={result} />}
         {result && "discovery" in result && <DiscoveryPreviewView result={result} />}
+        {result && "discovery" in result && reviewer && (
+          <div className="mt-4">
+            <ProposePanel preview={result.preview} query={q} reviewerName={reviewer.name} />
+          </div>
+        )}
         {result && !result.found && "message" in result && (
           <div className="rounded-xl border border-dotted border-unknown bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">No supported connection found</p>

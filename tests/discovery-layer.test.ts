@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { JsonGraphService, REAL_BUNDLE } from "@/lib/services/graph-service";
 import { CuratedReusableAssetFinder } from "@/lib/services/reusable-asset-finder";
 import { GraphSearchService } from "@/lib/services/search-service";
-import { MultiProviderDiscoveryService, type DiscoveryOutcome, type DiscoveryPreview, type DiscoveryService } from "@/lib/discovery";
+import { MultiProviderDiscoveryService, toCandidateEdge, type DiscoveryOutcome, type DiscoveryPreview, type DiscoveryService } from "@/lib/discovery";
 import { setResearchFetch } from "@/lib/research/fetch";
 import { clearClinGenCache } from "@/lib/research/providers/clingen";
 import { reconcile } from "@/lib/research/reconcile";
@@ -251,7 +251,13 @@ describe("reviewed layer stays authoritative", () => {
       expect(isMachineAssembledEdge(e)).toBe(true);
       expect(isReviewedEvidenceEdge(e)).toBe(false);
       expect(deriveEvidenceStatus(e), e.id).not.toBe("supported");
-      expect(e.predicate).not.toBe("caused_by_variant_in");
+    }
+    // A causal predicate may come only from curated causal sources (Monarch / Orphanet causal genes, ClinGen validity),
+    // never from a generic association.
+    for (const l of p.links) {
+      const e = toCandidateEdge(l);
+      if (e?.predicate === "caused_by_variant_in") expect(["causal_gene", "clingen_validity"], l.key).toContain(l.relation);
+      if (l.relation === "associated_with") expect(e?.predicate).toBe("associated_with");
     }
     const base = rankResearchConnections(b.nodes, b.edges, "disease:cdd");
     expect(rankResearchConnections(b.nodes, [...b.edges, ...p.candidate_edges, forged], "disease:cdd")).toEqual(base);

@@ -18,11 +18,13 @@ function build() {
   // Papers already in the reviewed bundle, so discovery can flag (not duplicate) them.
   const reviewedPapers = new Map<string, string>();
   for (const n of graph.bundle().nodes) if (n.type === "Paper") for (const v of [n.pmid, n.doi]) if (v) reviewedPapers.set(v.toLowerCase(), n.id);
+  // DISCOVERY=off disables the live research-API layer (reviewed search is unaffected).
+  const discovery = process.env.DISCOVERY === "off" ? undefined : new MultiProviderDiscoveryService({ reviewedPapers });
   return {
     graph,
     finder,
-    // DISCOVERY=off disables the live research-API layer (reviewed search is unaffected).
-    search: new GraphSearchService(graph, finder, process.env.DISCOVERY === "off" ? undefined : new MultiProviderDiscoveryService({ reviewedPapers })),
+    discovery,
+    search: new GraphSearchService(graph, finder, discovery),
     ai: {
       configured: () => getOpenAI() !== null,
       extractor: new OpenAIEvidenceExtractorImpl(),

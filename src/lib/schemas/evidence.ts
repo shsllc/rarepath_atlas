@@ -121,6 +121,18 @@ export const EvidenceEdge = z.object({
   review_status: z.enum(["reviewed", "machine_assembled"]).optional(),
   eligible_for_ranking: z.boolean().optional(),
   eligible_for_action: z.boolean().optional(),
+  /** Present only on edges promoted by a signed-in reviewer through the review queue. */
+  review: z
+    .object({
+      by: z.string(),
+      by_name: z.string(),
+      at: z.string(),
+      item_id: z.string(),
+      outcome: z.enum(["supports", "qualifies", "contradicts"]),
+      note: z.string(),
+      source_checked: z.literal(true),
+    })
+    .optional(),
 });
 export type EvidenceEdge = z.infer<typeof EvidenceEdge>;
 

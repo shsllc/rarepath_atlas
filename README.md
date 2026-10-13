@@ -146,6 +146,18 @@ RarePath has two evidence tiers:
   - The reviewed CDKL5 journey never depends on these providers.
 - **More detail:** [docs/architecture.md](docs/architecture.md), and the `/sources` page in the product.
 
+## Review workflow
+
+Machine-assembled relationships only enter the reviewed graph through a human review queue at `/review`.
+
+- **Propose:** a signed-in reviewer clicks "Send to review" on a search's discovery preview. The server re-derives the claim from its own discovery run; the browser sends only the query and a link key.
+- **Decide:** supports / qualifies / contradicts / reject. Accepting requires ticking "I opened the source", a confidence level, and a note for anything other than a plain "supports".
+- **Revoke:** withdraws an accepted edge from the reviewed graph; the decision stays in history.
+- **Audit:** every action is appended to `/review/audit`.
+- **Gate:** a reviewed edge passes `isReviewedEvidenceEdge` only with a complete review record (`edge:rev:` id, reviewer, time, `source_checked`). Edges that merely claim `review_status: "reviewed"` are refused.
+- **Sign-in:** no external service. `REVIEWERS` holds `id:Display Name:<sha256 of access key>` entries separated by `;`, and `SESSION_SECRET` (≥ 32 chars) signs a 12-hour HttpOnly cookie. Create an entry with `npx tsx scripts/reviewer-key.ts "Display Name"`. Without both variables the deployment stays read-only.
+- **Storage:** Netlify Blobs in production, `data/.store/` (gitignored) locally, in-memory in tests (`src/lib/store`).
+
 ## Deploy
 
 Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.
