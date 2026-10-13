@@ -9,6 +9,8 @@ import { ProposePanel } from "@/components/review/ProposePanel";
 import { cookies } from "next/headers";
 import { getWatch, validKey, WATCH_COOKIE } from "@/lib/watch";
 import { WatchButton } from "@/components/watch/WatchControls";
+import { ExportBar } from "@/components/ExportBar";
+import { briefDocFrom } from "@/lib/export/brief-doc";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +25,9 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
   return (
     <div>
       <SearchBox defaultValue={q} size="sm" />
-      {watchable && (
-        <div className="mt-3 flex justify-end">
+      {watchable && result && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <ExportBar query={q} hasBrief={!!briefDocFrom(result, "")} />
           <WatchButton query={q} watched={watched} />
         </div>
       )}

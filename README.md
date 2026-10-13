@@ -169,6 +169,12 @@ Any search can be watched from the results page (up to 10 per browser), with no 
 - **Alerts:** each watchlist has a private, read-only Atom feed (`/api/watch/feed?k=…`) for any feed reader. The feed token is derived from the browser key and cannot be used to change the list.
 - **Privacy:** a random key in an HttpOnly cookie identifies the browser; only its hash is stored, with no name, email or IP address, because a watchlist can reveal a family's health situation. "Delete this watchlist" removes it and its feed.
 
+## Exports
+
+- **Research Action Brief:** PDF and Word downloads (`/api/export/brief?q=…&format=pdf|docx`) for any search with a curated or generated brief. Every export keeps the limits, counterweights and sources shown on the page.
+- **Share:** "Share brief" stores a frozen copy at `/share/<id>` (unguessable id, not indexed), labelled with its date and linked to the live page.
+- **Citations:** BibTeX and RIS (`/api/export/citations?q=…&format=bibtex|ris`). Reviewed sources come first; discovery papers are tagged "machine-assembled discovery, not reviewed" and preprints "not peer reviewed".
+
 ## Deploy
 
 Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.

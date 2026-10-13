@@ -9,7 +9,7 @@
  */
 import { deriveEvidenceStatus, type EvidenceEdge, type EvidenceStatus, type GraphBundle, type GraphNode, type Predicate } from "@/lib/schemas";
 import { isReviewedEvidenceEdge } from "@/lib/graph-view";
-import { opportunityDetails, rankResearchConnections, type OpportunityDetail, type RankCaution, type RankedConnection } from "@/lib/analytics";
+import { FACTOR_WEIGHTS, opportunityDetails, rankResearchConnections, type OpportunityDetail, type RankCaution, type RankedConnection } from "@/lib/analytics";
 
 export interface JourneyFact {
   edge_id: string;
@@ -138,7 +138,7 @@ function generateBrief(
       partner_id: top.disease_id,
       partner_label: partner,
       opportunity,
-      why: top.factors.map((f) => ({ text: f.detail, edge_ids: f.evidence_edge_ids })),
+      why: top.factors.map((f) => ({ text: `${FACTOR_WEIGHTS[f.kind].label}: ${f.detail}`, edge_ids: f.evidence_edge_ids })),
       assets,
       studies,
       team,
