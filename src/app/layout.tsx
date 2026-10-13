@@ -21,7 +21,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </span>
               <span className="hidden text-xs text-muted sm:inline">Rare shouldn&apos;t mean researching alone.</span>
             </Link>
-            <span className="max-w-[9rem] text-right text-[11px] leading-tight text-muted sm:max-w-none sm:text-xs">Research navigation, not medical advice</span>
+            <span className="flex items-center gap-3">
+              <Link href="/watch" className="text-xs font-semibold text-brand hover:underline">
+                Watchlist
+              </Link>
+              <span className="max-w-[9rem] text-right text-[11px] leading-tight text-muted sm:max-w-none sm:text-xs">Research navigation, not medical advice</span>
+            </span>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>

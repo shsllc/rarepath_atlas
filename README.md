@@ -161,6 +161,14 @@ Machine-assembled relationships only enter the reviewed graph through a human re
 - **Sign-in:** no external service. `REVIEWERS` holds `id:Display Name:<sha256 of access key>` entries separated by `;`, and `SESSION_SECRET` (≥ 32 chars) signs a 12-hour HttpOnly cookie. Create an entry with `npx tsx scripts/reviewer-key.ts "Display Name"`. Without both variables the deployment stays read-only.
 - **Storage:** Netlify Blobs in production, `data/.store/` (gitignored) locally, in-memory in tests (`src/lib/store`).
 
+## Watchlists and alerts
+
+Any search can be watched from the results page (up to 10 per browser), with no account.
+
+- **What's new:** `/watch` shows reviewed relationships, papers, preprints, clinical studies and NIH-funded projects that appeared since the list was last marked as seen. Discovery items stay labelled machine-assembled.
+- **Alerts:** each watchlist has a private, read-only Atom feed (`/api/watch/feed?k=…`) for any feed reader. The feed token is derived from the browser key and cannot be used to change the list.
+- **Privacy:** a random key in an HttpOnly cookie identifies the browser; only its hash is stored, with no name, email or IP address, because a watchlist can reveal a family's health situation. "Delete this watchlist" removes it and its feed.
+
 ## Deploy
 
 Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.

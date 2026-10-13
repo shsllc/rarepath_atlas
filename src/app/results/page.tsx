@@ -6,6 +6,9 @@ import { DiscoveryPreviewView } from "@/components/DiscoveryPreview";
 import { getServices } from "@/lib/services/registry";
 import { currentReviewer } from "@/lib/review/http";
 import { ProposePanel } from "@/components/review/ProposePanel";
+import { cookies } from "next/headers";
+import { getWatch, validKey, WATCH_COOKIE } from "@/lib/watch";
+import { WatchButton } from "@/components/watch/WatchControls";
 
 export const dynamic = "force-dynamic";
 
@@ -13,10 +16,18 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
   const [result, reviewer] = await Promise.all([q ? getServices().search.search(q) : null, currentReviewer()]);
+  const watchKey = (await cookies()).get(WATCH_COOKIE)?.value;
+  const watchable = !!result && ("discovery" in result || "partial" in result || result.found);
+  const watched = watchable && validKey(watchKey) ? !!(await getWatch(watchKey, q)) : false;
 
   return (
     <div>
       <SearchBox defaultValue={q} size="sm" />
+      {watchable && (
+        <div className="mt-3 flex justify-end">
+          <WatchButton query={q} watched={watched} />
+        </div>
+      )}
       <div className="mt-6">
         {!result && <p className="text-muted">Enter a disease, gene, variant, symptom or mechanism.</p>}
         {result && "partial" in result && <PartialDiseaseView result={result} />}
