@@ -19,3 +19,8 @@ data/raw/
 Thumbs.db
 npm-debug.log*
 .vercel
+submission-media/tools/node_modules/
+submission-media/build/
+
+# local persistence (review queue, watchlists)
+data/.store/
