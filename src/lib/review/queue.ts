@@ -133,6 +133,8 @@ const SOURCE_TYPE: Record<ProviderId, SourceType> = {
   gwas: "research_platform",
   datacite: "research_platform",
   alliance: "research_platform",
+  pubmed: "literature",
+  nihreporter: "funding_database",
 };
 
 const colon = (s: string) => s.replace("_", ":");

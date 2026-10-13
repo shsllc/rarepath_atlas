@@ -37,12 +37,18 @@ export class EuropePmcProvider implements ResearchProvider {
   async run(ctx: ProviderContext): Promise<ProviderResult> {
     const at = ctx.now().toISOString();
     const term = `"${ctx.disease.label.replace(/"/g, "")}"`;
-    const [rel, cited, recent] = await Promise.all([this.search(term, 8), this.search(`${term} sort_cited:y`, 4).catch(() => null), this.search(`${term} sort_date:y`, 5).catch(() => null)]);
+    const [rel, cited, recent, preprints] = await Promise.all([
+      this.search(term, 8),
+      this.search(`${term} sort_cited:y`, 4).catch(() => null),
+      this.search(`${term} sort_date:y`, 5).catch(() => null),
+      // Preprint servers indexed by Europe PMC (medRxiv, bioRxiv, Research Square, …): never peer reviewed.
+      this.search(`${term} AND SRC:PPR sort_date:y`, 6).catch(() => null),
+    ]);
     const records: ResearchRecord[] = [];
     const links: ResearchLink[] = [];
     const dKey = ctx.disease.ontology_id ? `disease:${ctx.disease.ontology_id}` : `disease:query:${ctx.disease.label.toLowerCase()}`;
     const seen = new Set<string>();
-    const add = (r: EpmcResult, bucket: "relevance" | "cited" | "recent") => {
+    const add = (r: EpmcResult, bucket: "relevance" | "cited" | "recent" | "preprint") => {
       const ids = { doi: normDoi(r.doi), pmid: r.pmid as string | undefined, pmcid: r.pmcid as string | undefined };
       const key = paperKey(ids, `epmc:${r.source}:${r.id}`);
       const url = ids.pmid ? `https://europepmc.org/article/MED/${ids.pmid}` : `https://europepmc.org/article/${r.source}/${r.id}`;
@@ -91,11 +97,12 @@ export class EuropePmcProvider implements ResearchProvider {
     for (const r of rel.resultList?.result ?? []) add(r, "relevance");
     for (const r of cited?.resultList?.result ?? []) add(r, "cited");
     for (const r of recent?.resultList?.result ?? []) add(r, "recent");
+    for (const r of preprints?.resultList?.result ?? []) add(r, "preprint");
     return {
       records,
       links,
-      totals: { papers: rel.hitCount ?? 0 },
-      notes: [...(cited ? [] : ["Most-cited query did not return."]), ...(recent ? [] : ["Recent-papers query did not return."])],
+      totals: { papers: rel.hitCount ?? 0, ...(preprints ? { preprints: preprints.hitCount ?? 0 } : {}) },
+      notes: [...(cited ? [] : ["Most-cited query did not return."]), ...(recent ? [] : ["Recent-papers query did not return."]), ...(preprints ? [] : ["Preprint query did not return."])],
     };
   }
 

@@ -201,6 +201,8 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
   const r = p.rare;
   const counts: [string, number][] = [
     ["Papers (Europe PMC)", lit.total],
+    ...(lit.pubmed_total != null ? ([["Papers (PubMed)", lit.pubmed_total]] as [string, number][]) : []),
+    ["NIH-funded projects (5 yrs)", p.funding.total],
     ["Clinical studies", p.clinical.total],
     ["Associated genes", p.genetics.gene_total],
     ["ClinVar records", p.genetics.variant_total],
@@ -318,7 +320,7 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
         {!r.mappings.length && !r.natural_history && <Empty>No Orphanet record could be tied to this disease by a shared identifier.</Empty>}
       </Section>
 
-      <Section title="Literature" note="Europe PMC search results, enriched by OpenAlex and verified against Crossref where a DOI exists. Search hits and citations are navigation leads, not findings.">
+      <Section title="Literature" note="Europe PMC and PubMed search results, merged by DOI and PMID, enriched by OpenAlex and verified against Crossref where a DOI exists. Search hits and citations are navigation leads, not findings.">
         <Sub>Most relevant</Sub>
         {lit.top.length ? (
           <ul className="divide-y divide-line">
@@ -334,6 +336,19 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
             <Sub>Most cited</Sub>
             <ul className="divide-y divide-line">
               {lit.most_cited.map((x) => (
+                <Paper key={x.key} p={x} />
+              ))}
+            </ul>
+          </>
+        )}
+        {lit.preprints.length > 0 && (
+          <>
+            <Sub>
+              Preprints{lit.preprint_total ? ` (${n(lit.preprint_total)} indexed by Europe PMC)` : ""}: not peer reviewed
+            </Sub>
+            <p className="mb-1 text-[11px] text-muted">medRxiv, bioRxiv and other preprint servers, via Europe PMC. Findings in a preprint have not been checked by peer review and may change.</p>
+            <ul className="divide-y divide-line">
+              {lit.preprints.map((x) => (
                 <Paper key={x.key} p={x} />
               ))}
             </ul>
@@ -366,6 +381,35 @@ export function DiscoveryPreviewView({ result }: { result: DiscoveryResult }) {
               </div>
             </div>
           </>
+        )}
+      </Section>
+
+      <Section title="Funded research (NIH RePORTER)" note="NIH projects from the last five fiscal years whose title, terms or abstract mention this disease. A text match is a lead: a project may only mention the disease in passing. Funding is not evidence of results, and listed investigators are not endorsements or contacts.">
+        {p.funding.projects.length === 0 ? (
+          <Empty>No NIH-funded projects mention this disease in the last five fiscal years.</Empty>
+        ) : (
+          <ul className="divide-y divide-line">
+            {p.funding.projects.map((g) => (
+              <li key={g.key} className="py-2 text-sm">
+                <a href={g.url} target="_blank" rel="noreferrer" className="font-medium hover:text-brand hover:underline">
+                  {g.title}
+                </a>
+                <span className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-muted">
+                  <span className="font-mono">{g.core}</span>
+                  <span>{g.funder}</span>
+                  {g.fiscal_year && <span>FY{g.fiscal_year}</span>}
+                  {g.award_amount != null && <span>${n(g.award_amount)} that year</span>}
+                  {g.start_date && <span>{g.start_date.slice(0, 4)}–{g.end_date?.slice(0, 4) ?? ""}</span>}
+                </span>
+                {(g.investigators.length > 0 || g.institution) && (
+                  <span className="mt-1 block text-[11px] text-muted">
+                    {g.investigators.length > 0 && <>PI: {g.investigators.join(", ")}</>}
+                    {g.institution && <> · {g.institution}</>}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
         )}
       </Section>
 

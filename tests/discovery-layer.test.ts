@@ -37,9 +37,9 @@ async function preview(fail: Failures = {}, q = "Dravet syndrome"): Promise<Disc
 }
 
 describe("provider contract", () => {
-  it("sixteen live providers, each declaring role, mode and data types", () => {
+  it("eighteen live providers, each declaring role, mode and data types", () => {
     const ps = liveProviders();
-    expect(ps.map((p) => p.meta.id).sort()).toEqual(["alliance", "clingen", "clinicaltrials", "clinvar", "crossref", "datacite", "euctr", "europepmc", "gwas", "hpo", "isrctn", "monarch", "openalex", "opentargets", "orphadata", "trialpubs"]);
+    expect(ps.map((p) => p.meta.id).sort()).toEqual(["alliance", "clingen", "clinicaltrials", "clinvar", "crossref", "datacite", "euctr", "europepmc", "gwas", "hpo", "isrctn", "monarch", "nihreporter", "openalex", "opentargets", "orphadata", "pubmed", "trialpubs"]);
     for (const p of ps) {
       expect(p.meta.mode).toBe("live");
       expect(["discovery", "metadata"]).toContain(p.meta.role);
@@ -50,7 +50,7 @@ describe("provider contract", () => {
 
   it("the sources view lists live and offline sources honestly", () => {
     const s = researchSources();
-    expect(s.filter((x) => x.mode === "live")).toHaveLength(16);
+    expect(s.filter((x) => x.mode === "live")).toHaveLength(18);
     expect(s.filter((x) => x.mode === "not_integrated").map((x) => x.name)).toEqual(expect.arrayContaining(["WHO ICTRP", "EMA CTIS", "DisGeNET"]));
     expect(s.some((x) => x.mode === "offline" && /PubMed/.test(x.name))).toBe(true);
     expect(s.filter((x) => x.mode === "live").every((x) => !x.uses.includes("reviewed_ingestion"))).toBe(true);
@@ -82,14 +82,33 @@ describe("provider contract", () => {
     expect(p.assets.dataset_total).toBe(63);
     expect(p.assets.datasets[0]).toMatchObject({ doi: "10.5061/dryad.x1", resource_type: "Dataset", publisher: "Dryad" });
   });
+
+  it("preprints from any literature source are listed apart and never marked peer reviewed", async () => {
+    const p = await preview();
+    const ids = p.literature.preprints.map((x) => x.ids.doi ?? x.ids.pmid);
+    expect(ids).toEqual(expect.arrayContaining(["10.1101/2024.01.01.000001", "10.1101/2025.02.02.000002", "444"]));
+    for (const x of p.literature.preprints) expect(x.publication_status).toBe("preprint");
+    expect(p.literature.preprint_total).toBe(37);
+    expect(p.literature.pubmed_total).toBe(4210);
+  });
+
+  it("NIH RePORTER projects collapse per core project and keep PIs, institution and award year", async () => {
+    const p = await preview();
+    expect(p.funding.total).toBe(58);
+    expect(p.funding.projects.map((x) => x.core)).toEqual(["R01NS000001", "R21NS000002"]);
+    expect(p.funding.projects[0]).toMatchObject({ funder: "NIH NINDS", fiscal_year: 2026, award_amount: 450000, investigators: ["Jane Smith"], institution: "HOSPITAL A, BOSTON, MA", url: "https://reporter.nih.gov/project-details/1001" });
+    const grantLinks = p.links.filter((l) => l.from.startsWith("grant:nih:"));
+    for (const l of grantLinks) expect(l).toMatchObject({ discovery_lead: true, eligible_for_ranking: false });
+    for (const l of grantLinks) expect(toCandidateEdge(l)).toBeNull();
+  });
 });
 
 describe("reconciliation by stable identifiers", () => {
-  it("a paper from Europe PMC, OpenAlex and Crossref collapses into one record with three provenance sources", async () => {
+  it("a paper from Europe PMC, PubMed, OpenAlex and Crossref collapses into one record with four provenance sources", async () => {
     const p = await preview();
     const dup = p.records.filter((r) => r.kind === "paper" && r.ids.doi === "10.1000/dup");
     expect(dup).toHaveLength(1);
-    expect(new Set(dup[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "openalex", "crossref"]));
+    expect(new Set(dup[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "pubmed", "openalex", "crossref"]));
     const view = p.literature.top.find((x) => x.ids.doi === "10.1000/dup")!;
     expect(view.sources).toEqual(expect.arrayContaining(["Europe PMC", "OpenAlex", "Crossref"]));
     expect(view.verified_by_crossref).toBe(true);
@@ -108,8 +127,8 @@ describe("reconciliation by stable identifiers", () => {
     const people = p.records.filter((r): r is Extract<ResearchRecord, { kind: "person" }> => r.kind === "person");
     const orcid = people.filter((r) => r.ids.orcid === "0000-0001-2345-6789");
     expect(orcid).toHaveLength(1);
-    // ORCID joins Europe PMC, OpenAlex, Crossref and DataCite; the trial official "Jane Smith" at the identical affiliation "Hospital A" also joins (name + institution rule).
-    expect(new Set(orcid[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "openalex", "crossref", "datacite", "clinicaltrials"]));
+    // ORCID joins Europe PMC, OpenAlex, Crossref and DataCite; the trial official and the NIH principal investigator "Jane Smith" at the identical affiliation "Hospital A" also join (name + institution rule).
+    expect(new Set(orcid[0].provenance.map((x) => x.provider))).toEqual(new Set(["europepmc", "openalex", "crossref", "datacite", "clinicaltrials", "nihreporter"]));
     // The OpenAlex author "Jane Smith" at Hospital B has no ORCID and a different institution → stays a separate person.
     const other = people.filter((r) => r.label === "Jane Smith" && !r.ids.orcid);
     expect(other).toHaveLength(1);
@@ -207,7 +226,7 @@ describe("failure isolation and caching", () => {
   });
 
   it("every provider down → graceful not-found; reviewed CDD search unaffected", async () => {
-    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down", monarch: "down", orphadata: "down", hpo: "down", clingen: "down", clinvar: "down", alliance: "down", isrctn: "down", euctr: "down" });
+    const svc = service({ opentargets: "down", gwas: "down", clinicaltrials: "down", europepmc: "down", openalex: "down", crossref: "down", datacite: "down", monarch: "down", orphadata: "down", hpo: "down", clingen: "down", clinvar: "down", alliance: "down", isrctn: "down", euctr: "down", pubmed: "down", nihreporter: "down" });
     const search = new GraphSearchService(g, finder, svc);
     const r = await search.search("Dravet syndrome");
     expect(r.found).toBe(false);

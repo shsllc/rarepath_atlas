@@ -108,7 +108,7 @@ In one exploratory run ([docs/benchmark.md](docs/benchmark.md)), finding the sha
 
 RarePath has two evidence tiers:
 
-- **Reviewed evidence** (the CDKL5 journey) was retrieved offline, stored verbatim and analyst-reviewed. Only it can drive Research Connection Strength, reusable-asset recommendations and the Research Action Brief.
+- **Reviewed evidence** is the CDKL5 bundle (retrieved offline, stored verbatim, analyst-reviewed) plus relationships accepted through the [review queue](#review-workflow). Only it can drive Research Connection Strength, reusable-asset recommendations and the Research Action Brief.
 - **Discovery evidence** is assembled live from structured research APIs for any disease outside the reviewed slice. It is labelled *machine-assembled* and never drives scoring or actions.
 
 | Source | Data used | Mode | Tier |
@@ -125,11 +125,14 @@ RarePath has two evidence tiers:
 | ClinGen | Gene-Disease Validity (expert classification), Dosage Sensitivity, expert-panel variant classifications | Live (lists cached 24 h per instance) | Discovery |
 | ClinVar (E-utilities) | Variant classifications with review status (stars), conditions, last evaluated | Live | Discovery |
 | Alliance of Genome Resources | Orthologs, experimental disease models (preclinical) | Live | Discovery |
-| Europe PMC | Papers (PMID/PMCID/DOI), abstracts, preprint status, authors + ORCID, grants, open-access full text | Live | Discovery |
+| Europe PMC | Papers (PMID/PMCID/DOI), abstracts, preprint status, authors + ORCID, grants, open-access full text, and a dedicated preprint query (medRxiv, bioRxiv and other servers it indexes; labelled not peer reviewed) | Live | Discovery |
+| PubMed (E-utilities) | Papers by PMID with publication types (indexed preprints flagged), journal, authors; merged with Europe PMC by DOI/PMID | Live | Discovery |
+| NIH RePORTER (API v2, public domain) | NIH-funded projects from the last five fiscal years whose title, terms or abstract mention the disease, with PIs, awardee organisation, fiscal year and award amount (text matches are leads) | Live | Discovery |
 | OpenAlex | Citing/referenced works, authors (ORCID), institutions (ROR), funders, venues | Live | Discovery |
 | Crossref | DOI metadata verification, ORCIDs, funders, retraction/correction notices | Live | Metadata only |
 | DataCite | DOI-registered datasets and collections, creators (ORCID), ROR affiliations, funders | Live | Discovery |
 | PubMed / PMC (E-utilities), MONDO/HPO (OLS4), HGNC, NIH RePORTER, patient-org sites | Sources of the reviewed CDKL5 journey | Offline | Reviewed |
+| Orphanet directory (patient organisations, expert centres) | Patient organisations | Not integrated: not among the documented open Orphadata Science datasets, and no openly licensed API for it was found. Linked to, not ingested. | — |
 | DisGeNET | Gene-disease associations | Not integrated: requires a registered account and licence tier. | — |
 | WHO ICTRP, EMA CTIS, DDrare, other national registries | International trial registrations | Not integrated. ICTRP is available with approval (fee on request, no commercial use) and its crawling service is unavailable. CTIS's API is undocumented. DDrare requires permission. jRCT prohibits automated download, and ANZCTR blocks automated clients. Nothing is scraped. See [docs/global-trial-strategy.md](docs/global-trial-strategy.md). | — |
 

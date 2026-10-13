@@ -8,7 +8,7 @@
  * only adds provenance; it never makes anything "reviewed".
  */
 
-export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr";
+export type ProviderId = "opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "trialpubs" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr" | "pubmed" | "nihreporter";
 
 /** Stable identifier systems used for reconciliation (lower-case keys). */
 export type IdSystem =
@@ -164,7 +164,17 @@ export type OutcomeMeasureRecord = RecordBase & {
   measure: string;
   roles: ("primary" | "secondary" | "other")[];
 };
-export type GrantRecord = RecordBase & { kind: "grant"; funder: string };
+export type GrantRecord = RecordBase & {
+  kind: "grant";
+  funder: string;
+  /** Present on funder-registry records (NIH RePORTER); Europe PMC grant acknowledgements carry the funder only. */
+  fiscal_year?: number;
+  award_amount?: number;
+  start_date?: string;
+  end_date?: string;
+  institution?: string;
+  investigators?: string[];
+};
 export type DatasetRecord = RecordBase & { kind: "dataset"; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] };
 export type DrugRecord = RecordBase & { kind: "drug"; stage: string; drug_type?: string };
 

@@ -36,6 +36,8 @@ export const PROVIDER_NAME: Record<ProviderId, string> = {
   alliance: "Alliance",
   isrctn: "ISRCTN",
   euctr: "EU CTR",
+  pubmed: "PubMed",
+  nihreporter: "NIH RePORTER",
 };
 
 export type PaperView = {
@@ -74,6 +76,7 @@ export type PhenotypeView = { hpo: string; name: string; url: string; frequency?
 export type ValidityView = { gene: string; hgnc?: string; classification: string; expert_panel: string; mode_of_inheritance: string; released: string; url: string };
 export type CausalGeneView = { gene: string; hgnc?: string; source: string; detail: string; url: string };
 export type ClinVarView = { label: string; classification: string; review_status: string; stars: number; conditions?: string; last_evaluated?: string; url: string; source: string };
+export type GrantView = { key: string; title: string; core: string; funder: string; fiscal_year?: number; award_amount?: number; start_date?: string; end_date?: string; institution?: string; investigators: string[]; url: string };
 export type ModelView = { label: string; id: string; species: string; disease_context?: string; source: string; url: string };
 
 export type DiscoveryPreview = {
@@ -82,7 +85,16 @@ export type DiscoveryPreview = {
   eligible_for_action: false;
   disease: { id?: string; source_id?: string; label: string; description?: string; url?: string; identifiers: { system: string; id: string }[]; synonyms: string[]; resolved: boolean };
   match: { query: string; exact: boolean; alternatives: { id: string; name: string }[] };
-  literature: { total: number; top: PaperView[]; most_cited: PaperView[]; recent: PaperView[]; citation: { seed?: PaperView; citing: PaperView[]; referenced: PaperView[]; citing_total: number } };
+  literature: {
+    total: number;
+    pubmed_total?: number;
+    preprint_total?: number;
+    top: PaperView[];
+    most_cited: PaperView[];
+    recent: PaperView[];
+    /** Every preprint found by any literature query, newest first. Never peer reviewed. */
+    preprints: PaperView[];
+    citation: { seed?: PaperView; citing: PaperView[]; referenced: PaperView[]; citing_total: number } };
   people: { researchers: PersonView[]; institutions: { label: string; ror: string; country?: string; people: number }[] };
   clinical: {
     total: number;
@@ -99,6 +111,7 @@ export type DiscoveryPreview = {
     not_on_ctgov: number;
   };
   genetics: { gene_total: number; genes: GeneView[]; variant_total: number; variants: { label: string; gene?: string; statement: string; url: string }[]; gwas_total: number; gwas: { label: string; statement: string; url: string }[] };
+  funding: { total: number; projects: GrantView[] };
   assets: { dataset_total: number; datasets: { label: string; doi: string; url: string; resource_type: string; publisher?: string; year?: number; description?: string; subjects: string[] }[]; reuse_leads: StudyView[] };
   adjacent: { ontology: { id: string; name: string; relation: "broader" | "narrower"; url: string }[]; same_gene: { gene: string; diseases: { id: string; name: string }[] } | null };
   drugs: { total: number; items: { chembl_id: string; name: string; drug_type?: string; stage: string; url: string }[] };
@@ -237,6 +250,12 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
   const cited = mentions.filter((l) => l.native_evidence_type === "search:cited" && !topKeys.has(l.from)).map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p);
   const citedKeys = new Set(cited.map((p) => p.key));
   const recent = mentions.filter((l) => l.native_evidence_type === "search:recent" && !topKeys.has(l.from) && !citedKeys.has(l.from)).map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p);
+  const preprints = [...new Map(mentions.map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p && p.publication_status === "preprint").map((p) => [p.key, p])).values()].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+  const grants: GrantView[] = mentions
+    .filter((l) => l.native_evidence_type === "search:funded_project")
+    .map((l) => byKey.get(l.from))
+    .filter((r): r is Extract<ResearchRecord, { kind: "grant" }> => !!r && r.kind === "grant")
+    .map((r) => ({ key: r.key, title: r.label, core: r.ids.grant ?? r.key, funder: r.funder, fiscal_year: r.fiscal_year, award_amount: r.award_amount, start_date: r.start_date, end_date: r.end_date, institution: r.institution, investigators: r.investigators ?? [], url: r.provenance[0].url }));
   const cites = linksOf("cites");
   const seedKey = cites.find((l) => l.native_evidence_type === "cites")?.to ?? cites.find((l) => l.native_evidence_type === "references")?.from;
   const seed = seedKey ? paper(seedKey) : undefined;
@@ -396,7 +415,7 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       resolved: g.resolved,
     },
     match: { query: g.disease.query, exact: g.exact, alternatives: g.alternatives },
-    literature: { total: g.totals.papers ?? 0, top: top.map(pv), most_cited: cited.map(pv), recent: recent.map(pv), citation: { seed: seed ? pv(seed) : undefined, citing: cites.filter((l) => l.native_evidence_type === "cites").map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p).map(pv), referenced: cites.filter((l) => l.native_evidence_type === "references").map((l) => paper(l.to)).filter((p): p is PaperRecord => !!p).map(pv), citing_total: g.totals.citing_works_of_seed ?? 0 } },
+    literature: { total: g.totals.papers ?? 0, pubmed_total: g.totals.pubmed_papers, preprint_total: g.totals.preprints, top: top.map(pv), most_cited: cited.map(pv), recent: recent.map(pv), preprints: preprints.slice(0, 8).map(pv), citation: { seed: seed ? pv(seed) : undefined, citing: cites.filter((l) => l.native_evidence_type === "cites").map((l) => paper(l.from)).filter((p): p is PaperRecord => !!p).map(pv), referenced: cites.filter((l) => l.native_evidence_type === "references").map((l) => paper(l.to)).filter((p): p is PaperRecord => !!p).map(pv), citing_total: g.totals.citing_works_of_seed ?? 0 } },
     people: { researchers, institutions },
     clinical: {
       total: g.totals.studies ?? 0,
@@ -425,6 +444,7 @@ export function buildPreview(g: AssembledGraph): DiscoveryPreview {
       gwas_total: g.totals.gwas_associations ?? 0,
       gwas: linksOf("gwas_association").map((l) => ({ label: byKey.get(l.from)?.label ?? l.from, statement: l.statement, url: l.provenance[0].url })),
     },
+    funding: { total: g.totals.nih_projects ?? 0, projects: grants },
     assets: { dataset_total: g.totals.datasets ?? 0, datasets, reuse_leads: infrastructure },
     adjacent: {
       ontology: linksOf("subclass_of").map((l) => {

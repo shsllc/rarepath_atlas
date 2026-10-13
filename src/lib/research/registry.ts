@@ -18,12 +18,14 @@ import { ClinVarProvider } from "./providers/clinvar";
 import { AllianceProvider } from "./providers/alliance";
 import { IsrctnProvider } from "./providers/isrctn";
 import { EuCtrProvider } from "./providers/euctr";
+import { PubMedProvider } from "./providers/pubmed";
+import { NihReporterProvider } from "./providers/nihreporter";
 import type { ResearchProvider } from "./types";
 
 export function liveProviders(): ResearchProvider[] {
   return [new OpenTargetsProvider(), new GwasProvider(), new ClinicalTrialsProvider(), new EuropePmcProvider(), new DataCiteProvider(), new OpenAlexProvider(), new CrossrefProvider(), new TrialPublicationsProvider(),
     new MonarchProvider(), new OrphadataProvider(), new HpoProvider(), new ClinGenProvider(), new ClinVarProvider(), new AllianceProvider(),
-    new IsrctnProvider(), new EuCtrProvider()];
+    new IsrctnProvider(), new EuCtrProvider(), new PubMedProvider(), new NihReporterProvider()];
 }
 
 export type SourceUse = "discovery" | "metadata" | "reviewed_ingestion";
@@ -48,7 +50,7 @@ const OFFLINE: SourceEntry[] = [
   { name: "ANZCTR, jRCT, ChiCTR, CTRI, PACTR, ReBEC, CRiS, IRCT, RPCEC, DRKS", data_types: ["National / regional trial registries"], mode: "not_integrated", uses: [], homepage: "https://www.who.int/tools/clinical-trials-registry-platform/network/primary-registries", note: "No free documented API usable today: jRCT prohibits automated download, ANZCTR blocks automated clients and its XML export is unavailable, DRKS's download interface is still planned, and the others offer web pages only. Reachable legitimately via WHO ICTRP once approved." },
   { name: "DisGeNET", data_types: ["Gene-disease associations"], mode: "not_integrated", uses: [], homepage: "https://www.disgenet.com", note: "Requires a registered account and licence tier; not used." },
   { name: "MONDO / HPO (EBI OLS4) and HGNC", data_types: ["Disease, phenotype and gene identity"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://www.ebi.ac.uk/ols4", note: "Identity verification for reviewed nodes." },
-  { name: "NIH RePORTER", data_types: ["Funded projects"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://reporter.nih.gov", note: "Funding record for the shared natural-history infrastructure." },
+  { name: "Orphanet directory (patient organisations, expert centres)", data_types: ["Patient organisations", "Expert centres"], mode: "not_integrated", uses: [], homepage: "https://www.orpha.net", note: "Not among the documented open Orphadata Science datasets (scientific knowledge base, ORDO, HOOM, Orphapackets), and no openly licensed API for it was found. Linked to, not ingested." },
   { name: "Patient-organization websites", data_types: ["Mission statements (title/description only)"], mode: "offline", uses: ["reviewed_ingestion"], homepage: "https://rarepathatlas.netlify.app/atlas", note: "Homepage title and description only; no crawling." },
 ];
 

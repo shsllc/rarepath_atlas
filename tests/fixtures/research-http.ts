@@ -5,7 +5,7 @@
  */
 import { vi } from "vitest";
 
-export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr", "down" | "http500" | "timeout">>;
+export type Failures = Partial<Record<"opentargets" | "gwas" | "clinicaltrials" | "europepmc" | "openalex" | "crossref" | "datacite" | "monarch" | "orphadata" | "hpo" | "clingen" | "clinvar" | "alliance" | "isrctn" | "euctr" | "pubmed" | "nihreporter", "down" | "http500" | "timeout">>;
 // Note: trial-publication links use the Europe PMC host, so a europepmc failure also fails them.
 
 const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
@@ -152,6 +152,22 @@ const CLINGEN_VALIDITY = { rows: [
 ] };
 const CLINGEN_DOSAGE = { rows: [{ symbol: "SCN1A", hgnc_id: "HGNC:10585", haplo_assertion: 3, triplo_assertion: 0, haplo_disease: "developmental and epileptic encephalopathy, 6" }] };
 const CLINGEN_EREPO = { variantInterpretations: [{ uuid: "u1", caid: "CAR:CA303333", hgvs: ["NM_001165963.4:c.2303C>T"], condition: { "@id": "MONDO:0100135", label: "Dravet syndrome" }, guidelines: [{ outcome: { label: "Likely Pathogenic" } }], publishedDate: "2024-05-07" }] };
+const EPMC_PREPRINTS = { hitCount: 37, resultList: { result: [{ id: "PPR2", source: "PPR", doi: "10.1101/2025.02.02.000002", title: "Second Dravet preprint", pubYear: "2025", pubTypeList: { pubType: ["Preprint"] }, authorList: { author: [] } }] } };
+// PMID 111 is the same paper Europe PMC returns (DOI and PMID match) → must merge; 444 is PubMed-only and a preprint.
+const PUBMED_SEARCH = { esearchresult: { count: "4210", idlist: ["111", "444"] } };
+const PUBMED_SUMMARY = {
+  result: {
+    uids: ["111", "444"],
+    "111": { uid: "111", title: "Duplicate paper across providers.", pubdate: "2020 May", fulljournalname: "Epilepsia", pubtype: ["Journal Article"], authors: [{ name: "Smith J" }], articleids: [{ idtype: "pubmed", value: "111" }, { idtype: "doi", value: "10.1000/DUP" }] },
+    "444": { uid: "444", title: "A PubMed-indexed preprint", pubdate: "2025 Jan", source: "medRxiv", pubtype: ["Preprint"], authors: [], articleids: [{ idtype: "pubmed", value: "444" }] },
+  },
+};
+// Two fiscal years of one core project (must collapse to one), plus a second project with no PI.
+const REPORTER_PROJECT = { appl_id: 1001, project_num: "5R01NS000001-03", core_project_num: "R01NS000001", project_title: "Natural history of Dravet syndrome", fiscal_year: 2026, award_amount: 450000, organization: { org_name: "HOSPITAL A", org_city: "BOSTON", org_state: "MA" }, principal_investigators: [{ profile_id: 77, full_name: "Jane Smith", is_contact_pi: true }], agency_ic_admin: { abbreviation: "NINDS" }, project_start_date: "2024-04-01T00:00:00", project_end_date: "2029-03-31T00:00:00", project_detail_url: "https://reporter.nih.gov/project-details/1001" };
+const REPORTER = {
+  meta: { total: 58 },
+  results: [REPORTER_PROJECT, { ...REPORTER_PROJECT, appl_id: 1000, project_num: "5R01NS000001-02", fiscal_year: 2025 }, { appl_id: 2002, project_num: "1R21NS000002-01", core_project_num: "R21NS000002", project_title: "Mouse model of SCN1A loss", fiscal_year: 2025, award_amount: 200000, organization: { org_name: "UNIVERSITY B" }, principal_investigators: [], agency_ic_admin: { abbreviation: "NINDS" } }],
+};
 const CLINVAR_SEARCH = { esearchresult: { count: "1506", idlist: ["68000"] } };
 const CLINVAR_SUMMARY = { result: { uids: ["68000"], "68000": { uid: "68000", accession: "VCV000068000", title: "NM_001165963.4(SCN1A):c.5536_5539del", germline_classification: { description: "Pathogenic", review_status: "criteria provided, multiple submitters, no conflicts", last_evaluated: "2024/01/01", trait_set: [{ trait_name: "Severe myoclonic epilepsy in infancy" }] }, variation_set: [{ variation_xrefs: [{ db_source: "dbSNP", db_id: "796053029" }] }] } } };
 const ALLIANCE_ORTH = { total: 2, results: [
@@ -236,7 +252,7 @@ Link:                    https://www.clinicaltrialsregister.eu/ctr-search/search
 export function researchRouter(fail: Failures = {}) {
   return vi.fn(async (url: string, init?: RequestInit): Promise<Response> => {
     const host = new URL(url).host;
-    const provider = host.includes("clinicaltrialsregister.eu") ? "euctr" : host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : host.includes("monarchinitiative") ? "monarch" : host.includes("orphadata") ? "orphadata" : host.includes("ontology.jax.org") ? "hpo" : host.includes("clinicalgenome") ? "clingen" : host.includes("eutils.ncbi") ? "clinvar" : host.includes("alliancegenome") ? "alliance" : host.includes("isrctn.com") ? "isrctn" : host.includes("clinicaltrialsregister.eu") ? "euctr" : null;
+    const provider = host.includes("api.reporter.nih.gov") ? "nihreporter" : host.includes("eutils.ncbi") && url.includes("db=pubmed") ? "pubmed" : host.includes("clinicaltrialsregister.eu") ? "euctr" : host.includes("opentargets") ? "opentargets" : url.includes("/gwas/") ? "gwas" : host.includes("clinicaltrials") ? "clinicaltrials" : url.includes("europepmc") ? "europepmc" : host.includes("openalex") ? "openalex" : host.includes("crossref") ? "crossref" : host.includes("datacite") ? "datacite" : host.includes("monarchinitiative") ? "monarch" : host.includes("orphadata") ? "orphadata" : host.includes("ontology.jax.org") ? "hpo" : host.includes("clinicalgenome") ? "clingen" : host.includes("eutils.ncbi") ? "clinvar" : host.includes("alliancegenome") ? "alliance" : host.includes("isrctn.com") ? "isrctn" : host.includes("clinicaltrialsregister.eu") ? "euctr" : null;
     if (!provider) throw new Error(`unexpected URL ${url}`);
     const f = fail[provider];
     if (f === "down") throw new TypeError("fetch failed");
@@ -254,7 +270,7 @@ export function researchRouter(fail: Failures = {}) {
       case "europepmc": {
         const q = decodeURIComponent(new URL(url).searchParams.get("query") ?? "");
         if (q.startsWith("ACCESSION_ID:")) return json(q.includes("NCT00000001") ? EPMC_ACCESSION : { hitCount: 0, resultList: { result: [] } });
-        return json(q.includes("sort_cited") ? EPMC_CITED : q.includes("sort_date") ? EPMC_RECENT : EPMC_REL);
+        return json(q.includes("SRC:PPR") ? EPMC_PREPRINTS : q.includes("sort_cited") ? EPMC_CITED : q.includes("sort_date") ? EPMC_RECENT : EPMC_REL);
       }
       case "openalex": {
         const filter = new URL(url).searchParams.get("filter") ?? "";
@@ -284,6 +300,10 @@ export function researchRouter(fail: Failures = {}) {
         return new Response(EUCTR_TXT, { status: 200, headers: { "content-type": "application/octet-stream" } });
       case "datacite":
         return json(DATACITE);
+      case "pubmed":
+        return json(url.includes("esearch") ? PUBMED_SEARCH : PUBMED_SUMMARY);
+      case "nihreporter":
+        return json(REPORTER);
     }
   });
 }
