@@ -113,6 +113,10 @@ export class BlobsStore implements KVStore {
   }
   async get<T>(key: string) {
     const s = await this.storePromise;
+    // In the Netlify runtime a strongly consistent read of a missing key stalls instead of returning
+    // null (observed 2026-10-13, @netlify/blobs 11.1.4), so confirm the key exists with a list first.
+    const { blobs } = await bounded("exists", s.list({ prefix: key }));
+    if (!blobs.some((b) => b.key === key)) return null;
     return ((await bounded("get", s.get(key, { type: "json" }))) as T | null) ?? null;
   }
   async set<T>(key: string, value: T) {
