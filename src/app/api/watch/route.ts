@@ -67,6 +67,7 @@ export async function POST(req: Request) {
     return res;
   } catch (e) {
     if (e instanceof WatchError) return NextResponse.json({ error: e.message }, { status: e.status });
+    console.error(`[watch] ${(e as Error)?.message ?? "unknown error"}`);
     return NextResponse.json({ error: "Something went wrong. Nothing was changed." }, { status: 500 });
   }
 }

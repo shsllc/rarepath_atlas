@@ -90,6 +90,21 @@ export class FileStore implements KVStore {
   }
 }
 
+/** Every storage call is bounded, so a stalled request fails clearly instead of hanging the page. */
+const OP_TIMEOUT_MS = 8_000;
+async function bounded<T>(op: string, p: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const started = Date.now();
+  try {
+    return await Promise.race([p, new Promise<never>((_, reject) => (timer = setTimeout(() => reject(new Error(`store ${op} timed out`)), OP_TIMEOUT_MS)))]);
+  } catch (e) {
+    console.error(`[store] ${op} failed after ${Date.now() - started} ms: ${(e as Error).message}`);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** Netlify Blobs: used automatically when running on Netlify (the runtime provides the context). */
 export class BlobsStore implements KVStore {
   private storePromise: Promise<import("@netlify/blobs").Store>;
@@ -97,20 +112,25 @@ export class BlobsStore implements KVStore {
     this.storePromise = import("@netlify/blobs").then(({ getStore }) => getStore({ name, consistency: "strong" }));
   }
   async get<T>(key: string) {
-    return ((await (await this.storePromise).get(key, { type: "json" })) as T | null) ?? null;
+    const s = await this.storePromise;
+    return ((await bounded("get", s.get(key, { type: "json" }))) as T | null) ?? null;
   }
   async set<T>(key: string, value: T) {
-    await (await this.storePromise).setJSON(key, value);
+    const s = await this.storePromise;
+    await bounded("set", s.setJSON(key, value));
   }
   async create<T>(key: string, value: T) {
-    const r = await (await this.storePromise).setJSON(key, value, { onlyIfNew: true });
+    const s = await this.storePromise;
+    const r = await bounded("create", s.setJSON(key, value, { onlyIfNew: true }));
     return r.modified;
   }
   async delete(key: string) {
-    await (await this.storePromise).delete(key);
+    const s = await this.storePromise;
+    await bounded("delete", s.delete(key));
   }
   async list(prefix: string) {
-    const { blobs } = await (await this.storePromise).list({ prefix });
+    const s = await this.storePromise;
+    const { blobs } = await bounded("list", s.list({ prefix }));
     return blobs.map((b) => b.key).sort();
   }
 }
