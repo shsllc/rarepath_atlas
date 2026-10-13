@@ -20,6 +20,12 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
       <div className="mt-6">
         {!result && <p className="text-muted">Enter a disease, gene, variant, symptom or mechanism.</p>}
         {result && "partial" in result && <PartialDiseaseView result={result} />}
+        {result && "partial" in result && result.preview && (
+          <div className="mt-6 space-y-4">
+            <DiscoveryPreviewView result={{ query: result.query, found: false, discovery: true, preview: result.preview, full_journey: result.full_journey }} />
+            {reviewer && <ProposePanel preview={result.preview} query={result.preview.match.query} reviewerName={reviewer.name} />}
+          </div>
+        )}
         {result && "discovery" in result && <DiscoveryPreviewView result={result} />}
         {result && "discovery" in result && reviewer && (
           <div className="mt-4">

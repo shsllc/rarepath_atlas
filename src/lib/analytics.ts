@@ -143,6 +143,9 @@ export function opportunityDetails(nodes: GraphNode[], allEdges: EvidenceEdge[],
   const edges = reviewed(allEdges).filter(positive);
   const label = new Map(nodes.map((n) => [n.id, n.label]));
   const short = new Map(nodes.map((n) => [n.id, n.aliases[0] ? `the ${n.aliases[0]}` : n.label]));
+  // Short name for the focus disease: a short acronym alias (e.g. "CDD") when one exists, else its label.
+  const focusNode = nodes.find((n) => n.id === focusId);
+  const focus = focusNode?.aliases.find((a) => /^[A-Z0-9-]{2,8}$/.test(a)) ?? focusNode?.label ?? "this disease";
   return ranked.map((r) => {
     const shared_asset_ids = r.factors.filter((f) => f.kind === "shared_asset").map((f) => edges.find((e) => f.evidence_edge_ids.includes(e.id) && e.predicate === "applied_to")?.subject_id).filter((x): x is string => !!x);
     const shared_study_ids = r.factors.filter((f) => f.kind === "shared_study").map((f) => edges.find((e) => f.evidence_edge_ids.includes(e.id) && e.predicate === "studied_in")?.object_id).filter((x): x is string => !!x);
@@ -153,8 +156,8 @@ export function opportunityDetails(nodes: GraphNode[], allEdges: EvidenceEdge[],
       ? `${shared_asset_ids.length} reusable asset${shared_asset_ids.length > 1 ? "s" : ""} verified in both communities.`
       : "Shared study infrastructure identified; no stronger reusable-asset path is currently verified.";
     const next_question = shared_asset_ids.length
-      ? `How does ${short.get(shared_asset_ids[0])} perform in CDD compared with ${d}, and what needs CDD-specific validation?`
-      : `Which data collected in ${study} are comparable between CDD and ${d}, and is a reusable asset worth looking for?`;
+      ? `How does ${short.get(shared_asset_ids[0])} perform in ${focus} compared with ${d}, and what needs ${focus}-specific validation?`
+      : `Which data collected in ${study} are comparable between ${focus} and ${d}, and is a reusable asset worth looking for?`;
     return { disease_id: r.disease_id, shared_asset_ids, shared_study_ids, study_team_ids, asset_note, next_question };
   });
 }

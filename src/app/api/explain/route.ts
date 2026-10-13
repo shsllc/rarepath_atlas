@@ -19,7 +19,8 @@ const Body = z
  * Failure never affects the sourced evidence page; it only returns a calm error.
  */
 export async function POST(req: Request) {
-  const { graph, ai } = getServices();
+  const services = getServices();
+  const { ai } = services;
   if (!ai.configured()) {
     return NextResponse.json({ error: "Explanations are not available on this deployment. All evidence is still shown below.", code: "not_configured" }, { status: 503 });
   }
@@ -36,6 +37,8 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Malformed request.", code: "bad_request" }, { status: 400 });
 
   const ids = [...new Set(parsed.data.edge_ids)];
+  // Includes queue-reviewed edges, so reviewed journeys for any disease can be explained.
+  const graph = await services.reviewedGraph();
   const edges = ids.map((id) => graph.getEdge(id));
   if (edges.some((e) => e === undefined)) return NextResponse.json({ error: "Unknown evidence id.", code: "unknown_id" }, { status: 400 });
   const known = edges.filter((e) => e !== undefined);

@@ -45,6 +45,9 @@ export interface AuditEvent {
 }
 
 let auditSeq = 0;
+/** Bumped whenever this instance changes the reviewed overlay, so cached graphs refresh immediately. */
+let generation = 0;
+export const overlayGeneration = () => generation;
 const K = {
   item: (id: string) => `review/items/${id}`,
   // The per-process sequence keeps events written in the same millisecond in order.
@@ -231,6 +234,7 @@ export async function decide(id: string, by: Reviewer, d: Decision, bundleNodes:
     };
     for (const n of [subj, obj]) if (n.id.startsWith("rv:")) await getStore().set(K.node(n.id), n);
     await getStore().set(K.edge(item.id), edge);
+    generation++;
     item.status = "accepted";
   }
   await getStore().set(K.item(item.id), item);
@@ -245,6 +249,7 @@ export async function revoke(id: string, by: Reviewer, note: string, now = new D
   const n = (note ?? "").trim();
   if (n.length < 5) throw new ReviewError("A note is required to revoke.");
   await getStore().delete(K.edge(item.id));
+  generation++;
   item.status = "revoked";
   item.revoked = { by: by.id, by_name: by.name, at: now.toISOString(), note: n.slice(0, 2000) };
   await getStore().set(K.item(item.id), item);

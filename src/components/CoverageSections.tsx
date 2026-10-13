@@ -4,6 +4,7 @@ import { COVERAGE_STATEMENT, TIER_META, type CoverageCounts, type CoverageTier, 
 import { PREDICATE_LABEL } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
 import { EvidenceTierChip } from "@/components/EvidenceTierChip";
+import { JourneySections } from "@/components/JourneySections";
 
 /** Distinct fill + border style per tier, so depth reads without colour and never looks equal. */
 const TIER_STYLE: Record<CoverageTier, string> = {
@@ -228,13 +229,15 @@ export function PartialDiseaseView({ result }: { result: PartialDiseaseResult })
         <div role="note" className="mt-4 rounded-xl border border-dashed border-unknown bg-unknown-bg px-4 py-3 text-sm text-ink">
           <strong>{result.banner}</strong>
           <span className="mt-1 block text-xs text-muted">
-            Only analyst-reviewed relationships are shown. There is no research-connection ranking, reuse classification or score for this disease.
+            Only reviewed relationships are shown. The ranking and brief below are built by fixed rules from those relationships alone; no hand-curated brief exists for this disease yet.
           </span>
         </div>
         <div className="mt-4">
           <DepthChecklist d={d} />
         </div>
       </div>
+
+      <JourneySections journey={result.journey} nodes={result.nodes} edges={result.edges} focusLabel={d.label} coveredEdgeIds={d.reviewed_edge_ids} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Block title="Associated gene" empty="No causal-gene relationship has been reviewed for this disease in the current graph.">
@@ -317,8 +320,8 @@ export function PartialDiseaseView({ result }: { result: PartialDiseaseResult })
       <section className="rounded-2xl border border-line bg-canvas p-5 text-sm">
         <h2 className="text-xs font-bold uppercase tracking-wide text-muted">Not available for this disease yet</h2>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
-          <li>Research Action Brief (requires reviewed evidence for every recommended step)</li>
-          <li>Ranked research connections and reusable-asset opportunities</li>
+          <li>A hand-curated Research Action Brief (the brief above is assembled by a fixed template)</li>
+          <li>Reuse classification of individual research assets</li>
           {d.unreviewed_ai_edge_count > 0 && (
             <li>
               {d.unreviewed_ai_edge_count} OpenAI-extracted relationship{d.unreviewed_ai_edge_count === 1 ? "" : "s"} involving this disease {d.unreviewed_ai_edge_count === 1 ? "is" : "are"} quote-verified but not

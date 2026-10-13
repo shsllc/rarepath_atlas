@@ -7,6 +7,7 @@ import { OpenAIEntityReconcilerImpl } from "./openai/entity-reconciler";
 import { OpenAIPathExplainerImpl } from "./openai/path-explainer";
 import { getOpenAI } from "./openai/client";
 import { MultiProviderDiscoveryService } from "@/lib/discovery";
+import { reviewedGraph } from "@/lib/review/graph";
 
 /**
  * Single wiring point. Loads the verified real bundle by default
@@ -24,7 +25,9 @@ function build() {
     graph,
     finder,
     discovery,
-    search: new GraphSearchService(graph, finder, discovery),
+    search: new GraphSearchService(graph, finder, discovery, () => reviewedGraph(graph)),
+    /** Bundle + queue-accepted edges. */
+    reviewedGraph: () => reviewedGraph(graph),
     ai: {
       configured: () => getOpenAI() !== null,
       extractor: new OpenAIEvidenceExtractorImpl(),

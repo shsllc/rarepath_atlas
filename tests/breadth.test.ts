@@ -1,3 +1,4 @@
+import { isReviewedEvidenceEdge } from "@/lib/graph-view";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -92,22 +93,30 @@ describe("search for non-CDD diseases", () => {
     }
   });
 
-  it("returns only reviewed edges, all referenced by the coverage", async () => {
+  it("returns only reviewed edges, each referenced by the coverage or the journey", async () => {
     for (const q of ["Rett syndrome", "FOXG1 disorder", "MECP2 duplication syndrome"]) {
       const r = await search.search(q);
       if (!("partial" in r)) throw new Error("expected partial");
       expect(r.edges.length).toBeGreaterThan(0);
-      for (const e of r.edges) expect(isUnreviewedAiEdge(e), e.id).toBe(false);
-      expect(r.edges.map((e) => e.id).sort()).toEqual([...r.coverage.reviewed_edge_ids].sort());
+      for (const e of r.edges) expect(isReviewedEvidenceEdge(e), e.id).toBe(true);
+      const ids = new Set(r.edges.map((e) => e.id));
+      for (const id of r.coverage.reviewed_edge_ids) expect(ids.has(id), id).toBe(true);
+      const referenced = new Set([
+        ...r.coverage.reviewed_edge_ids,
+        ...r.journey.facts.map((f) => f.edge_id),
+        ...r.journey.ranked.flatMap((x) => [...x.factors, ...x.cautions].flatMap((f) => f.evidence_edge_ids)),
+      ]);
+      for (const id of ids) expect(referenced.has(id), id).toBe(true);
     }
   });
 
-  it("partial entries carry no numeric score", async () => {
+  it("partial-coverage journeys rank and brief from reviewed edges only, never the curated CDD brief", async () => {
     const r = await search.search("Rett syndrome");
-    const keys = JSON.stringify(r).match(/"[a-z_]*(score|strength|rank)[a-z_]*":/gi) ?? [];
-    expect(keys).toEqual([]);
-    const ui = src("src/components/CoverageSections.tsx");
-    expect(ui).not.toMatch(/rankResearchConnections|opportunityDetails|Research Connection Strength/);
+    if (!("partial" in r)) throw new Error("expected partial");
+    const edges = new Map(r.edges.map((e) => [e.id, e]));
+    for (const x of r.journey.ranked) for (const f of x.factors) for (const id of f.evidence_edge_ids) expect(isReviewedEvidenceEdge(edges.get(id)!), id).toBe(true);
+    if (r.journey.brief) for (const id of r.journey.brief.edge_ids) expect(edges.has(id), id).toBe(true);
+    expect(JSON.stringify(r)).not.toMatch(/"action_brief":/);
   });
 
   it("CDD searches still return the full journey with its brief", async () => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { DiseaseCoverage } from "@/lib/coverage";
 import type { DiscoveryPreview } from "@/lib/discovery";
+import type { DiseaseJourney } from "@/lib/journey";
 import { GraphNode } from "./entities";
 import { SourceRecord } from "./sources";
 import { Confidence, EvidenceEdge, EvidenceStatus } from "./evidence";
@@ -204,8 +205,14 @@ export type PartialDiseaseResult = {
   matched: { node_id: string; label: string; type: string; via?: "label" | "alias" | "identifier"; matched_text?: string };
   banner: string;
   coverage: DiseaseCoverage;
-  /** Reviewed edges referenced by `coverage` (no OpenAI-only extractions). */
+  /** Reviewed edges referenced by `coverage` and `journey` (no OpenAI-only extractions). */
   edges: EvidenceEdge[];
+  /** Nodes referenced by `edges` and the ranking. */
+  nodes: GraphNode[];
+  /** Ranking, counter-evidence and generated brief, all from reviewed edges only. */
+  journey: DiseaseJourney;
+  /** Machine-assembled discovery for the same disease, shown separately and never counted. */
+  preview?: DiscoveryPreview;
   full_journey: { label: string; query: string };
 };
 

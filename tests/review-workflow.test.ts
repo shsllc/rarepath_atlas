@@ -9,6 +9,10 @@ import { decide, getItem, listAudit, listItems, propose, recordToNode, reviewedO
 import { sameOrigin } from "@/lib/review/http";
 import { isReviewedEvidenceEdge } from "@/lib/graph-view";
 import { MemoryStore, setStore } from "@/lib/store";
+import { clearReviewedGraphCache, reviewedGraph } from "@/lib/review/graph";
+import { GraphSearchService } from "@/lib/services/search-service";
+import { CuratedReusableAssetFinder } from "@/lib/services/reusable-asset-finder";
+import { buildJourney } from "@/lib/journey";
 import { researchRouter } from "./fixtures/research-http";
 
 const KEY = "test-access-key-not-a-secret";
@@ -25,7 +29,10 @@ afterAll(() => {
   for (const [k, v] of Object.entries(env)) if (v === undefined) delete process.env[k];
   else process.env[k] = v;
 });
-beforeEach(() => setStore(new MemoryStore()));
+beforeEach(() => {
+  setStore(new MemoryStore());
+  clearReviewedGraphCache();
+});
 afterEach(() => {
   setStore(null);
   setResearchFetch(null);
@@ -148,5 +155,43 @@ describe("review queue", () => {
     const forged = { ...c, id: "edge:rev:forged", review_status: "reviewed" as const, eligible_for_ranking: true as const, eligible_for_action: true as const };
     expect(isReviewedEvidenceEdge(forged as never)).toBe(false);
     expect(isReviewedEvidenceEdge({ ...forged, id: "edge:x:1" } as never)).toBe(false);
+  });
+});
+
+describe("reviewed journeys", () => {
+  it("an accepted claim gives its disease a reviewed journey, with discovery kept separate", async () => {
+    const p = await preview();
+    const l = promotable(p);
+    const { item } = await propose(p, l.key, ada);
+    const base = JsonGraphService.fromFile(REAL_BUNDLE);
+    await decide(item.id, ada, { outcome: "supports", confidence: "high", note: "Checked.", source_checked: true }, base.bundle().nodes);
+
+    setResearchFetch(researchRouter({}));
+    const discovery = new MultiProviderDiscoveryService({ now: () => new Date("2026-10-04T12:00:00Z") });
+    const search = new GraphSearchService(base, new CuratedReusableAssetFinder(base), discovery, () => reviewedGraph(base));
+    const r = await search.search("Dravet syndrome");
+    if (!("partial" in r)) throw new Error(`expected a reviewed journey, got ${JSON.stringify(Object.keys(r))}`);
+    expect(r.journey.facts.map((f) => f.edge_id)).toContain(`edge:rev:${item.id}`);
+    expect(r.journey.facts[0].review?.by_name).toBe("Ada Reviewer");
+    expect(r.preview?.disease.label).toBeTruthy();
+    for (const e of r.edges) expect(isReviewedEvidenceEdge(e), e.id).toBe(true);
+
+    await revoke(item.id, ada, "Withdrawn for test.");
+    const after = await search.search("Dravet syndrome");
+    expect("partial" in after).toBe(false);
+  });
+
+  it("the generated brief cites only reviewed edges and never claims a shared mechanism or treatment", () => {
+    const b = JsonGraphService.fromFile(REAL_BUNDLE).bundle();
+    const rett = b.nodes.find((n) => n.type === "Disease" && /rett/i.test(n.label) && n.id !== b.focus_disease_id)!;
+    const j = buildJourney(b, rett.id);
+    const edges = new Map(b.edges.map((e) => [e.id, e]));
+    for (const x of j.ranked) for (const f of x.factors) for (const id of f.evidence_edge_ids) expect(isReviewedEvidenceEdge(edges.get(id)!)).toBe(true);
+    if (j.brief) {
+      expect(j.brief.does_not_mean.join(" ")).toMatch(/not shown to be the same disease/);
+      expect(j.brief.does_not_mean.join(" ")).toMatch(/No treatment/);
+      expect(j.brief.bring_sources.length).toBeGreaterThan(0);
+      for (const id of j.brief.edge_ids) expect(isReviewedEvidenceEdge(edges.get(id)!)).toBe(true);
+    } else expect(j.brief_blocker).toBeTruthy();
   });
 });

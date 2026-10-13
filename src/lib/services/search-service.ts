@@ -1,6 +1,7 @@
 import { deriveEvidenceStatus, type EvidenceCoverage, type GraphNode, type SearchResponse } from "@/lib/schemas";
 import { diseaseCoverage, PARTIAL_BANNER } from "@/lib/coverage";
-import type { DiscoveryService } from "@/lib/discovery";
+import type { DiscoveryPreview, DiscoveryService } from "@/lib/discovery";
+import { buildJourney } from "@/lib/journey";
 import type { GraphService, ReusableAssetFinder, SearchService } from "./interfaces";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -12,26 +13,30 @@ export class GraphSearchService implements SearchService {
     private readonly finder: ReusableAssetFinder,
     /** Optional machine-assembled discovery layer, consulted only when the reviewed graph has no match. */
     private readonly discovery?: DiscoveryService,
+    /** The live reviewed graph (bundle + queue-accepted edges). Defaults to the bundle alone. */
+    private readonly graphSource?: () => Promise<GraphService>,
   ) {}
 
   /** Disease, its causal genes, and those genes' mechanisms route to the disease page. */
-  private focusFor(node: GraphNode): GraphNode | undefined {
+  private focusFor(node: GraphNode, graph: GraphService): GraphNode | undefined {
     if (node.type === "Disease") return node;
     if (node.type === "Gene") {
-      return this.graph.neighbors(node.id, ["caused_by_variant_in"]).find((x) => x.node.type === "Disease")?.node;
+      return graph.neighbors(node.id, ["caused_by_variant_in"]).find((x) => x.node.type === "Disease")?.node;
     }
     if (node.type === "Mechanism") {
-      const gene = this.graph.neighbors(node.id, ["involves_mechanism"]).find((x) => x.node.type === "Gene" && x.edge.object_id === node.id);
-      return gene ? this.focusFor(gene.node) : undefined;
+      const gene = graph.neighbors(node.id, ["involves_mechanism"]).find((x) => x.node.type === "Gene" && x.edge.object_id === node.id);
+      return gene ? this.focusFor(gene.node, graph) : undefined;
     }
     return undefined;
   }
 
-  async search(query: string): Promise<SearchResponse> {
-    const b = this.graph.bundle();
-    const focusLabel = this.graph.getNode(b.focus_disease_id)?.label ?? "the seeded disease";
-    const resolved = this.graph.resolveDetailed?.(query);
-    const matched = resolved?.node ?? this.graph.resolve(query);
+  /** `preview` is passed through when a discovery result resolved to a disease the reviewed graph holds. */
+  async search(query: string, preview?: DiscoveryPreview): Promise<SearchResponse> {
+    const graph = (await this.graphSource?.()) ?? this.graph;
+    const b = graph.bundle();
+    const focusLabel = graph.getNode(b.focus_disease_id)?.label ?? "the seeded disease";
+    const resolved = graph.resolveDetailed?.(query);
+    const matched = resolved?.node ?? graph.resolve(query);
 
     if (!matched) {
       if (this.discovery) {
@@ -39,7 +44,7 @@ export class GraphSearchService implements SearchService {
         if (outcome.kind === "preview") {
           // Reviewed wins: if the API resolves to a disease the reviewed graph already holds, show the reviewed view.
           const reviewedTwin = b.nodes.find((n) => n.type === "Disease" && n.external_ids.some((x) => x.id === outcome.preview.disease.id));
-          if (reviewedTwin && norm(reviewedTwin.label) !== norm(query)) return this.search(reviewedTwin.label);
+          if (reviewedTwin && norm(reviewedTwin.label) !== norm(query)) return this.search(reviewedTwin.label, outcome.preview);
           return { query, found: false, discovery: true, preview: outcome.preview, full_journey: { label: focusLabel, query: "CDKL5" } };
         }
         if (outcome.kind === "unavailable") {
@@ -55,7 +60,7 @@ export class GraphSearchService implements SearchService {
     }
 
     if (matched.type === "Phenotype") {
-      const diseases = this.graph.neighbors(matched.id, ["has_phenotype"]).map((x) => x.node.label);
+      const diseases = graph.neighbors(matched.id, ["has_phenotype"]).map((x) => x.node.label);
       return {
         query,
         found: false,
@@ -64,12 +69,24 @@ export class GraphSearchService implements SearchService {
       };
     }
 
-    const focus = this.focusFor(matched);
+    const focus = this.focusFor(matched, graph);
     // Other supported diseases resolve to their reviewed coverage only: never the focus journey's brief or ranking.
     if (focus && focus.id !== b.focus_disease_id) {
       const coverage = diseaseCoverage(b).find((d) => d.node_id === focus.id);
       if (coverage) {
-        const ids = new Set(coverage.reviewed_edge_ids);
+        // Diseases introduced by the review queue also keep their machine-assembled discovery view.
+        if (!preview && focus.id.startsWith("rv:") && this.discovery) {
+          const outcome = await this.discovery.preview(focus.label);
+          if (outcome.kind === "preview") preview = outcome.preview;
+        }
+        const journey = buildJourney(b, focus.id);
+        const ids = new Set([
+          ...coverage.reviewed_edge_ids,
+          ...journey.facts.map((f) => f.edge_id),
+          ...journey.ranked.flatMap((r) => [...r.factors, ...r.cautions].flatMap((f) => f.evidence_edge_ids)),
+        ]);
+        const edges = b.edges.filter((e) => ids.has(e.id));
+        const nodeIds = new Set([focus.id, ...edges.flatMap((e) => [e.subject_id, e.object_id]), ...journey.ranked.map((r) => r.disease_id)]);
         return {
           query,
           found: false,
@@ -77,7 +94,10 @@ export class GraphSearchService implements SearchService {
           matched: { node_id: matched.id, label: matched.label, type: matched.type, via: resolved?.via, matched_text: resolved?.matched_text },
           banner: PARTIAL_BANNER,
           coverage,
-          edges: b.edges.filter((e) => ids.has(e.id)),
+          edges,
+          nodes: b.nodes.filter((n) => nodeIds.has(n.id)),
+          journey,
+          preview,
           full_journey: { label: focusLabel, query: "CDKL5" },
         };
       }
@@ -91,9 +111,9 @@ export class GraphSearchService implements SearchService {
       };
     }
 
-    const genes = this.graph.neighbors(focus.id, ["caused_by_variant_in"]).map((x) => x.node);
-    const mechanisms = genes.flatMap((g) => this.graph.neighbors(g.id, ["involves_mechanism"]).filter((x) => x.edge.subject_id === g.id).map((x) => x.node));
-    const phenotypes = this.graph.neighbors(focus.id, ["has_phenotype"]).map((x) => x.node);
+    const genes = graph.neighbors(focus.id, ["caused_by_variant_in"]).map((x) => x.node);
+    const mechanisms = genes.flatMap((g) => graph.neighbors(g.id, ["involves_mechanism"]).filter((x) => x.edge.subject_id === g.id).map((x) => x.node));
+    const phenotypes = graph.neighbors(focus.id, ["has_phenotype"]).map((x) => x.node);
     const orgs = b.nodes.filter((n) => n.type === "PatientOrganization");
     const researchers = b.nodes.filter((n) => n.type === "Researcher");
     const studies = b.nodes.filter((n) => n.type === "Study");
