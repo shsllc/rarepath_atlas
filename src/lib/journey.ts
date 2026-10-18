@@ -24,7 +24,7 @@ export interface JourneyFact {
   source_url: string;
   quote: string;
   /** Present for queue-reviewed edges. */
-  review?: { by_name: string; at: string; note: string };
+  review?: { by_name: string; by_org?: string; at: string; note: string };
 }
 
 export interface GeneratedBrief {
@@ -87,7 +87,7 @@ export function buildJourney(bundle: Pick<GraphBundle, "nodes" | "edges">, disea
           source: e.source,
           source_url: e.source_url,
           quote: e.quoted_or_structured_evidence,
-          review: e.review ? { by_name: e.review.by_name, at: e.review.at, note: e.review.note } : undefined,
+          review: e.review ? { by_name: e.review.by_name, by_org: e.review.by_org, at: e.review.at, note: e.review.note } : undefined,
         } satisfies JourneyFact,
       ];
     });

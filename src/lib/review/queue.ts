@@ -30,7 +30,7 @@ export interface ReviewItem {
   candidate_edge: EvidenceEdge;
   records: ResearchRecord[];
   status: ReviewStatus;
-  decision?: { by: string; by_name: string; at: string; outcome: ReviewOutcome; confidence?: Confidence; note: string; source_checked: boolean };
+  decision?: { by: string; by_name: string; by_org?: string; at: string; outcome: ReviewOutcome; confidence?: Confidence; note: string; source_checked: boolean };
   revoked?: { by: string; by_name: string; at: string; note: string };
 }
 
@@ -199,7 +199,7 @@ export async function decide(id: string, by: Reviewer, d: Decision, bundleNodes:
   if ((d.outcome === "rejected" || d.outcome === "contradicts" || d.outcome === "qualifies") && note.length < 5) throw new ReviewError("A note is required when rejecting, qualifying or recording a contradiction.");
   if (d.outcome !== "rejected" && !["high", "moderate", "low"].includes(d.confidence ?? "")) throw new ReviewError("Choose a confidence level.");
   const at = now.toISOString();
-  item.decision = { by: by.id, by_name: by.name, at, outcome: d.outcome, confidence: d.outcome === "rejected" ? undefined : d.confidence, note, source_checked: d.source_checked };
+  item.decision = { by: by.id, by_name: by.name, by_org: by.org?.name, at, outcome: d.outcome, confidence: d.outcome === "rejected" ? undefined : d.confidence, note, source_checked: d.source_checked };
 
   if (d.outcome === "rejected") {
     item.status = "rejected";
@@ -232,7 +232,7 @@ export async function decide(id: string, by: Reviewer, d: Decision, bundleNodes:
       review_status: "reviewed",
       eligible_for_ranking: true,
       eligible_for_action: true,
-      review: { by: by.id, by_name: by.name, at, item_id: item.id, outcome: d.outcome, note, source_checked: true },
+      review: { by: by.id, by_name: by.name, by_org: by.org?.name, at, item_id: item.id, outcome: d.outcome, note, source_checked: true },
     };
     for (const n of [subj, obj]) if (n.id.startsWith("rv:")) await getStore().set(K.node(n.id), n);
     await getStore().set(K.edge(item.id), edge);

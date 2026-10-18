@@ -126,6 +126,8 @@ export const EvidenceEdge = z.object({
     .object({
       by: z.string(),
       by_name: z.string(),
+      /** The organisation the reviewer reviewed for, shown next to their name. */
+      by_org: z.string().optional(),
       at: z.string(),
       item_id: z.string(),
       outcome: z.enum(["supports", "qualifies", "contradicts"]),

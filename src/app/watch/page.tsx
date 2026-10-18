@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { cookies, headers } from "next/headers";
-import { feedToken, listWatches, MAX_WATCHES, validKey, WATCH_COOKIE } from "@/lib/watch";
+import { headers } from "next/headers";
+import { watchKey } from "@/lib/watch/key";
+import { feedToken, listWatches, MAX_WATCHES } from "@/lib/watch";
 import { CopyField, ForgetButton, WatchRow } from "@/components/watch/WatchControls";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Watchlist · RarePath Atlas", robots: { index: false } };
 
 export default async function WatchPage() {
-  const key = (await cookies()).get(WATCH_COOKIE)?.value;
-  const watches = validKey(key) ? await listWatches(key) : [];
+  const { key, account } = await watchKey();
+  const watches = key ? await listWatches(key) : [];
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
   return (
@@ -16,8 +17,9 @@ export default async function WatchPage() {
       <div>
         <h1 className="text-xl font-bold">Your watchlist</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
-          Watch up to {MAX_WATCHES} searches and see what has appeared since you last looked: reviewed relationships, papers, preprints, clinical studies and NIH-funded projects. No account is needed. The list is tied to this browser by a private
-          cookie, and RarePath stores no name, email or IP address with it.
+          Watch up to {MAX_WATCHES} searches and see what has appeared since you last looked: reviewed relationships, papers, preprints, clinical studies and NIH-funded projects. {account
+            ? "Signed in: this list follows your account on every device."
+            : "No account is needed. The list is tied to this browser by a private cookie, and nothing that identifies you is stored with it. Sign in to keep it on every device."}
         </p>
       </div>
       {watches.length === 0 ? (

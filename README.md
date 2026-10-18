@@ -175,6 +175,17 @@ Any search can be watched from the results page (up to 10 per browser), with no 
 - **Share:** "Share brief" stores a frozen copy at `/share/<id>` (unguessable id, not indexed), labelled with its date and linked to the live page.
 - **Citations:** BibTeX and RIS (`/api/export/citations?q=…&format=bibtex|ris`). Reviewed sources come first; discovery papers are tagged "machine-assembled discovery, not reviewed" and preprints "not peer reviewed".
 
+## Accounts
+
+Optional accounts for reviewers, organisations and individuals, backed by AWS (see [infra/README.md](infra/README.md)).
+
+- **Sign-in:** email and password through Amazon Cognito, with email verification and password reset. Sessions are HttpOnly cookies, refreshed by middleware; ID tokens are verified with `aws-jwt-verify`.
+- **Organisations:** owners invite members, reviewers and admins with single-use, email-bound links (14 days). The last owner cannot leave.
+- **Reviewing:** platform curators (Cognito group `curators`) and organisation reviewers, admins and owners. Decisions show the reviewer's name and organisation. Without accounts configured, the legacy `REVIEWERS` keys still work for local development.
+- **Watchlists:** follow the account across devices when signed in.
+- **Usage:** live discovery searches are counted per account per day (kept 40 days) to set fair limits later. Nothing is limited yet.
+- **Data rights:** account deletion removes the Cognito user, profile, memberships and usage. The privacy notice is at `/privacy`.
+
 ## Deploy
 
 Deployed on **Netlify** from `shsllc/rarepath_atlas` (`main`). Netlify auto-detects Next.js, and the build command is `next build`.

@@ -12,6 +12,10 @@ import crypto from "node:crypto";
 export interface Reviewer {
   id: string;
   name: string;
+  /** Organisation the reviewer acts for (account-based reviewers only). */
+  org?: { id: string; name: string };
+  /** Platform curator (Cognito group "curators"). */
+  curator?: boolean;
 }
 export const SESSION_COOKIE = "rp_review";
 const SESSION_HOURS = 12;

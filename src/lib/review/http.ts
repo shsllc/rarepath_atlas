@@ -3,9 +3,20 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { readSession, SESSION_COOKIE, type Reviewer } from "./auth";
 import { ReviewError } from "./queue";
+import { reviewerFromAccount } from "./roles";
+import { accountsEnabled, currentUser } from "@/lib/auth/session";
+import { getMe } from "@/lib/auth/api";
 
-/** Current reviewer from the signed session cookie, or null. */
+/**
+ * Current reviewer. With accounts configured: a signed-in curator or organisation reviewer.
+ * Otherwise the legacy shared-key session (REVIEWERS / SESSION_SECRET), kept for local development.
+ */
 export async function currentReviewer(): Promise<Reviewer | null> {
+  if (accountsEnabled()) {
+    const user = await currentUser();
+    if (!user) return null;
+    return reviewerFromAccount(user, await getMe());
+  }
   return readSession((await cookies()).get(SESSION_COOKIE)?.value);
 }
 

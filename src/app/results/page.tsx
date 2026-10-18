@@ -6,8 +6,11 @@ import { DiscoveryPreviewView } from "@/components/DiscoveryPreview";
 import { getServices } from "@/lib/services/registry";
 import { currentReviewer } from "@/lib/review/http";
 import { ProposePanel } from "@/components/review/ProposePanel";
-import { cookies } from "next/headers";
-import { getWatch, validKey, WATCH_COOKIE } from "@/lib/watch";
+import { after } from "next/server";
+import { accountsApi } from "@/lib/auth/api";
+import { accountsEnabled, currentUser, idToken } from "@/lib/auth/session";
+import { getWatch } from "@/lib/watch";
+import { watchKey } from "@/lib/watch/key";
 import { WatchButton } from "@/components/watch/WatchControls";
 import { ExportBar } from "@/components/ExportBar";
 import { briefDocFrom } from "@/lib/export/brief-doc";
@@ -18,9 +21,14 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
   const [result, reviewer] = await Promise.all([q ? getServices().search.search(q) : null, currentReviewer()]);
-  const watchKey = (await cookies()).get(WATCH_COOKIE)?.value;
+  const { key: wKey } = await watchKey();
   const watchable = !!result && ("discovery" in result || "partial" in result || result.found);
-  const watched = watchable && validKey(watchKey) ? !!(await getWatch(watchKey, q)) : false;
+  const watched = watchable && wKey ? !!(await getWatch(wKey, q)) : false;
+  // Count live discovery searches for signed-in accounts (measured before any limits are set).
+  if (result && "discovery" in result && accountsEnabled() && (await currentUser())) {
+    const bearer = await idToken();
+    after(() => accountsApi("POST", "/usage", { unit: "discovery_search" }, bearer).catch(() => {}));
+  }
 
   return (
     <div>

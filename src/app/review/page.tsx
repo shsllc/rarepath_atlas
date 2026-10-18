@@ -3,6 +3,7 @@ import { reviewEnabled } from "@/lib/review/auth";
 import { currentReviewer } from "@/lib/review/http";
 import { listItems, type ReviewStatus } from "@/lib/review/queue";
 import { LoginForm, LogoutButton } from "@/components/review/ReviewActions";
+import { accountsEnabled, currentUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Review queue · RarePath Atlas", robots: { index: false } };
@@ -10,7 +11,8 @@ export const metadata = { title: "Review queue · RarePath Atlas", robots: { ind
 const TABS: ReviewStatus[] = ["pending", "accepted", "rejected", "revoked"];
 
 export default async function ReviewPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  if (!reviewEnabled())
+  const accounts = accountsEnabled();
+  if (!accounts && !reviewEnabled())
     return (
       <div className="rounded-2xl border border-line bg-white p-6">
         <h1 className="text-xl font-bold">Review queue</h1>
@@ -18,6 +20,24 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
       </div>
     );
   const reviewer = await currentReviewer();
+  if (!reviewer && accounts) {
+    const signedIn = !!(await currentUser());
+    return (
+      <div className="rounded-2xl border border-line bg-white p-6">
+        <h1 className="text-xl font-bold">Review queue</h1>
+        <p className="mb-4 mt-2 text-sm text-muted">
+          {signedIn
+            ? "Reviewing is open to platform curators and to reviewers, admins and owners of an organisation. Ask your organisation's owner to give you the reviewer role."
+            : "Reviewers check machine-assembled relationships against their sources before anything enters the reviewed graph. Sign in to continue."}
+        </p>
+        {!signedIn && (
+          <Link href="/account/sign-in?next=/review" className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white">
+            Sign in
+          </Link>
+        )}
+      </div>
+    );
+  }
   if (!reviewer)
     return (
       <div className="rounded-2xl border border-line bg-white p-6">
@@ -34,13 +54,17 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold">Review queue</h1>
-          <p className="text-sm text-muted">Signed in as {reviewer.name}. Send relationships here from any search&apos;s discovery preview.</p>
+          <p className="text-sm text-muted">
+            Signed in as {reviewer.name}
+            {reviewer.org ? `, reviewing for ${reviewer.org.name}` : ""}
+            {reviewer.curator ? " (platform curator)" : ""}. Send relationships here from any search&apos;s discovery preview.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/review/audit" className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold">
             Audit log
           </Link>
-          <LogoutButton />
+          {!accounts && <LogoutButton />}
         </div>
       </div>
       <nav className="flex gap-2 text-sm" aria-label="Status">

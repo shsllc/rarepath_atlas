@@ -85,7 +85,8 @@ export default async function ReviewItemPage({ params }: { params: Promise<{ id:
           <h2 className="font-bold">Decision</h2>
           <p className="mt-1">
             <strong className="capitalize">{item.decision.outcome}</strong>
-            {item.decision.confidence && ` · ${item.decision.confidence} confidence`} · {item.decision.by_name} · {when(item.decision.at)}
+            {item.decision.confidence && ` · ${item.decision.confidence} confidence`} · {item.decision.by_name}
+            {item.decision.by_org ? ` (${item.decision.by_org})` : ""} · {when(item.decision.at)}
           </p>
           {item.decision.note && <p className="mt-2 whitespace-pre-wrap">{item.decision.note}</p>}
           {item.revoked && (

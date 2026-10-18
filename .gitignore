@@ -24,3 +24,7 @@ submission-media/build/
 
 # local persistence (review queue, watchlists)
 data/.store/
+
+# CDK
+infra/cdk.out/
+infra/node_modules/

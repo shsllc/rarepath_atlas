@@ -56,7 +56,8 @@ function Fact({ f, focus, open }: { f: JourneyFact; focus: string; open: Open })
       </span>
       {f.review && (
         <span className="mt-1 block text-[11px] text-muted">
-          Reviewed by {f.review.by_name} on {f.review.at.slice(0, 10)}
+          Reviewed by {f.review.by_name}
+          {f.review.by_org ? ` (${f.review.by_org})` : ""} on {f.review.at.slice(0, 10)}
           {f.review.note && <>: {f.review.note}</>}
         </span>
       )}

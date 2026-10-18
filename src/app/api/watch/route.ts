@@ -1,9 +1,9 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { sameOrigin } from "@/lib/review/http";
 import { getServices } from "@/lib/services/registry";
 import { addWatch, diff, forgetAll, getWatch, markSeen, newWatchKey, registerFeed, removeWatch, snapshotOf, validKey, WATCH_COOKIE, WatchError } from "@/lib/watch";
 import { allow } from "@/lib/watch/limit";
+import { watchKey } from "@/lib/watch/key";
 
 const cookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: 365 * 24 * 3600 };
 
@@ -27,9 +27,9 @@ export async function POST(req: Request) {
     }
     const action = String(body.action ?? "");
     const query = String(body.query ?? "").trim().slice(0, 120);
-    const jar = await cookies();
-    let key = jar.get(WATCH_COOKIE)?.value;
-    const fresh = !validKey(key);
+    const resolved = await watchKey();
+    let key = resolved.key;
+    const fresh = !resolved.account && !validKey(key);
     if (action === "add" && fresh) key = newWatchKey();
     if (!validKey(key)) throw new WatchError("This browser has no watchlist yet.", 404);
     if (!allow(`watch:${key}`, 20)) throw new WatchError("Too many requests. Try again in a minute.", 429);
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         throw new WatchError("Unknown action.");
     }
     const res = NextResponse.json(payload);
-    if (action === "forget") res.cookies.set(WATCH_COOKIE, "", { ...cookieOptions, maxAge: 0 });
+    if (action === "forget" && !resolved.account) res.cookies.set(WATCH_COOKIE, "", { ...cookieOptions, maxAge: 0 });
     else if (fresh) res.cookies.set(WATCH_COOKIE, key, cookieOptions);
     return res;
   } catch (e) {
