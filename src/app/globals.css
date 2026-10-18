@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
+/* Fonts come from next/font (self-hosted at build): Atkinson Hyperlegible for reading (designed for
+   low-vision legibility), Bricolage Grotesque for display, JetBrains Mono for identifiers and numbers. */
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Brand palette */
   --color-brand: #4f46a5;
@@ -10,13 +17,19 @@
   --color-ink: #182033;
   --color-muted: #4f5873; /* ≥ 6:1 on canvas and surface */
   --color-line: #e2e0ee;
-  --color-canvas: #f5f4fa;
+  --color-canvas: #f7f6f9;
   --color-teal: #168c84;
   --color-teal-wash: #e4f3f1;
   --color-rose: #b84a62;
   --color-rose-wash: #f8e9ed;
   --color-amber: #c47a20;
   --color-amber-wash: #fbf1e3;
+  /* Warm accent for the family path and primary calls to action (white text passes 4.5:1). */
+  --color-coral: #c4513b;
+  --color-coral-deep: #a7412e;
+  --color-coral-wash: #fbebe6;
+  --color-sage-wash: #e6f1ea;
+  --color-surface: #ffffff;
 
   /* Evidence status palette. Text tones are darkened where needed for 4.5:1 contrast.
      Always paired with an icon, a text label and a border/line style — never color alone. */
