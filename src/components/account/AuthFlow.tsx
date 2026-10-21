@@ -28,12 +28,12 @@ const TITLE: Record<Step, string> = {
 export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?: Step; next?: string }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initial);
-  const [email, setEmail] = useState("");
+  const [emailState, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [passwordState, setPassword] = useState("");
+  const [confirmState, setConfirm] = useState("");
   const [show, setShow] = useState(false);
-  const [code, setCode] = useState("");
+  const [codeState, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const [notice, setNotice] = useState<string>();
@@ -50,7 +50,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
     setCode("");
   };
 
-  async function signInNow(pw: string, fallback: string) {
+  async function signInNow(email: string, pw: string, fallback: string) {
     const r = await post({ action: "sign-in", email, password: pw });
     if (r.ok) {
       router.push(safeNext);
@@ -61,10 +61,20 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
     go("sign-in", fallback);
   }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setError(undefined);
+    // Send exactly what is in the boxes now. A browser can fill a field without telling the page,
+    // so the component's own copy is not trusted for credentials.
+    const f = new FormData(e.currentTarget);
+    const val = (k: string, cur: string) => (f.has(k) ? String(f.get(k) ?? "") : cur);
+    const email = val("email", emailState);
+    const password = val("password", passwordState);
+    const confirm = val("confirm", confirmState);
+    const code = val("code", codeState).replace(/\D/g, "");
+    if (email !== emailState) setEmail(email);
+    if (password !== passwordState) setPassword(password);
     if ((step === "sign-up" || step === "reset") && password !== confirm) {
       setBusy(false);
       return setError("The two passwords do not match. Use Show to check what was typed or filled in.");
@@ -91,7 +101,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
     } else if (step === "verify") {
       r = await post({ action: "confirm", email, code });
       if (r.ok) {
-        if (password) return signInNow(password, "Email confirmed. Sign in to continue.");
+        if (password) return signInNow(email, password, "Email confirmed. Sign in to continue.");
         setBusy(false);
         return go("sign-in", "Email confirmed. Sign in to continue.");
       }
@@ -104,7 +114,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
     } else {
       r = await post({ action: "reset", email, code, password });
       // Sign straight in with the password just set, so it never has to be typed (or autofilled) twice.
-      if (r.ok) return signInNow(password, "Password changed. Sign in with your new password.");
+      if (r.ok) return signInNow(email, password, "Password changed. Sign in with your new password.");
     }
     setBusy(false);
     setError(r?.error);
@@ -133,11 +143,11 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
         {needsEmailInput ? (
           <label className={label} htmlFor="auth-email">
             Email
-            <input id="auth-email" className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+            <input id="auth-email" name="email" className={field} type="email" value={emailState} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
           </label>
         ) : (
           <p className="text-sm text-muted">
-            Email: <strong className="text-ink">{email}</strong>{" "}
+            Email: <strong className="text-ink">{emailState}</strong>{" "}
             <button type="button" className="text-brand underline" onClick={() => go(step === "verify" ? "sign-up" : "forgot")}>
               Change
             </button>
@@ -146,7 +156,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
         {(step === "verify" || step === "reset") && (
           <label className={label} htmlFor="auth-code">
             6-digit code
-            <input id="auth-code" className={`${field} tracking-[0.3em]`} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} autoComplete="one-time-code" required />
+            <input id="auth-code" name="code" className={`${field} tracking-[0.3em]`} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={codeState} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} autoComplete="one-time-code" required />
           </label>
         )}
         {(step === "sign-in" || step === "sign-up" || step === "reset") && (
@@ -155,9 +165,10 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
             <span className="relative block">
               <input
                 id="auth-password"
+                name="password"
                 className={`${field} pr-16`}
                 type={show ? "text" : "password"}
-                value={password}
+                value={passwordState}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={step === "sign-in" ? "current-password" : "new-password"}
                 minLength={step === "sign-in" ? undefined : 12}
@@ -179,7 +190,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
         {(step === "sign-up" || step === "reset") && (
           <label className={label} htmlFor="auth-confirm">
             Type it again
-            <input id="auth-confirm" className={field} type={show ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
+            <input id="auth-confirm" name="confirm" className={field} type={show ? "text" : "password"} value={confirmState} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
           </label>
         )}
         {error && (
@@ -221,7 +232,7 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
             <button
               className="text-brand hover:underline"
               onClick={async () => {
-                const r = await post({ action: "resend", email });
+                const r = await post({ action: "resend", email: emailState });
                 setNotice(r.ok ? "We sent a new code." : undefined);
                 setError(r.ok ? undefined : r.error);
               }}
