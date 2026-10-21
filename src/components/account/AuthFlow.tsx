@@ -31,24 +31,44 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [show, setShow] = useState(false);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const [notice, setNotice] = useState<string>();
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/account";
 
-  const go = (s: Step, msg?: string) => {
+  /** `keepPassword` carries the new password from sign-up into verification, so confirming signs you in. */
+  const go = (s: Step, msg?: string, keepPassword = false) => {
     setStep(s);
     setError(undefined);
     setNotice(msg);
-    setPassword("");
+    if (!keepPassword) setPassword("");
+    setConfirm("");
+    setShow(false);
     setCode("");
   };
+
+  async function signInNow(pw: string, fallback: string) {
+    const r = await post({ action: "sign-in", email, password: pw });
+    if (r.ok) {
+      router.push(safeNext);
+      router.refresh();
+      return;
+    }
+    setBusy(false);
+    go("sign-in", fallback);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(undefined);
+    if ((step === "sign-up" || step === "reset") && password !== confirm) {
+      setBusy(false);
+      return setError("The two passwords do not match. Use Show to check what was typed or filled in.");
+    }
     let r;
     if (step === "sign-in") {
       r = await post({ action: "sign-in", email, password });
@@ -66,11 +86,12 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
       r = await post({ action: "sign-up", email, password, name });
       if (r.ok) {
         setBusy(false);
-        return go("verify", `We sent a 6-digit code to ${email}.`);
+        return go("verify", `We sent a 6-digit code to ${email}.`, true);
       }
     } else if (step === "verify") {
       r = await post({ action: "confirm", email, code });
       if (r.ok) {
+        if (password) return signInNow(password, "Email confirmed. Sign in to continue.");
         setBusy(false);
         return go("sign-in", "Email confirmed. Sign in to continue.");
       }
@@ -82,10 +103,8 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
       }
     } else {
       r = await post({ action: "reset", email, code, password });
-      if (r.ok) {
-        setBusy(false);
-        return go("sign-in", "Password changed. Sign in with your new password.");
-      }
+      // Sign straight in with the password just set, so it never has to be typed (or autofilled) twice.
+      if (r.ok) return signInNow(password, "Password changed. Sign in with your new password.");
     }
     setBusy(false);
     setError(r?.error);
@@ -133,17 +152,34 @@ export function AuthFlow({ initial = "sign-in", next = "/account" }: { initial?:
         {(step === "sign-in" || step === "sign-up" || step === "reset") && (
           <label className={label} htmlFor="auth-password">
             {step === "reset" ? "New password" : "Password"}
-            <input
-              id="auth-password"
-              className={field}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={step === "sign-in" ? "current-password" : "new-password"}
-              minLength={step === "sign-in" ? undefined : 12}
-              required
-            />
-            {step !== "sign-in" && <span className="mt-1 block text-xs font-normal text-muted">At least 12 characters. A short sentence works well.</span>}
+            <span className="relative block">
+              <input
+                id="auth-password"
+                className={`${field} pr-16`}
+                type={show ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={step === "sign-in" ? "current-password" : "new-password"}
+                minLength={step === "sign-in" ? undefined : 12}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShow(!show)}
+                aria-pressed={show}
+                aria-controls="auth-password"
+                className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-semibold text-brand hover:bg-brand-wash"
+              >
+                {show ? "Hide" : "Show"}
+              </button>
+            </span>
+            {step !== "sign-in" && <span className="mt-1 block text-xs font-normal text-muted">At least 12 characters. A short sentence works well. If your browser offers to suggest a password, use Show to see it.</span>}
+          </label>
+        )}
+        {(step === "sign-up" || step === "reset") && (
+          <label className={label} htmlFor="auth-confirm">
+            Type it again
+            <input id="auth-confirm" className={field} type={show ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
           </label>
         )}
         {error && (

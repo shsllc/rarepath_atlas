@@ -72,6 +72,8 @@ async function call<T>(cfg: CognitoConfig, op: string, body: Record<string, unkn
   const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
     const type = String(json.__type ?? "").split("#").pop() ?? "";
+    // Cognito reports a temporary lockout as NotAuthorized with this message.
+    if (type === "NotAuthorizedException" && /attempts exceeded/i.test(String(json.message ?? ""))) throw new AuthError("Too many sign-in attempts. Wait 15 minutes, or reset your password.", "TooManyFailedAttemptsException", 429);
     const [message, status] = MESSAGES[type] ?? ["Something went wrong. Try again shortly.", 502];
     throw new AuthError(message, type || "unknown", status);
   }

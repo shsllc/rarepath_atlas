@@ -56,6 +56,13 @@ describe("Cognito client", () => {
     await expect(signIn(cfg, "a@b.org", "pw")).rejects.toThrow(/not supported/);
   });
 
+  it("a temporary lockout says so instead of blaming the password", async () => {
+    fake(() => [400, { __type: "NotAuthorizedException", message: "Password attempts exceeded" }]);
+    const e = await signIn(cfg, "a@b.org", "pw").catch((x) => x);
+    expect(e).toMatchObject({ status: 429, code: "TooManyFailedAttemptsException" });
+    expect(e.message).toMatch(/Wait 15 minutes/);
+  });
+
   it("network failures become a calm 503", async () => {
     setCognitoFetch(async () => {
       throw new TypeError("fetch failed");
