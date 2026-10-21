@@ -4,6 +4,9 @@ import { getServices } from "@/lib/services/registry";
 import { addWatch, diff, forgetAll, getWatch, markSeen, newWatchKey, registerFeed, removeWatch, snapshotOf, validKey, WATCH_COOKIE, WatchError } from "@/lib/watch";
 import { allow } from "@/lib/watch/limit";
 import { watchKey } from "@/lib/watch/key";
+import { setDigest } from "@/lib/watch/digest";
+import { currentUser } from "@/lib/auth/session";
+import { listWatches } from "@/lib/watch";
 
 const cookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: 365 * 24 * 3600 };
 
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
     if (!sameOrigin(req)) throw new WatchError("Cross-site request refused.", 403);
     const text = await req.text();
     if (text.length > 1_024) throw new WatchError("Request too large.", 413);
-    let body: { action?: string; query?: string };
+    let body: { action?: string; query?: string; enabled?: boolean };
     try {
       body = JSON.parse(text);
     } catch {
@@ -55,6 +58,18 @@ export async function POST(req: Request) {
       case "remove":
         await removeWatch(key, query);
         break;
+      case "digest": {
+        // Weekly email digests are for signed-in accounts only, sent to their own verified address.
+        const user = resolved.account ? await currentUser() : null;
+        if (!user) throw new WatchError("Sign in to get email digests.", 401);
+        try {
+          const rec = await setDigest(key, { sub: user.sub, email: user.email, emailVerified: user.emailVerified }, body.enabled === true, await listWatches(key));
+          payload = { ok: true, enabled: rec.enabled };
+        } catch (e) {
+          throw new WatchError((e as Error).message, 400);
+        }
+        break;
+      }
       case "forget":
         await forgetAll(key);
         break;

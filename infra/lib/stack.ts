@@ -9,10 +9,19 @@ import * as logs from "aws-cdk-lib/aws-logs";
 import { CorsHttpMethod, HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpJwtAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import * as events from "aws-cdk-lib/aws-events";
+import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
+import * as ses from "aws-cdk-lib/aws-ses";
 
 export interface BackendProps extends StackProps {
   /** Site origins allowed to call the API from a browser (the app calls it server-side today). */
   allowedOrigins: string[];
+  /** Public site the nightly job calls. */
+  siteUrl: string;
+  /** Domain verified in SES for sending digests, and the From address on it. */
+  mailDomain: string;
+  fromAddress: string;
 }
 
 /**
@@ -91,6 +100,30 @@ export class BackendStack extends Stack {
     const stage = api.defaultStage!.node.defaultChild as import("aws-cdk-lib/aws-apigatewayv2").CfnStage;
     stage.defaultRouteSettings = { throttlingBurstLimit: 50, throttlingRateLimit: 25 };
 
+    // Nightly refresh + weekly digests. The secret is shared with the site (CRON_SECRET) and never logged.
+    const cronSecret = new secretsmanager.Secret(this, "CronSecret", {
+      description: "Shared secret for the site's /api/cron endpoints",
+      generateSecretString: { passwordLength: 48, excludePunctuation: true },
+    });
+    const mail = new ses.EmailIdentity(this, "MailDomain", { identity: ses.Identity.domain(props.mailDomain) });
+    const nightly = new NodejsFunction(this, "Nightly", {
+      entry: path.join(__dirname, "..", "lambda", "nightly.ts"),
+      handler: "handler",
+      runtime: lambda.Runtime.NODEJS_22_X,
+      architecture: lambda.Architecture.ARM_64,
+      memorySize: 256,
+      timeout: Duration.minutes(15),
+      environment: { SITE_URL: props.siteUrl, SECRET_ARN: cronSecret.secretArn, FROM_ADDRESS: props.fromAddress },
+      logGroup: new logs.LogGroup(this, "NightlyLogs", { retention: logs.RetentionDays.ONE_MONTH, removalPolicy: RemovalPolicy.DESTROY }),
+      bundling: { externalModules: ["@aws-sdk/*"], minify: true, sourceMap: true },
+    });
+    cronSecret.grantRead(nightly);
+    mail.grantSendEmail(nightly);
+    // 10:00 UTC = 3am Pacific (daylight time).
+    new events.Rule(this, "NightlySchedule", { schedule: events.Schedule.cron({ minute: "0", hour: "10" }), targets: [new targets.LambdaFunction(nightly, { retryAttempts: 0 })] });
+
+    new CfnOutput(this, "CronSecretArn", { value: cronSecret.secretArn });
+    new CfnOutput(this, "NightlyFunction", { value: nightly.functionName });
     new CfnOutput(this, "Region", { value: this.region });
     new CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
     new CfnOutput(this, "UserPoolClientId", { value: client.userPoolClientId });

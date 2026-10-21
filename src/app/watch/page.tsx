@@ -2,7 +2,9 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { watchKey } from "@/lib/watch/key";
 import { feedToken, listWatches, MAX_WATCHES } from "@/lib/watch";
-import { CopyField, ForgetButton, WatchRow } from "@/components/watch/WatchControls";
+import { CopyField, DigestToggle, ForgetButton, WatchRow } from "@/components/watch/WatchControls";
+import { getDigest } from "@/lib/watch/digest";
+import { currentUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Watchlist · RarePath Atlas", robots: { index: false } };
@@ -10,6 +12,8 @@ export const metadata = { title: "Watchlist · RarePath Atlas", robots: { index:
 export default async function WatchPage() {
   const { key, account } = await watchKey();
   const watches = key ? await listWatches(key) : [];
+  const user = account ? await currentUser() : null;
+  const digest = account && key ? await getDigest(key) : null;
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
   return (
@@ -36,6 +40,12 @@ export default async function WatchPage() {
               <WatchRow key={w.id} query={w.query} label={w.label} lastSeen={w.last_seen_at} />
             ))}
           </ul>
+          {user && (
+            <section className="rounded-2xl border border-line bg-white p-5">
+              <h2 className="mb-2 text-xs font-bold tracking-wide text-muted uppercase">Email alerts</h2>
+              <DigestToggle enabled={!!digest?.enabled} email={user.email} verified={user.emailVerified} />
+            </section>
+          )}
           <section className="rounded-2xl border border-line bg-white p-5 text-sm">
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted">Get alerts in a feed reader</h2>
             <p className="mt-1 text-muted">

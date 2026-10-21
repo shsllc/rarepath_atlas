@@ -173,3 +173,37 @@ export function CopyField({ value }: { value: string }) {
     </span>
   );
 }
+
+export function DigestToggle({ enabled: initial, email, verified }: { enabled: boolean; email: string; verified: boolean }) {
+  const [enabled, setEnabled] = useState(initial);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+  return (
+    <div className="space-y-1">
+      <label className="flex items-start gap-3 text-sm" htmlFor="digest-toggle">
+        <input
+          id="digest-toggle"
+          type="checkbox"
+          className="mt-1 h-4 w-4"
+          checked={enabled}
+          disabled={busy || !verified}
+          onChange={async (e) => {
+            const next = e.target.checked;
+            setBusy(true);
+            setError(undefined);
+            const res = await fetch("/api/watch", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "digest", enabled: next }) });
+            const j = await res.json().catch(() => ({}));
+            setBusy(false);
+            if (!res.ok) return setError(j.error ?? "Could not change this setting.");
+            setEnabled(!!j.enabled);
+          }}
+        />
+        <span>
+          <strong>Email me a weekly digest</strong> of new research on these searches, at {email}. Only when something is new. Every email has a one-click unsubscribe link.
+        </span>
+      </label>
+      {!verified && <p className="text-xs text-muted">Confirm your email address to turn this on.</p>}
+      {error && <p className="text-xs text-contradictory">{error}</p>}
+    </div>
+  );
+}
