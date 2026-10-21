@@ -32,6 +32,9 @@ export interface ReviewItem {
   status: ReviewStatus;
   decision?: { by: string; by_name: string; by_org?: string; at: string; outcome: ReviewOutcome; confidence?: Confidence; note: string; source_checked: boolean };
   revoked?: { by: string; by_name: string; at: string; note: string };
+  /** AI pre-check: a drafted decision for the reviewer to confirm. Never applied automatically. */
+  precheck?: import("./precheck").Precheck;
+  precheck_error?: string;
 }
 
 export interface AuditEvent {
@@ -110,6 +113,18 @@ export async function propose(preview: DiscoveryPreview, linkKey: string, by: Re
   if (!created) return { item: (await getStore().get<ReviewItem>(K.item(id)))!, created: false };
   await audit(by, "proposed", item, now);
   return { item, created: true };
+}
+
+/** Store an AI pre-check (or its failure) on a pending item. */
+export async function savePrecheck(id: string, result: { precheck?: import("./precheck").Precheck; error?: string }) {
+  const item = await getItem(id);
+  if (!item || item.status !== "pending") return null;
+  if (result.precheck) {
+    item.precheck = result.precheck;
+    delete item.precheck_error;
+  } else item.precheck_error = (result.error ?? "The pre-check failed.").slice(0, 200);
+  await getStore().set(K.item(id), item);
+  return item;
 }
 
 export async function getItem(id: string) {

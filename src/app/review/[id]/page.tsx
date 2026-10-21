@@ -4,6 +4,7 @@ import { currentReviewer } from "@/lib/review/http";
 import { getItem } from "@/lib/review/queue";
 import { DecisionForm, RevokeForm } from "@/components/review/ReviewActions";
 import { EvidenceTierChip } from "@/components/EvidenceTierChip";
+import { getServices } from "@/lib/services/registry";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Review item · RarePath Atlas", robots: { index: false } };
@@ -77,7 +78,7 @@ export default async function ReviewItemPage({ params }: { params: Promise<{ id:
       {item.status === "pending" && (
         <section className="rounded-2xl border border-line bg-white p-6">
           <h2 className="mb-3 font-bold">Your decision</h2>
-          <DecisionForm id={item.id} />
+          <DecisionForm id={item.id} precheck={item.precheck} precheckError={item.precheck_error} aiEnabled={getServices().ai.configured()} />
         </section>
       )}
       {item.decision && (
