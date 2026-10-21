@@ -21,6 +21,13 @@ export const FACTOR_WEIGHTS: Record<FactorKind, { points: number; label: string 
   historical_link: { points: 1, label: "Historical research connection (context only)" },
 };
 
+/**
+ * How many of each factor can score. Rule-promoted registries and annotations can list dozens of shared
+ * trials or features; caps keep a pile of common features from looking like a strong research connection
+ * (features alone stay below the Moderate band). Extra matches are still listed, but not scored.
+ */
+export const FACTOR_CAPS: Partial<Record<FactorKind, number>> = { shared_study: 3, shared_asset: 3, shared_phenotype: 2 };
+
 export type CautionKind = "contradicted_classification" | "clinical_differences" | "no_mechanism_evidence" | "no_treatment_transfer_evidence";
 
 export const CAUTION_LABEL: Record<CautionKind, string> = {
@@ -109,11 +116,31 @@ export function rankResearchConnections(nodes: GraphNode[], allEdges: EvidenceEd
     // The graph has no treatment predicates at all; state that explicitly rather than leave it implied.
     cautions.push({ kind: "no_treatment_transfer_evidence", detail: CAUTION_LABEL.no_treatment_transfer_evidence, evidence_edge_ids: [] });
 
+    capFactors(factors);
     const score = factors.reduce((n, f) => n + f.points, 0);
     return { disease_id: d, score, band: band(score), factors, cautions };
   });
 
   return ranked.filter((r) => r.score > 0).sort((a, b) => b.score - a.score || a.disease_id.localeCompare(b.disease_id));
+}
+
+/** Keep at most FACTOR_CAPS[kind] scoring factors of each kind; fold the rest into a note on the last one. */
+function capFactors(factors: RankFactor[]) {
+  // The same study or feature can be supported by both a reviewed and a source-curated edge: score it once.
+  for (let i = factors.length - 1; i >= 0; i--) {
+    const first = factors.findIndex((f) => f.kind === factors[i].kind && f.detail === factors[i].detail);
+    if (first < i) {
+      factors[first].evidence_edge_ids = [...new Set([...factors[first].evidence_edge_ids, ...factors[i].evidence_edge_ids])];
+      factors.splice(i, 1);
+    }
+  }
+  for (const [kind, cap] of Object.entries(FACTOR_CAPS) as [FactorKind, number][]) {
+    const of = factors.filter((f) => f.kind === kind);
+    if (of.length <= cap) continue;
+    const extra = of.slice(cap);
+    of[cap - 1].detail += ` (and ${extra.length} more, not scored)`;
+    for (const f of extra) factors.splice(factors.indexOf(f), 1);
+  }
 }
 
 /** Studies/infrastructure that connect the most disease communities (simple degree centrality on reviewed edges). */

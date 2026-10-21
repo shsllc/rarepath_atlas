@@ -8,6 +8,7 @@ import { OpenAIPathExplainerImpl } from "./openai/path-explainer";
 import { getOpenAI } from "./openai/client";
 import { MultiProviderDiscoveryService } from "@/lib/discovery";
 import { reviewedGraph } from "@/lib/review/graph";
+import { promoteFromPreview } from "@/lib/curation/store";
 
 /**
  * Single wiring point. Loads the verified real bundle by default
@@ -25,7 +26,7 @@ function build() {
     graph,
     finder,
     discovery,
-    search: new GraphSearchService(graph, finder, discovery, () => reviewedGraph(graph)),
+    search: new GraphSearchService(graph, finder, discovery, () => reviewedGraph(graph), (p) => promoteFromPreview(p, graph.bundle().nodes, graph.bundle().focus_disease_id)),
     /** Bundle + queue-accepted edges. */
     reviewedGraph: () => reviewedGraph(graph),
     ai: {

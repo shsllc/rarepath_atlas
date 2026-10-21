@@ -1,7 +1,7 @@
 "use client";
 
 import type { ActionBrief, Collaborator, EvidenceEdge, GraphNode } from "@/lib/schemas";
-import { BAND_THRESHOLDS, FACTOR_WEIGHTS, type RankedConnection, type ResearchHub } from "@/lib/analytics";
+import { BAND_THRESHOLDS, FACTOR_CAPS, FACTOR_WEIGHTS, type RankedConnection, type ResearchHub } from "@/lib/analytics";
 
 type Open = (title: string, edgeIds: string[]) => void;
 
@@ -38,15 +38,19 @@ export function RankingFormula() {
       <details className="rounded-2xl border border-line bg-white px-4 py-3 text-sm">
         <summary className="cursor-pointer font-medium">How this ranking is calculated</summary>
         <ul className="mt-2 space-y-1 text-muted">
-          {Object.values(FACTOR_WEIGHTS).map((w) => (
+          {(Object.entries(FACTOR_WEIGHTS) as [keyof typeof FACTOR_WEIGHTS, (typeof FACTOR_WEIGHTS)[keyof typeof FACTOR_WEIGHTS]][]).map(([k, w]) => (
             <li key={w.label}>
               <strong className="text-ink">+{w.points}</strong> {w.label}
+              {FACTOR_CAPS[k] ? ` (each, up to ${FACTOR_CAPS[k]})` : ""}
             </li>
           ))}
           <li>
             Bands: Strongest ≥ {BAND_THRESHOLDS.strongest} points; Moderate ≥ {BAND_THRESHOLDS.moderate}; otherwise Limited.
           </li>
-          <li>Only analyst-reviewed, sourced relationships count. AI-only extractions, inferred and contradicted links add no points. Counterweights are always listed.</li>
+          <li>
+            Only reviewed relationships count: analyst-reviewed, or source-curated by a published rule from an expert-curated source. Machine-assembled, AI-only, inferred and contradicted links add no
+            points. Counterweights are always listed.
+          </li>
         </ul>
         <p className="mt-2 text-xs text-muted">
           This ranks research paths worth investigating. It is not a measure of biological, clinical or treatment similarity.

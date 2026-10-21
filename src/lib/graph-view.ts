@@ -44,14 +44,21 @@ export const EDGE_STATUS_CLASS: Record<EvidenceStatus, string> = {
 export const isUnreviewedAiEdge = (e: EvidenceEdge) => e.evidence_type === "llm_extraction" || e.id.startsWith("edge:ai:");
 /** Discovery-layer edges assembled from structured research APIs at query time. Never reviewed. */
 export const isMachineAssembledEdge = (e: EvidenceEdge) =>
-  !isQueueReviewedEdge(e) && (e.review_status === "machine_assembled" || e.evidence_type === "machine_assembled" || e.source_type === "research_platform" || e.id.startsWith("edge:disc:"));
+  !isQueueReviewedEdge(e) && !isSourceCuratedEdge(e) && (e.review_status === "machine_assembled" || e.evidence_type === "machine_assembled" || e.source_type === "research_platform" || e.id.startsWith("edge:disc:"));
 /** Promoted through the review queue: explicit reviewed status AND a complete, source-checked review record. */
 export const isQueueReviewedEdge = (e: EvidenceEdge) =>
   e.review_status === "reviewed" && e.id.startsWith("edge:rev:") && !!e.review && !!e.review.by && !!e.review.at && e.review.source_checked === true;
-/** The single eligibility gate for ranking and actions: analyst-reviewed, not AI-only, not machine-assembled. */
+/** Promoted automatically by a published rule from an expert-curated source: explicit status AND a complete rule record. */
+export const isSourceCuratedEdge = (e: EvidenceEdge) =>
+  e.review_status === "source_curated" && e.id.startsWith("edge:sc:") && !!e.curation && !!e.curation.rule && !!e.curation.rule_version && !!e.curation.promoted_at;
+/**
+ * The single eligibility gate for ranking and actions: analyst-reviewed or source-curated by rule, not AI-only,
+ * not machine-assembled.
+ */
 export const isReviewedEvidenceEdge = (e: EvidenceEdge) => {
-  // Claiming "reviewed" without a review record is never enough.
+  // Claiming "reviewed" or "source-curated" without the matching record is never enough.
   if (e.review_status === "reviewed" && !isQueueReviewedEdge(e)) return false;
+  if (e.review_status === "source_curated" && !isSourceCuratedEdge(e)) return false;
   return !isUnreviewedAiEdge(e) && !isMachineAssembledEdge(e) && e.eligible_for_ranking !== false;
 };
 

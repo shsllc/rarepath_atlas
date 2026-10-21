@@ -61,6 +61,11 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {reviewer.curator && (
+            <Link href="/review/curated" className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold">
+              Source-curated
+            </Link>
+          )}
           <Link href="/review/audit" className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-semibold">
             Audit log
           </Link>

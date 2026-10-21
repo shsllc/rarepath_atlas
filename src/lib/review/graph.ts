@@ -7,6 +7,7 @@ import type { EvidenceEdge, GraphBundle, GraphNode } from "@/lib/schemas";
 import { JsonGraphService } from "@/lib/services/graph-service";
 import type { GraphService } from "@/lib/services/interfaces";
 import { overlayGeneration, reviewedOverlay } from "./queue";
+import { curatedOverlay } from "@/lib/curation/store";
 
 export function mergeOverlay(b: GraphBundle, o: { nodes: GraphNode[]; edges: EvidenceEdge[] }): GraphBundle {
   const nodeIds = new Set(b.nodes.map((n) => n.id));
@@ -26,7 +27,9 @@ export async function reviewedGraph(base: JsonGraphService, now = Date.now()): P
   if (cache && cache.gen === gen && now - cache.at < TTL_MS) return cache.graph;
   let graph: GraphService = base;
   try {
-    const overlay = await reviewedOverlay();
+    // Queue-reviewed and rule-promoted (source-curated) claims, each carrying its own provenance record.
+    const [reviewed, curated] = await Promise.all([reviewedOverlay(), curatedOverlay().catch(() => ({ nodes: [], edges: [] }))]);
+    const overlay = { nodes: [...reviewed.nodes, ...curated.nodes], edges: [...reviewed.edges, ...curated.edges] };
     if (overlay.edges.length > 0) graph = new JsonGraphService(mergeOverlay(base.bundle(), overlay));
   } catch {
     // Storage unavailable: serve the committed reviewed bundle rather than failing the search.

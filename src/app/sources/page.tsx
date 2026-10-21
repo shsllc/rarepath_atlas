@@ -4,6 +4,8 @@ import { researchSources, type SourceUse } from "@/lib/research/registry";
 import { DiscoveryOrchestrator } from "@/lib/research/orchestrator";
 import { getServices } from "@/lib/services/registry";
 import { EvidenceTierChip } from "@/components/EvidenceTierChip";
+import { RULES, RULES_VERSION } from "@/lib/curation/rules";
+import { FACTOR_CAPS } from "@/lib/analytics";
 
 export const metadata: Metadata = { title: "Research sources · RarePath Atlas" };
 export const dynamic = "force-dynamic";
@@ -42,6 +44,27 @@ export default function SourcesPage() {
           <EvidenceTierChip tier="reviewed" />
         </div>
       </div>
+      <section id="curation-rules" className="space-y-3 rounded-2xl border-2 border-supported/40 bg-white p-5">
+        <div>
+          <h2 className="text-lg font-semibold">Source-curation rules (version {RULES_VERSION})</h2>
+          <p className="mt-1 text-sm text-muted">
+            Some sources are curations in their own right: expert panels, curated annotations, a registry&apos;s own fields. When a discovery record meets one of these published rules exactly, it is promoted
+            automatically and labelled <strong>Source-curated</strong>, with the rule, its version, the date and the source detail it relied on. Curators can withdraw any promoted claim, every promotion is
+            logged, and nothing else is promoted without a person reviewing it. OMIM-derived content is never promoted.
+          </p>
+        </div>
+        <ul className="space-y-2 text-sm">
+          {Object.entries(RULES).map(([id, r]) => (
+            <li key={id}>
+              <strong>{r.title}.</strong> {r.criteria}
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted">
+          Ranking caps keep long lists from dominating: shared studies and shared research assets score up to {FACTOR_CAPS.shared_study} each, and shared clinical features up to {FACTOR_CAPS.shared_phenotype}{" "}
+          points in total, so features alone never reach the Moderate band.
+        </p>
+      </section>
       <ul className="space-y-3">
         {sources.map((s) => {
           const last = s.mode === "live" ? DiscoveryOrchestrator.lastSuccess.get(LIVE_ID[s.name] as never) : lastOffline;

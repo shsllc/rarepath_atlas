@@ -25,6 +25,8 @@ export interface JourneyFact {
   quote: string;
   /** Present for queue-reviewed edges. */
   review?: { by_name: string; by_org?: string; at: string; note: string };
+  /** Present for edges promoted by a published source-curation rule. */
+  curation?: { rule_title: string; detail: string; promoted_at: string };
 }
 
 export interface GeneratedBrief {
@@ -88,6 +90,7 @@ export function buildJourney(bundle: Pick<GraphBundle, "nodes" | "edges">, disea
           source_url: e.source_url,
           quote: e.quoted_or_structured_evidence,
           review: e.review ? { by_name: e.review.by_name, by_org: e.review.by_org, at: e.review.at, note: e.review.note } : undefined,
+          curation: e.curation ? { rule_title: e.curation.rule_title, detail: e.curation.detail, promoted_at: e.curation.promoted_at } : undefined,
         } satisfies JourneyFact,
       ];
     });

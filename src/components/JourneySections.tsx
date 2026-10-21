@@ -54,6 +54,12 @@ function Fact({ f, focus, open }: { f: JourneyFact; focus: string; open: Open })
           Evidence
         </button>
       </span>
+      {f.curation && (
+        <span className="mt-1 block text-[11px] text-muted">
+          <span className="mr-1 rounded border border-supported/40 bg-teal-wash px-1.5 py-0.5 font-semibold text-supported">Source-curated</span>
+          {f.curation.rule_title}: {f.curation.detail}. Promoted by a published rule on {f.curation.promoted_at.slice(0, 10)}.
+        </span>
+      )}
       {f.review && (
         <span className="mt-1 block text-[11px] text-muted">
           Reviewed by {f.review.by_name}

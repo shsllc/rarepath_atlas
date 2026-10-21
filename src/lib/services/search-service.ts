@@ -15,6 +15,8 @@ export class GraphSearchService implements SearchService {
     private readonly discovery?: DiscoveryService,
     /** The live reviewed graph (bundle + queue-accepted edges). Defaults to the bundle alone. */
     private readonly graphSource?: () => Promise<GraphService>,
+    /** Applies the source-curation rules to a discovery preview; true when the graph changed. */
+    private readonly promoter?: (preview: DiscoveryPreview) => Promise<boolean>,
   ) {}
 
   /** Disease, its causal genes, and those genes' mechanisms route to the disease page. */
@@ -31,7 +33,7 @@ export class GraphSearchService implements SearchService {
   }
 
   /** `preview` is passed through when a discovery result resolved to a disease the reviewed graph holds. */
-  async search(query: string, preview?: DiscoveryPreview): Promise<SearchResponse> {
+  async search(query: string, preview?: DiscoveryPreview, promoted = false): Promise<SearchResponse> {
     const graph = (await this.graphSource?.()) ?? this.graph;
     const b = graph.bundle();
     const focusLabel = graph.getNode(b.focus_disease_id)?.label ?? "the seeded disease";
@@ -42,9 +44,11 @@ export class GraphSearchService implements SearchService {
       if (this.discovery) {
         const outcome = await this.discovery.preview(query);
         if (outcome.kind === "preview") {
+          // Expert-curated claims are promoted by rule, then the search runs once more on the updated graph.
+          if (!promoted && this.promoter && (await this.promoter(outcome.preview))) return this.search(query, outcome.preview, true);
           // Reviewed wins: if the API resolves to a disease the reviewed graph already holds, show the reviewed view.
           const reviewedTwin = b.nodes.find((n) => n.type === "Disease" && n.external_ids.some((x) => x.id === outcome.preview.disease.id));
-          if (reviewedTwin && norm(reviewedTwin.label) !== norm(query)) return this.search(reviewedTwin.label, outcome.preview);
+          if (reviewedTwin && norm(reviewedTwin.label) !== norm(query)) return this.search(reviewedTwin.label, outcome.preview, true);
           return { query, found: false, discovery: true, preview: outcome.preview, full_journey: { label: focusLabel, query: "CDKL5" } };
         }
         if (outcome.kind === "unavailable") {
@@ -79,6 +83,7 @@ export class GraphSearchService implements SearchService {
           const outcome = await this.discovery.preview(focus.label);
           if (outcome.kind === "preview") preview = outcome.preview;
         }
+        if (!promoted && preview && this.promoter && (await this.promoter(preview))) return this.search(query, preview, true);
         const journey = buildJourney(b, focus.id);
         const ids = new Set([
           ...coverage.reviewed_edge_ids,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { researchSources } from "@/lib/research/registry";
-import { FACTOR_WEIGHTS } from "@/lib/analytics";
+import { FACTOR_CAPS, FACTOR_WEIGHTS } from "@/lib/analytics";
 import { BRAND } from "@/lib/brand";
 import { accountsEnabled } from "@/lib/auth/session";
 
@@ -68,7 +68,10 @@ export default function ResearchPage() {
               {Object.entries(FACTOR_WEIGHTS).map(([k, f]) => (
                 <tr key={k} className="border-b border-line last:border-0">
                   <td className="py-2.5 pr-4">{f.label}</td>
-                  <td className="py-2.5 font-mono tabular-nums">+{f.points}</td>
+                  <td className="py-2.5 font-mono tabular-nums whitespace-nowrap">
+                    +{f.points}
+                    {FACTOR_CAPS[k as keyof typeof FACTOR_CAPS] ? <span className="text-muted"> each, max {FACTOR_CAPS[k as keyof typeof FACTOR_CAPS]}</span> : null}
+                  </td>
                 </tr>
               ))}
             </tbody>

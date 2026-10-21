@@ -118,9 +118,20 @@ export const EvidenceEdge = z.object({
    * Evidence tier. Absent = the curated bundle's own edge (reviewed unless it is an OpenAI-only extraction).
    * "machine_assembled" edges come from the discovery layer and can never rank or drive actions.
    */
-  review_status: z.enum(["reviewed", "machine_assembled"]).optional(),
+  review_status: z.enum(["reviewed", "source_curated", "machine_assembled"]).optional(),
   eligible_for_ranking: z.boolean().optional(),
   eligible_for_action: z.boolean().optional(),
+  /** Present only on edges promoted automatically by a published rule from an expert-curated source. */
+  curation: z
+    .object({
+      rule: z.string(),
+      rule_title: z.string(),
+      rule_version: z.string(),
+      promoted_at: z.string(),
+      /** Source-native detail the rule relied on, e.g. a ClinGen classification. */
+      detail: z.string(),
+    })
+    .optional(),
   /** Present only on edges promoted by a signed-in reviewer through the review queue. */
   review: z
     .object({

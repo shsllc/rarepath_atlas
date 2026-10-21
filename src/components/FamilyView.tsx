@@ -41,12 +41,12 @@ function ConnectionCard({ focus, top, label, others }: { focus: string; top: Ran
   return (
     <section className="space-y-5 rounded-3xl border border-line bg-white p-6 sm:p-8">
       <div className="space-y-2">
-        <p className="text-sm text-muted">{focus} · from reviewed evidence</p>
+        <p className="text-sm text-muted">{focus} · from reviewed and expert-curated sources</p>
         <h2 className="font-display text-2xl font-bold sm:text-3xl">The closest research community is {label(top.disease_id)}</h2>
         <div className="max-w-md space-y-1">
           <Meter score={top.score} />
           <p className="text-sm text-muted">
-            {top.band} research connection · {top.score} points from reviewed research links. This measures shared research, not how alike the conditions are.
+            {top.band} research connection · {top.score} point{top.score === 1 ? "" : "s"} from reviewed research links. This measures shared research, not how alike the conditions are.
           </p>
         </div>
       </div>
@@ -76,7 +76,7 @@ function ConnectionCard({ focus, top, label, others }: { focus: string; top: Ran
       </div>
       {others.length > 0 && (
         <p className="text-sm text-muted">
-          Also connected through research: {others.map((o) => `${label(o.disease_id)} (${o.score} points)`).join(", ")}.
+          Also connected through research: {others.map((o) => `${label(o.disease_id)} (${o.score} point${o.score === 1 ? "" : "s"})`).join(", ")}.
         </p>
       )}
     </section>

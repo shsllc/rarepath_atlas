@@ -191,6 +191,11 @@ function EdgeQuote({ edge }: { edge?: EvidenceEdge }) {
   if (!edge) return null;
   return (
     <p className="mt-1 text-xs text-muted">
+      {edge.curation && (
+        <span className="mr-1 rounded border border-supported/40 bg-teal-wash px-1.5 py-0.5 font-semibold text-supported" title={`${edge.curation.rule_title}: ${edge.curation.detail}`}>
+          Source-curated
+        </span>
+      )}
       &ldquo;{edge.quoted_or_structured_evidence}&rdquo;{" "}
       <a href={edge.source_url} target="_blank" rel="noreferrer" className="whitespace-nowrap text-brand hover:underline">
         {edge.source} ↗
@@ -229,7 +234,7 @@ export function PartialDiseaseView({ result }: { result: PartialDiseaseResult })
         <div role="note" className="mt-4 rounded-xl border border-dashed border-unknown bg-unknown-bg px-4 py-3 text-sm text-ink">
           <strong>{result.banner}</strong>
           <span className="mt-1 block text-xs text-muted">
-            Only reviewed relationships are shown. The ranking and brief below are built by fixed rules from those relationships alone; no hand-curated brief exists for this disease yet.
+            Only reviewed relationships are shown: checked by a reviewer, or promoted by a published rule from an expert-curated source such as ClinGen, Orphanet or a trial registry. The ranking and brief below are built by fixed rules from those relationships alone.
           </span>
         </div>
         <div className="mt-4">

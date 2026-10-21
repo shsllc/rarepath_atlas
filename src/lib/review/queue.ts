@@ -38,7 +38,8 @@ export interface AuditEvent {
   id: string;
   at: string;
   actor: { id: string; name: string };
-  action: "proposed" | "accepted" | "rejected" | "revoked";
+  /** Queue actions, plus rule-based promotion of source-curated claims and their withdrawal. */
+  action: "proposed" | "accepted" | "rejected" | "revoked" | "auto_promoted" | "withdrawn";
   item_id: string;
   summary: string;
   note?: string;
@@ -48,6 +49,10 @@ let auditSeq = 0;
 /** Bumped whenever this instance changes the reviewed overlay, so cached graphs refresh immediately. */
 let generation = 0;
 export const overlayGeneration = () => generation;
+/** Called by other overlay writers (source-curated rules) so cached graphs refresh at once. */
+export const bumpOverlayGeneration = () => {
+  generation++;
+};
 const K = {
   item: (id: string) => `review/items/${id}`,
   // The per-process sequence keeps events written in the same millisecond in order.
@@ -66,6 +71,13 @@ export class ReviewError extends Error {
 }
 
 const itemIdFor = (diseaseId: string, linkKey: string) => crypto.createHash("sha256").update(`${diseaseId}|${linkKey}`).digest("hex").slice(0, 20);
+
+/** Append an audit event that is not tied to a queue item (e.g. rule-based promotion). */
+export async function appendAudit(actor: { id: string; name: string }, action: AuditEvent["action"], summary: string, now: Date, note?: string, itemId = "") {
+  const at = now.toISOString();
+  const ev: AuditEvent = { id: crypto.randomBytes(6).toString("hex"), at, actor, action, item_id: itemId, summary: summary.slice(0, 240), note };
+  await getStore().create(K.audit(at, ev.id), ev);
+}
 
 async function audit(actor: Reviewer, action: AuditEvent["action"], item: ReviewItem, now: Date, note?: string) {
   const at = now.toISOString();
@@ -116,7 +128,7 @@ export async function listAudit(limit = 200): Promise<AuditEvent[]> {
   return (await Promise.all(keys.map((k) => getStore().get<AuditEvent>(k)))).filter((x): x is AuditEvent => !!x);
 }
 
-const SOURCE_TYPE: Record<ProviderId, SourceType> = {
+export const SOURCE_TYPE: Record<ProviderId, SourceType> = {
   europepmc: "literature",
   openalex: "literature",
   crossref: "literature",

@@ -27,9 +27,13 @@ export default async function AuditPage() {
         {events.map((e) => (
           <li key={e.id} className="p-3">
             <span className="font-mono text-xs text-muted">{e.at.slice(0, 19).replace("T", " ")}</span> <strong>{e.actor.name}</strong> {e.action}{" "}
-            <Link href={`/review/${e.item_id}`} className="text-brand hover:underline">
-              {e.summary}
-            </Link>
+            {e.item_id ? (
+              <Link href={`/review/${e.item_id}`} className="text-brand hover:underline">
+                {e.summary}
+              </Link>
+            ) : (
+              <span>{e.summary}</span>
+            )}
             {e.note && <span className="block text-xs text-muted">Note: {e.note}</span>}
           </li>
         ))}
