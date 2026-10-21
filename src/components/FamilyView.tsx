@@ -37,6 +37,31 @@ function Mark({ kind }: { kind: "yes" | "no" }) {
   );
 }
 
+/** A research connection worth headlining: a shared study, research tool or published link, not shared features alone. */
+const isResearchLink = (r: RankedConnection) => r.factors.some((f) => f.kind !== "shared_phenotype");
+
+/** Headline card, or an honest "no shared research yet" when only clinical features overlap. */
+function Connections({ focus, ranked, label, factCount }: { focus: string; ranked: RankedConnection[]; label: (id: string) => string; factCount: number }) {
+  const research = ranked.filter(isResearchLink);
+  if (research[0]) return <ConnectionCard focus={focus} top={research[0]} label={label} others={research.slice(1, 4)} />;
+  const featureOnly = ranked.filter((r) => !isResearchLink(r)).slice(0, 3);
+  return (
+    <section className="space-y-3 rounded-3xl border border-line bg-white p-6 sm:p-8">
+      <p className="text-sm text-muted">{focus} · from reviewed and expert-curated sources</p>
+      <h2 className="font-display text-2xl font-bold">No shared research with another condition yet</h2>
+      <p>
+        {factCount} checked finding{factCount === 1 ? "" : "s"} so far. None of the other conditions in RarePath shares a study, a research tool or a published link with {focus} yet. This
+        changes as more conditions are added and reviewed.
+      </p>
+      {featureOnly.length > 0 && (
+        <p className="text-sm text-muted">
+          Some recorded clinical features also appear in {featureOnly.map((r) => label(r.disease_id)).join(", ")}. Sharing features alone does not mean the research, the cause or the treatment is related.
+        </p>
+      )}
+    </section>
+  );
+}
+
 function ConnectionCard({ focus, top, label, others }: { focus: string; top: RankedConnection; label: (id: string) => string; others: RankedConnection[] }) {
   return (
     <section className="space-y-5 rounded-3xl border border-line bg-white p-6 sm:p-8">
@@ -132,7 +157,7 @@ export function FamilyJourneyView({ result }: { result: SearchResult }) {
   const b = result.action_brief;
   return (
     <div className="space-y-6">
-      {ranked[0] && <ConnectionCard focus={focus} top={ranked[0]} label={label} others={ranked.slice(1, 4)} />}
+      {ranked.length > 0 && <Connections focus={focus} ranked={ranked} label={label} factCount={result.edges.length} />}
       {b && <BriefCard query={result.query} opportunity={b.opportunity.text} question={b.question.text} nextStep={b.this_week?.next_step.text} generated={false} />}
       <PeopleCount n={result.collaborators.length} query={result.query} />
       <ResearchLink query={result.query} />
@@ -164,16 +189,7 @@ export function FamilyPartialView({ result }: { result: PartialDiseaseResult }) 
   const b = j.brief;
   return (
     <div className="space-y-6">
-      {j.ranked[0] ? (
-        <ConnectionCard focus={focus} top={j.ranked[0]} label={label} others={j.ranked.slice(1, 4)} />
-      ) : (
-        <section className="space-y-2 rounded-3xl border border-line bg-white p-6 sm:p-8">
-          <h2 className="font-display text-2xl font-bold">{focus}</h2>
-          <p>
-            {j.facts.length} reviewed finding{j.facts.length === 1 ? "" : "s"} so far. No other condition shares a reviewed study or research tool with it yet, so there is no ranking.
-          </p>
-        </section>
-      )}
+      <Connections focus={focus} ranked={j.ranked} label={label} factCount={j.facts.length} />
       {b && <BriefCard query={result.query} opportunity={b.opportunity} question={b.question} generated />}
       {result.preview && <DiscoverySummary preview={result.preview} />}
       <ResearchLink query={result.query} />
