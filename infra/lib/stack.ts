@@ -105,7 +105,8 @@ export class BackendStack extends Stack {
       description: "Shared secret for the site's /api/cron endpoints",
       generateSecretString: { passwordLength: 48, excludePunctuation: true },
     });
-    const mail = new ses.EmailIdentity(this, "MailDomain", { identity: ses.Identity.domain(props.mailDomain) });
+    // The sending domain is already verified in SES for this account (DKIM), so it is referenced, not created.
+    const mail = ses.EmailIdentity.fromEmailIdentityName(this, "MailDomain", props.mailDomain);
     const nightly = new NodejsFunction(this, "Nightly", {
       entry: path.join(__dirname, "..", "lambda", "nightly.ts"),
       handler: "handler",

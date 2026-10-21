@@ -161,6 +161,17 @@ Machine-assembled relationships only enter the reviewed graph through a human re
 - **Sign-in:** no external service. `REVIEWERS` holds `id:Display Name:<sha256 of access key>` entries separated by `;`, and `SESSION_SECRET` (≥ 32 chars) signs a 12-hour HttpOnly cookie. Create an entry with `npx tsx scripts/reviewer-key.ts "Display Name"`. Without both variables the deployment stays read-only.
 - **Storage:** Netlify Blobs in production, `data/.store/` (gitignored) locally, in-memory in tests (`src/lib/store`).
 
+## Source-curated evidence and automation
+
+Three evidence tiers: **reviewed** (a person checked the source), **source-curated** (promoted automatically by a published rule from an expert-curated source) and **machine-assembled** (discovery only, never counted).
+
+- **Rules** (`src/lib/curation/rules.ts`, versioned, listed on `/sources#curation-rules`): ClinGen validity Definitive/Strong/Moderate (Disputed/Refuted become counter-evidence); Orphanet "Disease-causing" genes with status Assessed; ClinicalTrials.gov records that list the disease's exact name or a synonym as a condition; Orphanet and Orphanet-sourced HPO phenotypes with a stated frequency. OMIM-derived content is never promoted, and the hand-curated focus journey is never changed.
+- **Provenance:** every promoted edge records its rule, version, date and source detail, and passes the evidence gate only with that record. Promotions are logged; curators withdraw any claim at `/review/curated`, and withdrawn claims are never re-promoted.
+- **Ranking caps:** shared studies and research assets score up to three each, shared clinical features up to two points in total.
+- **AI pre-checks:** a claim sent to review gets an OpenAI-drafted outcome, confidence and note from the source material RarePath holds. The reviewer confirms; nothing is decided automatically.
+- **Nightly job** (`infra/lambda/nightly.ts`, 10:00 UTC): refreshes seed rare diseases, the bundle's diseases, promoted diseases and every watched search, then sends due weekly digests through Amazon SES. Site cron endpoints require `CRON_SECRET` (Secrets Manager → Netlify).
+- **Email digests:** opt-in on `/watch` for signed-in accounts, to the verified address only, with one-click unsubscribe.
+
 ## Watchlists and alerts
 
 Any search can be watched from the results page (up to 10 per browser), with no account.
